@@ -1,3 +1,6 @@
+# Local assets (PDFs, images, references — not committed)
+assets/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]
