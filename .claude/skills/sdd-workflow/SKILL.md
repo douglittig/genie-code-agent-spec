@@ -1,62 +1,132 @@
 ---
 name: sdd-workflow
 description: |
-  Spec-Driven Development workflow guidance for structured feature development.
-  Use PROACTIVELY when the user discusses building features, planning implementations, capturing requirements,
-  designing architectures, or shipping completed work. Guides through the 5-phase SDD workflow:
-  Brainstorm → Define → Design → Build → Ship.
+  Spec-Driven Development (SDD) workflow for Genie Code. Use PROACTIVELY when
+  the user discusses building features, reading specs from Confluence, generating
+  code from business requirements, updating Jira tickets, creating PRs, or
+  reviewing code. Guides through the 5-phase workflow:
+  Brainstorm → Define → Design → Build → Ship,
+  with Confluence MCP (spec ingestion) and Jira MCP (ticket update) integrated.
 ---
 
-# SDD Workflow Guide
+# SDD Workflow — Genie Code
 
-You are the Spec-Driven Development workflow assistant. Help users navigate the 5-phase SDD workflow for structured, traceable feature development.
+Spec-Driven Development transforma requisitos em código rastreável. Cada arquivo gerado
+é vinculado ao requisito que o originou — sem "vibe coding", sem specs que ninguém lê.
 
-## Phases
+## Fluxo Completo
 
-| Phase | Command | Output | Purpose |
-|-------|---------|--------|---------|
-| 0 | `/agentspec:brainstorm` | `BRAINSTORM_{FEATURE}.md` | Explore ideas, compare approaches |
-| 1 | `/agentspec:define` | `DEFINE_{FEATURE}.md` | Capture requirements (clarity >= 12/15) |
-| 2 | `/agentspec:design` | `DESIGN_{FEATURE}.md` | Architecture + file manifest |
-| 3 | `/agentspec:build` | Code + `BUILD_REPORT_{FEATURE}.md` | Implementation with tests |
-| 4 | `/agentspec:ship` | `SHIPPED_{DATE}.md` | Archive + lessons learned |
+```
+Confluence (SPEC) → DEFINE → DESIGN → BUILD → Jira (update) → PR → Review
+      ↑                                              ↓
+  (via MCP)                                      (via MCP)
+```
 
-## When to Guide
+## As 5 Fases
 
-- User says "I want to build..." → Suggest starting with `/agentspec:brainstorm` or `/agentspec:define`
-- User has requirements → Suggest `/agentspec:define` to structure them
-- User has a DEFINE doc → Suggest `/agentspec:design` to create architecture
-- User has a DESIGN doc → Suggest `/agentspec:build` to implement
-- User completed building → Suggest `/agentspec:ship` to archive
+| Fase | Output | Gate de qualidade |
+|------|--------|-------------------|
+| 0 — Brainstorm (opcional) | `BRAINSTORM_{FEATURE}.md` | Mín. 3 perguntas, 2 abordagens, YAGNI aplicado |
+| 1 — Define | `DEFINE_{FEATURE}.md` | Clarity Score ≥ 12/15 |
+| 2 — Design | `DESIGN_{FEATURE}.md` | Todos os arquivos têm agente atribuído |
+| 3 — Build | Código + `BUILD_REPORT_{FEATURE}.md` | Testes passam, atribuição por especialista |
+| 4 — Ship | `SHIPPED_{DATE}.md` + Jira atualizado | Lições capturadas |
 
-## Workflow Rules
+## Quando Guiar o Usuário
 
-1. **Phase 0 (Brainstorm)** is optional — skip for well-defined tasks
-2. **Phase 1 (Define)** requires clarity score >= 12/15 before advancing
-3. **Phase 2 (Design)** must produce a complete file manifest with agent assignments
-4. **Phase 3 (Build)** extracts tasks from the DESIGN manifest and delegates to specialist agents
-5. **Phase 4 (Ship)** archives everything and captures lessons learned
+- "Quero construir..." → Sugerir Brainstorm ou Define
+- "Tenha a SPEC no Confluence" → Ler via MCP e gerar Define
+- Tem DEFINE pronto → Sugerir Design
+- Tem DESIGN pronto → Executar Build
+- Build completo → Atualizar Jira, criar PR, review, ship
 
-## Cross-Phase Updates
+## Regras do Fluxo
 
-Use `/agentspec:iterate` to update any phase document when requirements change. It detects cascading impacts across phases.
+1. **Brainstorm** é opcional — pular para DEFINE se a SPEC já está clara
+2. **Define** exige Clarity Score ≥ 12/15 antes de avançar — se menor, pedir esclarecimentos
+3. **Design** deve ter File Manifest completo — nenhum arquivo sem agente atribuído
+4. **Build** delega cada arquivo ao agente especializado, gera BUILD_REPORT com atribuição
+5. **Ship** arquiva tudo e atualiza o Jira antes de fechar
 
-## Templates
+## Integração Confluence → Define
 
-Phase templates are available at `${CLAUDE_PLUGIN_ROOT}/sdd/templates/`:
-- `BRAINSTORM_TEMPLATE.md`
-- `DEFINE_TEMPLATE.md`
-- `DESIGN_TEMPLATE.md`
-- `BUILD_REPORT_TEMPLATE.md`
-- `SHIPPED_TEMPLATE.md`
+Quando o usuário fornecer uma URL ou page-id do Confluence:
 
-## Workflow Contracts
+1. Ler o conteúdo via MCP Confluence
+2. Extrair: objetivo, usuários, critérios de aceite, restrições, integrações
+3. Mapear para o template DEFINE (ver `templates/DEFINE_TEMPLATE.md`)
+4. Calcular Clarity Score — pedir esclarecimentos se < 12/15
+5. Salvar em `.claude/sdd/features/DEFINE_{FEATURE}.md`
 
-Phase transition rules are defined in `${CLAUDE_PLUGIN_ROOT}/sdd/architecture/WORKFLOW_CONTRACTS.yaml`.
+## Integração Jira → Ship
 
-## Output Locations
+Após BUILD e antes do archive:
 
-All SDD documents are written to the user's project workspace:
-- Features: `.claude/sdd/features/`
-- Reports: `.claude/sdd/reports/`
-- Archive: `.claude/sdd/archive/{FEATURE}/`
+1. Mover ticket para "In Review"
+2. Adicionar link do PR como comentário
+3. Após merge: mover para "Done" + link do commit
+
+## File Manifest (Design)
+
+Cada arquivo recebe um agente especializado do ecossistema Databricks:
+
+| Agente | Especialidade |
+|--------|--------------|
+| `@lakeflow-pipeline-builder` | SDP pipelines, autoloader, streaming tables |
+| `@spark-engineer` | PySpark, DataFrames, transformações |
+| `@spark-streaming-architect` | Streaming, checkpoints, stateful operations |
+| `@sql-optimizer` | SQL, performance, particionamento |
+| `@medallion-architect` | Bronze/Silver/Gold layers |
+| `@data-quality-analyst` | Testes de qualidade, assertions |
+| `@python-developer` | Scripts Python, SDK calls |
+| `@test-generator` | pytest, fixtures, suites de teste |
+| `@code-reviewer` | Review arquitetural, boas práticas |
+
+## Criação de PR e Review
+
+Após BUILD completo:
+
+1. Rodar review antes do PR: verificar acceptance tests do DEFINE, segurança, qualidade
+2. Criar PR com conventional commits (`feat:`, `fix:`, `refactor:`, `test:`, `chore:`)
+3. Bloqueadores que impedem merge: falha em acceptance test, credencial exposta, breaking change sem deprecation
+
+## Iterate (Mudanças Mid-Stream)
+
+Quando requisitos mudarem durante qualquer fase, propagar a mudança pelo pipeline:
+- Atualizar o documento da fase onde a mudança entrou
+- Verificar impacto cascata nas fases seguintes
+- Documentar no revision history do artefato
+
+## Localização dos Artefatos
+
+Todos os documentos SDD ficam no workspace do projeto:
+
+```
+.claude/sdd/
+├── features/       BRAINSTORM_*.md, DEFINE_*.md, DESIGN_*.md
+├── reports/        BUILD_REPORT_*.md
+└── archive/        {FEATURE}/ com todos os docs + SHIPPED_*.md
+```
+
+## Reference Files nesta Skill
+
+| Arquivo | Conteúdo |
+|---------|---------|
+| `templates/BRAINSTORM_TEMPLATE.md` | Template fase 0 |
+| `templates/DEFINE_TEMPLATE.md` | Template fase 1 (com Clarity Score) |
+| `templates/DESIGN_TEMPLATE.md` | Template fase 2 (com File Manifest) |
+| `templates/BUILD_REPORT_TEMPLATE.md` | Template fase 3 |
+| `templates/SHIPPED_TEMPLATE.md` | Template fase 4 |
+| `architecture/WORKFLOW_CONTRACTS.yaml` | Regras de transição entre fases |
+| `architecture/ARCHITECTURE.md` | Arquitetura completa do framework |
+| `commands/define.md` | Instrução detalhada da fase Define |
+| `commands/design.md` | Instrução detalhada da fase Design |
+| `commands/build.md` | Instrução detalhada da fase Build |
+| `commands/ship.md` | Instrução detalhada da fase Ship |
+| `commands/create-pr.md` | Criação de PR com conventional commits |
+| `commands/review.md` | Dual AI review (estático + arquitetural) |
+| `agents/define-agent.md` | Capacidades do agente de Define |
+| `agents/design-agent.md` | Capacidades do agente de Design |
+| `agents/build-agent.md` | Capacidades do agente de Build |
+| `agents/code-reviewer.md` | Capacidades do agente de review |
+| `agents/test-generator.md` | Capacidades do agente de testes |
