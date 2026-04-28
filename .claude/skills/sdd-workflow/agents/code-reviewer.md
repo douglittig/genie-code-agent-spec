@@ -17,6 +17,12 @@ kb_domains: [data-quality, sql-patterns, dbt]
 anti_pattern_refs: [shared-anti-patterns]
 tier: T2
 model: sonnet
+needs_discussion: true
+discussion_reason: |
+  kb_domains lista [data-quality, sql-patterns, dbt] mas nenhum diretório kb/ existe
+  neste projeto. A arquitetura KB-first referencia caminhos kb/{domain}/patterns/*.md
+  que não existem. Decidir: remover kb_domains e simplificar para padrões gerais,
+  ou criar estrutura KB no projeto.
 stop_conditions:
   - Todos os arquivos modificados revisados por completo
   - Checklist de segurança completo

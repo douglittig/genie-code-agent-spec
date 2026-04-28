@@ -1,6 +1,12 @@
 ---
 name: review
 description: Dual AI code review com análise estática + arquitetural para cobertura máxima
+needs_discussion: true
+discussion_reason: |
+  Frontmatter 'name:' implica slash command (/review), paradigma do Claude Code CLI.
+  Genie Code não tem slash commands — invocação é via @skill-name em Agent mode.
+  Adicionalmente: este arquivo é um command isolado mas code-reviewer.md em agents/
+  já cobre a funcionalidade. Decidir: manter duplicidade ou consolidar em agents/code-reviewer.md.
 ---
 
 # Review

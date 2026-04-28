@@ -1,6 +1,12 @@
 ---
 name: create-pr
 description: Crie pull requests com conventional commits e descrições estruturadas
+needs_discussion: true
+discussion_reason: |
+  Frontmatter 'name:' implica slash command (/create-pr), paradigma do Claude Code CLI.
+  Genie Code não tem slash commands — invocação é via @skill-name em Agent mode.
+  Adicionalmente: este arquivo é um command isolado sem agente correspondente em agents/.
+  Decidir: manter como documentação de referência ou unificar com ship-agent.
 ---
 
 # Create PR

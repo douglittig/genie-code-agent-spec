@@ -18,6 +18,12 @@ tools: [Read, Write, Edit, Grep, Glob, Bash, TodoWrite, AskUserQuestion]
 kb_domains: []
 anti_pattern_refs: [shared-anti-patterns]
 color: blue
+needs_discussion: true
+discussion_reason: |
+  kb_domains está vazio mas o corpo do agente diz "KB-FIRST OBRIGATÓRIO, não opcional"
+  e tenta carregar kb/_index.yaml e mapear requisitos para KB domains. Isso é
+  contraditório. Decidir: remover a arquitetura KB-first ou definir kb_domains
+  concretos para este projeto.
 stop_conditions:
   - Clarity score >= 12/15 atingido
   - Todas as entidades extraídas (problema, usuários, goals, sucesso, escopo)

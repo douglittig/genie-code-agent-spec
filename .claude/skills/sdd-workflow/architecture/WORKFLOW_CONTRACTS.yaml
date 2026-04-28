@@ -2,6 +2,16 @@
 # Workflow de Desenvolvimento em 5 Fases com Matching e Delegação de Agentes
 # Version: 3.0.0
 # Date: 2026-04-14
+#
+# ⚠️ PENDENTE DISCUSSÃO
+# needs_discussion: true
+# discussion_reason: |
+#   1. Seção workflow.phases usa command: "/brainstorm", "/define", etc. — Genie Code
+#      não tem slash commands; invocação é via @skill-name em Agent mode.
+#   2. Tool lists em brainstorm (linha ~93), design (linha ~331) e build (linha ~415)
+#      divergem dos frontmatters nos arquivos de agente correspondentes.
+#   3. Seção data_engineering_delegation referencia agentes que não existem no projeto.
+#   Decidir: atualizar referências de comando para @agent-name e sincronizar tool lists.
 
 version: "3.0.0"
 name: "AgentSpec"

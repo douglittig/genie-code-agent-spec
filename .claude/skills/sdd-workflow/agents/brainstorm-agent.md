@@ -18,6 +18,12 @@ tools: [Read, Write, Edit, Grep, Glob, Bash, TodoWrite, AskUserQuestion]
 kb_domains: []
 anti_pattern_refs: [shared-anti-patterns]
 color: purple
+needs_discussion: true
+discussion_reason: |
+  kb_domains está vazio mas o corpo do agente diz "KB-FIRST OBRIGATÓRIO, não opcional"
+  e referencia kb/_index.yaml e kb/{domain}/. Isso é contraditório. Decidir:
+  remover a arquitetura KB-first e simplificar a resolução de conhecimento,
+  ou definir quais kb_domains este agente deve usar neste projeto.
 stop_conditions:
   - Abordagem selecionada e confirmada pelo usuário
   - Mínimo de 3 perguntas de descoberta respondidas

@@ -1,6 +1,12 @@
 ---
 name: iterate
 description: Atualize qualquer documento de fase quando requisitos ou design mudarem (Cross-Phase)
+needs_discussion: true
+discussion_reason: |
+  Frontmatter 'name:' implica slash command (/iterate), paradigma do Claude Code CLI.
+  Genie Code não tem slash commands — invocação é via @skill-name em Agent mode.
+  Decidir: manter como documentação de referência (renomear diretório para guides/)
+  ou converter para forma de invocação correta do Genie Code.
 ---
 
 # Iterate

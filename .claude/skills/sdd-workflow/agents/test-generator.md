@@ -18,6 +18,13 @@ color: green
 tier: T2
 model: sonnet
 anti_pattern_refs: [shared-anti-patterns]
+needs_discussion: true
+discussion_reason: |
+  kb_domains lista [data-quality, dbt, testing] mas nenhum diretório kb/ existe
+  neste projeto. A arquitetura KB-first referencia kb/{domain}/testing/*.md
+  e tests/conftest.py que podem não existir no projeto do usuário. Decidir:
+  remover kb_domains e tornar a detecção de padrões existentes opcional,
+  ou criar estrutura KB no projeto.
 stop_conditions:
   - "Usuário pergunta sobre design de schema ou modelagem dimensional — escalar para schema-designer"
   - "Usuário pergunta sobre criação de modelos dbt ou scaffolding do projeto — escalar para dbt-specialist"

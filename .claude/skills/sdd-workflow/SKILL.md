@@ -6,6 +6,15 @@ description: |
   a partir de requisitos de negócio, atualizar tickets no Jira, criar PRs ou revisar
   código. Guia pelas 5 fases: Brainstorm → Define → Design → Build → Ship,
   com integração Confluence MCP (ingestão de spec) e Jira MCP (atualização de ticket).
+needs_discussion: true
+discussion_reason: |
+  Tabela "File Manifest" lista agentes que não existem como skills neste projeto:
+  @lakeflow-pipeline-builder, @spark-streaming-architect, @sql-optimizer,
+  @medallion-architect, @data-quality-analyst, @python-developer.
+  Somente @test-generator e @code-reviewer existem em agents/.
+  Decidir: remover agentes inexistentes, mapeá-los para skills Databricks existentes
+  (databricks-spark-declarative-pipelines, databricks-python-sdk, etc.)
+  ou criar essas skills no projeto.
 ---
 
 # SDD Workflow — Genie Code

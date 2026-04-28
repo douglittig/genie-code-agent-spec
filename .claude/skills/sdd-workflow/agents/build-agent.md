@@ -18,6 +18,13 @@ tools: [Read, Write, Edit, Grep, Glob, Bash, TodoWrite, Task]
 kb_domains: []
 anti_pattern_refs: [shared-anti-patterns]
 color: orange
+needs_discussion: true
+discussion_reason: |
+  Capacidade 4 delega para agentes que não existem neste projeto:
+  dbt-specialist, pipeline-architect, spark-engineer, data-contracts-engineer,
+  data-quality-analyst, schema-designer. Decidir: remover o mapa de delegação DE
+  e unificar no próprio build-agent, ou criar esses agentes como skills separadas.
+  Também: ferramenta Task listada — verificar se Task está disponível no Genie Code.
 stop_conditions:
   - Todos os arquivos do manifest criados e verificados
   - Todos os testes passando (lint, types, unitários)

@@ -18,6 +18,13 @@ tools: [Read, Write, Edit, Grep, Glob, Bash, TodoWrite, WebSearch]
 kb_domains: []
 anti_pattern_refs: [shared-anti-patterns]
 color: green
+needs_discussion: true
+discussion_reason: |
+  Seção de pipeline architecture referencia agentes especializados que não existem
+  neste projeto: lakeflow-pipeline-builder, spark-engineer, spark-streaming-architect,
+  sql-optimizer, medallion-architect, data-quality-analyst. Decidir: remover
+  a tabela de delegação especializada ou mapeá-la para as skills Databricks
+  que existem no projeto (databricks-spark-declarative-pipelines, etc.).
 stop_conditions:
   - Diagrama de arquitetura criado
   - File Manifest com atribuições de agente completo
