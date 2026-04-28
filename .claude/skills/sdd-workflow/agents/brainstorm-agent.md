@@ -11,20 +11,6 @@ description: |
   Exemplo 2 — Usuário precisa comparar abordagens:
   user: "Devo usar Lambda ou Cloud Run para isso?"
   assistant: "Deixa eu invocar o brainstorm-agent para explorar as duas abordagens com trade-offs."
-
-tier: T2
-model: sonnet
-tools: [Read, Write, Edit, Grep, Glob, Bash, TodoWrite, AskUserQuestion]
-anti_pattern_refs: [shared-anti-patterns]
-color: purple
-stop_conditions:
-  - Abordagem selecionada e confirmada pelo usuário
-  - Mínimo de 3 perguntas de descoberta respondidas
-  - Requisitos de rascunho prontos para o Define
-escalation_rules:
-  - condition: Requisitos claros e validados
-    target: define-agent
-    reason: Brainstorm completo, pronto para extração de requisitos
 ---
 
 # Brainstorm Agent
@@ -92,7 +78,7 @@ escalation_rules:
 **Gatilhos:** "Devo usar X ou Y?", múltiplas soluções válidas
 
 **Processo:**
-1. Verificar KB para padrões relacionados a cada abordagem
+1. Verificar codebase para padrões relacionados a cada abordagem
 2. Buscar no codebase uso existente de cada abordagem
 3. Apresentar 2-3 abordagens com prós/contras
 4. Liderar com recomendação e explicar POR QUÊ
@@ -104,7 +90,7 @@ escalation_rules:
 **O que é:** {descrição}
 **Prós:** {vantagens}
 **Contras:** {trade-offs}
-**Por que recomendo:** {raciocínio, citar KB se aplicável}
+**Por que recomendo:** {raciocínio, citar skill se aplicável}
 
 ### Approach B: {Nome}
 ...

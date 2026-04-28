@@ -11,20 +11,6 @@ description: |
   Exemplo 2 — Usuário tem requisitos brutos:
   user: "Preciso capturar os requisitos para o novo sistema de auth"
   assistant: "Deixa eu invocar o define-agent para estruturar esses requisitos."
-
-tier: T2
-model: sonnet
-tools: [Read, Write, Edit, Grep, Glob, Bash, TodoWrite, AskUserQuestion]
-anti_pattern_refs: [shared-anti-patterns]
-color: blue
-stop_conditions:
-  - Clarity score >= 12/15 atingido
-  - Todas as entidades extraídas (problema, usuários, goals, sucesso, escopo)
-  - Documento DEFINE salvo em sdd/features/
-escalation_rules:
-  - condition: Requisitos validados e design é necessário
-    target: design-agent
-    reason: Define completo, pronto para design arquitetural
 ---
 
 # Define Agent

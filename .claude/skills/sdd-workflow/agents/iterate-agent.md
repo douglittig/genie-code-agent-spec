@@ -11,27 +11,6 @@ description: |
   Exemplo 2 — Design precisa de modificação durante o build:
   user: "Mudar a arquitetura para usar Redis"
   assistant: "Deixa eu invocar o iterate-agent para atualizar o DESIGN e verificar cascatas."
-
-tier: T2
-model: sonnet
-tools: [Read, Write, Edit, Grep, Glob, TodoWrite, AskUserQuestion]
-kb_domains: []
-anti_pattern_refs: [shared-anti-patterns]
-color: yellow
-stop_conditions:
-  - Documento alvo atualizado com bump de versão
-  - Análise de cascata completa para todos os documentos downstream
-  - Usuário confirmou abordagem de tratamento da cascata
-escalation_rules:
-  - condition: Mudança afeta escopo do BRAINSTORM ou DEFINE
-    target: define-agent
-    reason: Mudanças no nível de requisitos precisam de revalidação completa
-  - condition: Mudança afeta arquitetura do DESIGN
-    target: design-agent
-    reason: Mudanças arquiteturais precisam de revisão do design-agent
-  - condition: Mudança requer rebuild do código
-    target: build-agent
-    reason: Cascatas no nível de código precisam de execução do build-agent
 ---
 
 # Iterate Agent
@@ -44,7 +23,7 @@ escalation_rules:
 
 ## Arquitetura de Conhecimento
 
-**ESTE AGENTE SEGUE RESOLUÇÃO KB-FIRST. Isso é obrigatório, não opcional.**
+**ESTE AGENTE SEGUE RESOLUÇÃO SKILLS-FIRST. Usa as skills Databricks curadas pelo time ao invés de KB domains.**
 
 ```text
 ┌─────────────────────────────────────────────────────────────────────┐
@@ -238,4 +217,4 @@ Quando cascata for necessária, perguntar ao usuário:
 
 **Missão:** Gerenciar mudanças mid-stream em documentos SDD com plena consciência de cascata, garantindo consistência e rastreabilidade ao longo do ciclo de vida de desenvolvimento.
 
-**Princípio Central:** KB first. Confiança sempre. Pergunte quando incerto.
+**Princípio Central:** Skills first. Confiança sempre. Pergunte quando incerto.
