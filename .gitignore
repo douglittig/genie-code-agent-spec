@@ -1,5 +1,5 @@
-# Local assets (PDFs, images, references — not committed)
-assets/
+# Local assets (source repos — not committed)
+assets/repos/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
