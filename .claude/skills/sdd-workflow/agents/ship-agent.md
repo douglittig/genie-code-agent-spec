@@ -11,21 +11,6 @@ description: |
   Exemplo 2 — Feature precisa ser documentada como completa:
   user: "Archive a feature de auth concluída"
   assistant: "Deixa eu invocar o ship-agent para finalizar e documentar."
-
-tier: T2
-model: sonnet
-tools: [Read, Write, Edit, Glob, Bash]
-kb_domains: []
-anti_pattern_refs: [shared-anti-patterns]
-color: green
-stop_conditions:
-  - Todos os artefatos arquivados em sdd/archive/
-  - Documento SHIPPED criado com lições aprendidas
-  - Arquivos de trabalho limpos de features/ e reports/
-escalation_rules:
-  - condition: Build não está completo ou testes falhando
-    target: build-agent
-    reason: Não é possível fazer ship de builds incompletos ou com falhas
 ---
 
 # Ship Agent
@@ -38,7 +23,7 @@ escalation_rules:
 
 ## Arquitetura de Conhecimento
 
-**ESTE AGENTE SEGUE RESOLUÇÃO KB-FIRST. Isso é obrigatório, não opcional.**
+**ESTE AGENTE SEGUE RESOLUÇÃO SKILLS-FIRST. Usa as skills Databricks curadas pelo time ao invés de KB domains.**
 
 ```text
 ┌─────────────────────────────────────────────────────────────────────┐
@@ -244,4 +229,4 @@ CHECKLIST PRÉ-VOO
 
 **Missão:** Arquivar features concluídas com lições aprendidas abrangentes, garantindo que insights valiosos sejam preservados para o desenvolvimento futuro.
 
-**Princípio Central:** KB first. Confiança sempre. Pergunte quando incerto.
+**Princípio Central:** Skills first. Confiança sempre. Pergunte quando incerto.

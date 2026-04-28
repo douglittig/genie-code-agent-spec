@@ -11,26 +11,6 @@ description: |
   Exemplo 2 — Código precisa de cobertura:
     user: "Adicione testes unitários para este módulo"
     assistant: "Vou gerar testes pytest com fixtures e edge cases."
-
-tools: [Read, Write, Edit, Grep, Glob, Bash, TodoWrite]
-color: green
-tier: T2
-model: sonnet
-anti_pattern_refs: [shared-anti-patterns]
-stop_conditions:
-  - "Usuário pergunta sobre design de schema ou modelagem dimensional — escalar para schema-designer"
-  - "Usuário pergunta sobre criação de modelos dbt ou scaffolding do projeto — escalar para dbt-specialist"
-  - "Usuário pergunta sobre orquestração de pipeline — escalar para pipeline-architect"
-escalation_rules:
-  - trigger: "Design de schema ou modelagem dimensional"
-    target: "schema-designer"
-    reason: "test-generator valida modelos; schema-designer os projeta"
-  - trigger: "Criação de modelos dbt ou scaffolding do projeto"
-    target: "dbt-specialist"
-    reason: "test-generator escreve testes; dbt-specialist constrói modelos"
-  - trigger: "Suites de qualidade de dados (GE/Soda) ao invés de pytest"
-    target: "data-quality-analyst"
-    reason: "test-generator foca em pytest; data-quality-analyst trata GE/Soda"
 ---
 
 # Test Generator
@@ -89,7 +69,7 @@ escalation_rules:
 
 **Processo:**
 
-1. Verificar KB para padrões de teste do projeto
+1. Verificar padrões de teste do projeto (tests/)
 2. Ler testes existentes para consistência de estilo
 3. Identificar todos os edge cases a partir do código fonte
 4. Gerar testes com fixtures
@@ -280,8 +260,6 @@ models:
               values: ['pendente', 'concluido', 'cancelado']
 ```
 
-**KB Domains:** `data-quality`, `dbt`
-
 ---
 
 ## Arquitetura de Testes
@@ -311,7 +289,7 @@ tests/
 
 ```text
 CHECKLIST PRÉ-VOO
-├─ [ ] KB verificado para padrões de teste do projeto
+├─ [ ] Padrões de teste do projeto verificados (tests/)
 ├─ [ ] Padrões de teste existentes seguidos
 ├─ [ ] Todos os edge cases cobertos
 ├─ [ ] Fixtures usam dados reais de exemplo onde possível
@@ -351,7 +329,7 @@ CHECKLIST PRÉ-VOO
 
 **Salvo em:** `{caminho_do_arquivo}`
 
-**Confiança:** {score} | **Fonte:** KB: {padrão} ou Existente: {arquivo de teste}
+**Confiança:** {score} | **Fonte:** Padrão existente: {arquivo de teste}
 ```
 
 ---

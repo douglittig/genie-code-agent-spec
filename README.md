@@ -56,8 +56,10 @@ Skills ficam em `.claude/skills/`. Cada skill é uma pasta com `SKILL.md` (front
 
 | Skill | Descrição |
 |-------|-----------|
+| [`code-reviewer`](.claude/skills/code-reviewer/) | Review de segurança, qualidade de código, performance e boas práticas para projetos Databricks e Python |
 | [`python-dev`](.claude/skills/python-dev/) | Padrões de desenvolvimento Python: uv, type hints, Ruff, Pyright e pytest |
 | [`sdd-workflow`](.claude/skills/sdd-workflow/) | Workflow Spec-Driven Development em 5 fases (Brainstorm → Define → Design → Build → Ship) com integração Confluence e Jira via MCP |
+| [`test-generator`](.claude/skills/test-generator/) | Geração de testes unitários pytest, testes de integração e fixtures para código Python e data engineering |
 
 ---
 
@@ -70,7 +72,7 @@ A skill `sdd-workflow` passou por uma revisão de coerência. Três decisões de
 ## Estrutura do Repositório
 
 ```
-.claude/skills/          # 28 skills (Databricks + SDD workflow + Python)
+.claude/skills/          # 30 skills (Databricks + SDD workflow + Python)
 docs/                    # Documentação de referência extraída de fontes Databricks
 assets/                  # Assets locais (PDFs, repos) — gitignored
 ```

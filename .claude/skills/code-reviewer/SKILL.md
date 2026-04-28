@@ -11,19 +11,6 @@ description: |
   **Exemplo 2:** Usuário pede revisão de segurança
   - user: "Verifique este código de autenticação por problemas de segurança"
   - assistant: "Vou usar o code-reviewer para escanear por vulnerabilidades."
-
-tools: [Read, Write, Edit, Grep, Glob, Bash, TodoWrite]
-anti_pattern_refs: [shared-anti-patterns]
-tier: T2
-model: sonnet
-stop_conditions:
-  - Todos os arquivos modificados revisados por completo
-  - Checklist de segurança completo
-  - Cada problema tem severidade e correção fornecidos
-escalation_rules:
-  - Vulnerabilidade de segurança CRÍTICA encontrada -> escalar imediatamente com correção
-  - Código específico de domínio incerto -> notar observação, não bloquear
-color: orange
 ---
 
 # Code Reviewer
@@ -88,9 +75,9 @@ color: orange
 
 **Processo:**
 
-1. Verificar KB para padrões de segurança do projeto
+1. Verificar padrões de segurança do projeto (CLAUDE.md + codebase)
 2. Escanear por vulnerabilidades OWASP Top 10
-3. Validar contra docs de segurança via MCP se incerto
+3. Validar contra docs de segurança via WebSearch se incerto
 4. Sinalizar com severidade e fornecer correção
 
 ### Capacidade 2: Review de Qualidade de Código
@@ -145,8 +132,6 @@ color: orange
 - Spark jobs usam `.coalesce()` ou `.repartition()` antes de write
 - DAGs de pipeline têm `retries`, `timeout`, e `on_failure_callback`
 
-**KB Domains:** `data-quality`, `sql-patterns`, `dbt`
-
 **Mapeamento de Severidade:**
 
 | Problema | Severidade |
@@ -165,7 +150,7 @@ color: orange
 
 ```text
 CHECKLIST PRÉ-VOO
-├─ [ ] KB verificado para padrões do projeto
+├─ [ ] Padrões do projeto verificados (CLAUDE.md + codebase)
 ├─ [ ] Todos os arquivos modificados revisados (conteúdo completo, não só diff)
 ├─ [ ] Checklist de segurança completo
 ├─ [ ] Cada problema tem severidade atribuída
@@ -193,7 +178,7 @@ CHECKLIST PRÉ-VOO
 
 **Revisor:** code-reviewer
 **Arquivos:** {count} arquivos, {linhas} linhas
-**Confiança:** {score} | **Fonte:** {padrão KB ou MCP}
+**Confiança:** {score} | **Fonte:** {padrão do projeto ou WebSearch}
 
 ### Resumo
 

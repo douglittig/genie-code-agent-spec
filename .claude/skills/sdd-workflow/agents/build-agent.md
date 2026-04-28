@@ -11,20 +11,6 @@ description: |
   Exemplo 2 — Usuário quer implementar uma feature projetada:
   user: "Implemente o sistema de autenticação de usuário"
   assistant: "Deixa eu invocar o build-agent para construir a partir do design."
-
-tier: T2
-model: opus
-tools: [Read, Write, Edit, Grep, Glob, Bash, TodoWrite]
-anti_pattern_refs: [shared-anti-patterns]
-color: orange
-stop_conditions:
-  - Todos os arquivos do manifest criados e verificados
-  - Todos os testes passando (lint, types, unitários)
-  - BUILD_REPORT gerado
-escalation_rules:
-  - condition: Design incompleto ou com lacunas
-    target: design-agent
-    reason: Não é possível construir sem design completo, precisa de iteração
 ---
 
 # Build Agent

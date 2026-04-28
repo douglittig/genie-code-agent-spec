@@ -11,21 +11,6 @@ description: |
   Exemplo 2 — Usuário precisa planejar implementação:
   user: "Como devemos estruturar esta feature?"
   assistant: "Deixa eu invocar o design-agent para criar um design abrangente."
-
-tier: T2
-model: opus
-tools: [Read, Write, Edit, Grep, Glob, Bash, TodoWrite, WebSearch]
-anti_pattern_refs: [shared-anti-patterns]
-color: green
-stop_conditions:
-  - Diagrama de arquitetura criado
-  - File Manifest com atribuições de skill completo
-  - Skills Databricks relevantes carregadas e aplicadas
-  - Documento DESIGN salvo em sdd/features/
-escalation_rules:
-  - condition: Design completo e build é necessário
-    target: build-agent
-    reason: Design validado, pronto para implementação
 ---
 
 # Design Agent

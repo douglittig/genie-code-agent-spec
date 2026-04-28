@@ -119,14 +119,17 @@ Todos os documentos SDD ficam no workspace do projeto:
 | `templates/SHIPPED_TEMPLATE.md` | Template da fase 4 |
 | `architecture/WORKFLOW_CONTRACTS.yaml` | Regras de transição entre fases |
 | `architecture/ARCHITECTURE.md` | Arquitetura completa do framework |
+| `commands/brainstorm.md` | Instrução detalhada da fase Brainstorm |
 | `commands/define.md` | Instrução detalhada da fase Define |
 | `commands/design.md` | Instrução detalhada da fase Design |
 | `commands/build.md` | Instrução detalhada da fase Build |
 | `commands/ship.md` | Instrução detalhada da fase Ship |
+| `commands/iterate.md` | Instrução detalhada da fase Iterate |
 | `commands/create-pr.md` | Criação de PR com conventional commits |
 | `commands/review.md` | Dual AI review (análise estática + arquitetural) |
+| `agents/brainstorm-agent.md` | Capacidades do agente de Brainstorm |
 | `agents/define-agent.md` | Capacidades do agente de Define |
 | `agents/design-agent.md` | Capacidades do agente de Design |
 | `agents/build-agent.md` | Capacidades do agente de Build |
-| `agents/code-reviewer.md` | Capacidades do agente de review de código |
-| `agents/test-generator.md` | Capacidades do agente de geração de testes |
+| `agents/ship-agent.md` | Capacidades do agente de Ship |
+| `agents/iterate-agent.md` | Capacidades do agente de Iterate |
