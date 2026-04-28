@@ -4,50 +4,70 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project
 
-`genie-code-agent-spec` — a spec-driven development repository for using Databricks Genie Code with agent skills, custom instructions, and MCP integrations.
+`genie-code-agent-spec` — repositório de skills, custom instructions e integrações MCP para Databricks Genie Code e Claude Code. **Genie Code first**: todas as decisões de design priorizam o paradigma do Genie Code (Agent mode + `@skill-name`), não o paradigma de slash commands do Claude Code CLI.
 
 ## Repository Layout
 
 ```
-.claude/skills/          # 28 Databricks agent skills (for Genie Code / Claude Code)
-docs/                    # Reference documentation extracted from Databricks sources
-assets/                  # Local assets (PDFs, source repos) — gitignored, not committed
+.claude/skills/          # 28 skills (Databricks + SDD workflow + Python + Spark)
+docs/                    # Documentação de referência sobre features do Genie Code
+assets/                  # Assets locais (PDFs, repos fonte) — gitignored
 ```
 
 ## Agent Skills (`.claude/skills/`)
 
-Each subfolder is a self-contained skill following the open Agent Skills standard:
-- `SKILL.md` — frontmatter (`name`, `description`) + content the agent reads
-- Optional reference files (`.md`) and scripts (`.py`, `.sh`)
+Cada subpasta é uma skill autocontida seguindo o padrão open Agent Skills:
+- `SKILL.md` — frontmatter (`name`, `description`) + conteúdo que o agente lê
+- Arquivos de referência opcionais (`.md`, `.py`, `.sh`)
 
-Skills are sourced from the [Databricks AI Dev Kit](https://github.com/databricks/ai-dev-kit). Key skills:
+**Para criar uma nova skill:** copiar `.claude/skills/TEMPLATE/` e editar `SKILL.md`.
 
-| Skill | Purpose |
-|-------|---------|
-| `databricks-agent-bricks` | Knowledge Assistants, Genie Spaces, Supervisor Agents |
-| `databricks-aibi-dashboards` | LAKEVIEW dashboard creation (mandatory 5-step validation workflow) |
-| `databricks-bundles` | Databricks Asset Bundles (DABs) for deployment |
-| `databricks-genie` | Genie Space CRUD and Conversation API |
-| `databricks-mlflow-evaluation` | MLflow 3 GenAI evaluation, MemAlign, GEPA |
-| `databricks-python-sdk` | Full SDK reference with examples |
-| `databricks-spark-declarative-pipelines` | SDP / Lakeflow pipeline development |
-| `databricks-unity-catalog` | Catalog, schema, governance, system tables |
-| `python-dev` | uv, type hints, Ruff, Pyright, pytest standards |
+O índice completo das 28 skills está no **[README.md](README.md)**, organizado por categoria (IA & ML, Dados & SQL, Plataforma Databricks, Aplicações, Desenvolvimento & Workflow).
+
+### sdd-workflow — estrutura especial
+
+A skill `sdd-workflow` tem subdivisões além do `SKILL.md`:
+
+```
+sdd-workflow/
+├── SKILL.md                    # Entry point — roteia para agentes e guias
+├── agents/                     # 8 agentes especializados por fase
+├── commands/                   # 8 guias de referência (sem frontmatter — Genie Code)
+├── templates/                  # 5 templates de documentos SDD
+└── architecture/               # WORKFLOW_CONTRACTS.yaml + ARCHITECTURE.md
+```
+
+**Paradigma skills-first:** agentes desta skill usam as skills `@databricks-*` curadas pelo time Databricks ao invés de KB domains. Mapeamento completo em `COHERENCE_REVIEW.md`.
+
+**Artefatos SDD** (DEFINE, DESIGN, BUILD_REPORT, etc.) são criados no workspace do projeto do usuário em `.claude/sdd/`, não dentro da skill.
+
+## docs/
+
+Documentação de referência sobre features do Genie Code extraída de fontes Databricks:
+
+| Arquivo | Conteúdo |
+|---------|---------|
+| `agent-skills.md` | Como funcionam as Agent Skills, auto-load e invocação |
+| `custom-instructions.md` | Workspace vs user instructions, limites e precedência |
+| `genie-code-overview.md` | Visão geral do Genie Code (Agent mode vs Chat mode) |
+| `mcp-integration.md` | Configuração MCP, limite de 20 ferramentas, restrições |
+| `pipeline-development.md` | Desenvolvimento de pipelines no Databricks |
+| `spec-driven-development.md` | Conceito SDD e como usar o sdd-workflow |
+| `tips-and-tricks.md` | Boas práticas e dicas para o Genie Code |
 
 ## Git Workflow — Golden Rule
 
-**Never commit directly to `main`.** Always:
+**Nunca commitar direto em `main`.** Sempre:
 1. `git checkout main && git pull origin main`
-2. Create a new branch from main
-3. Make changes and commit
-4. Push and open a PR
-5. Wait for the user to merge
+2. Criar branch a partir do main
+3. Fazer changes e commitar
+4. Push e abrir PR
+5. Aguardar o usuário fazer merge
 
 ## Key Concepts
 
-- **Genie Code**: Databricks autonomous AI agent (Agent mode + Chat mode)
-- **Agent Skills**: Only work in Agent mode; auto-loaded or invoked via `@skill-name`
-- **MCP**: Limited to 20 tools across all servers; only in Agent mode
-- **Custom Instructions**: Workspace (`Workspace/.assistant_workspace_instructions.md`) overrides user (`/Users/<username>/.assistant_instructions.md`); 20k char limit
-
-See `docs/` for detailed documentation on each Genie Code feature.
+- **Genie Code**: agente AI autônomo do Databricks (Agent mode + Chat mode)
+- **Agent Skills**: só funcionam em Agent mode; carregadas automaticamente ou via `@skill-name`
+- **MCP**: limitado a 20 ferramentas por workspace; só em Agent mode
+- **Custom Instructions**: Workspace (`Workspace/.assistant_workspace_instructions.md`) tem precedência sobre user (`/Users/<username>/.assistant_instructions.md`); limite de 20k chars
+- **Skills-first**: este repo usa skills Databricks curadas no lugar de KB domains locais

@@ -63,9 +63,7 @@ Skills ficam em `.claude/skills/`. Cada skill é uma pasta com `SKILL.md` (front
 
 ## Revisão de Coerência — sdd-workflow
 
-A skill `sdd-workflow` foi submetida a uma revisão de coerência com o projeto. Os resultados completos estão em [`.claude/skills/sdd-workflow/COHERENCE_REVIEW.md`](.claude/skills/sdd-workflow/COHERENCE_REVIEW.md).
-
-**Resumo:** 16 arquivos marcados com `needs_discussion: true`; 9 arquivos sem problemas.
+A skill `sdd-workflow` passou por uma revisão de coerência. Três decisões de design foram identificadas e implementadas — ver [`.claude/skills/sdd-workflow/COHERENCE_REVIEW.md`](.claude/skills/sdd-workflow/COHERENCE_REVIEW.md) para o histórico completo.
 
 ---
 
