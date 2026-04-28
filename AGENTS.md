@@ -26,11 +26,13 @@ O índice completo das skills está no **[README.md](README.md)**, organizado po
 
 ### Skills de Workflow (essenciais para todo desenvolvimento)
 
-| Skill | Propósito |
-|-------|---------|
-| `dev-workflow` | Fluxo completo: discussão → branch → código → validação → review → PR → merge |
-| `sdd-workflow` | Spec-Driven Development: Brainstorm → Define → Design → Build → Ship |
-| `code-reviewer` | Code review: segurança, qualidade, performance, data engineering |
+| Skill | Fase | Propósito |
+|-------|------|---------|
+| `sdd-workflow` | 1–4 | Spec-Driven Development: Define (lê Confluence) → Design → Build → Ship |
+| `dev-workflow` | 4 | Fluxo de desenvolvimento: discussão → branch → código → validação → review → PR → merge |
+| `code-reviewer` | 4 | Code review: segurança, qualidade, performance, data engineering |
+| `staff-engineer` | 2 | Decisões arquiteturais e ADRs — **em desenvolvimento** |
+| `po` | 3 | Epic → Stories (Fibonacci) → Tasks no Jira — **em desenvolvimento** |
 
 ### sdd-workflow — estrutura especial
 
