@@ -2,6 +2,88 @@
 
 Repositório de skills, custom instructions e integrações MCP para Databricks Genie Code e Claude Code.
 
+---
+
+## Fluxo de Desenvolvimento
+
+O desenvolvimento de features segue 4 fases com configurações MCP distintas por fase. Cada fase produz um artefato que alimenta a próxima — sem dependência de contexto online entre fases.
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│ FASE 1 — Spec                    MCP: Confluence (12 slots)     │
+│                                                                  │
+│  Quem: Chapter leader / Tech lead                               │
+│  Skill: @sdd-workflow → define <url-confluence>                 │
+│  Output: docs/specs/DEFINE_{FEATURE}.md                         │
+└────────────────────────────┬────────────────────────────────────┘
+                             │
+┌────────────────────────────▼────────────────────────────────────┐
+│ FASE 2 — Arquitetura             MCP: nenhum                    │
+│                                                                  │
+│  Quem: Staff Engineer / Tech lead                               │
+│  Skill: @staff-engineer  [em desenvolvimento]                   │
+│  Output: docs/adr/ADR_{FEATURE}.md                              │
+└────────────────────────────┬────────────────────────────────────┘
+                             │
+┌────────────────────────────▼────────────────────────────────────┐
+│ FASE 3 — Planejamento            MCP: Jira (14 slots)           │
+│                                                                  │
+│  Quem: Product Owner / Tech lead                                │
+│  Skill: @po  [em desenvolvimento]                               │
+│  Output: Epic + Stories (Fibonacci) + Tasks no Jira             │
+└────────────────────────────┬────────────────────────────────────┘
+                             │
+┌────────────────────────────▼────────────────────────────────────┐
+│ FASE 4 — Desenvolvimento    MCP: Bitbucket (~6) + Jira (14)    │
+│                                                                  │
+│  Quem: Desenvolvedor                                            │
+│  Skill: @dev-workflow                                           │
+│  Output: branch → código → PR → ticket Jira atualizado         │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### Por que fases separadas?
+
+O Genie Code em Agent mode suporta no máximo **20 ferramentas MCP** simultaneamente. Cada produto Atlassian consome slots:
+
+| MCP | Slots |
+|-----|-------|
+| Confluence | 12 |
+| Jira | 14 |
+| Bitbucket (mínimo dev-workflow) | ~6 |
+| **Total se todos juntos** | **~32 — estoura o limite** |
+
+A separação em fases resolve o problema: cada fase ativa apenas os MCPs que precisa, mantendo sempre abaixo de 20 slots.
+
+### Documentação por fase
+
+Todos os artefatos ficam no repositório do projeto, dentro de `docs/`:
+
+```
+projeto/
+├── databricks.yml
+├── resources/
+├── src/
+├── tests/
+└── docs/
+    ├── specs/      # DEFINE_{FEATURE}.md  — saída da Fase 1
+    ├── adr/        # ADR_{FEATURE}.md     — saída da Fase 2
+    └── designs/    # DESIGN_{FEATURE}.md  — saída do sdd-workflow
+```
+
+### Configuração MCP por fase
+
+| Fase | Ativar | Desativar |
+|------|--------|-----------|
+| 1 — Spec | Confluence | Jira, Bitbucket |
+| 2 — Arquitetura | — | Todos |
+| 3 — Planejamento | Jira | Confluence, Bitbucket |
+| 4 — Desenvolvimento | Bitbucket + Jira | Confluence |
+
+> Guia de configuração do Bitbucket MCP: [`docs/bitbucket-mcp-guide.md`](docs/bitbucket-mcp-guide.md)
+
+---
+
 ## Índice de Skills
 
 Skills ficam em `.claude/skills/`. Cada skill é uma pasta com `SKILL.md` (frontmatter + instruções) e arquivos de referência opcionais. No Genie Code, são invocadas via `@skill-name` em Agent mode; no Claude Code CLI, são carregadas automaticamente.
@@ -54,12 +136,15 @@ Skills ficam em `.claude/skills/`. Cada skill é uma pasta com `SKILL.md` (front
 
 ### Desenvolvimento & Workflow
 
-| Skill | Descrição |
-|-------|-----------|
-| [`code-reviewer`](.claude/skills/code-reviewer/) | Review de segurança, qualidade de código, performance e boas práticas para projetos Databricks e Python |
-| [`python-dev`](.claude/skills/python-dev/) | Padrões de desenvolvimento Python: uv, type hints, Ruff, Pyright e pytest |
-| [`sdd-workflow`](.claude/skills/sdd-workflow/) | Workflow Spec-Driven Development em 5 fases (Brainstorm → Define → Design → Build → Ship) com integração Confluence e Jira via MCP |
-| [`test-generator`](.claude/skills/test-generator/) | Geração de testes unitários pytest, testes de integração e fixtures para código Python e data engineering |
+| Skill | Fase | Descrição |
+|-------|------|-----------|
+| [`sdd-workflow`](.claude/skills/sdd-workflow/) | 1–4 | Workflow Spec-Driven Development em 5 fases (Brainstorm → Define → Design → Build → Ship) com integração Confluence e Jira via MCP |
+| [`dev-workflow`](.claude/skills/dev-workflow/) | 4 | Fluxo de desenvolvimento seguro: discussão → branch → código → validação → auto-review → PR → merge |
+| [`code-reviewer`](.claude/skills/code-reviewer/) | 4 | Review de segurança, qualidade de código, performance e boas práticas para projetos Databricks e Python |
+| [`python-dev`](.claude/skills/python-dev/) | 4 | Padrões de desenvolvimento Python: uv, type hints, Ruff, Pyright e pytest |
+| [`test-generator`](.claude/skills/test-generator/) | 4 | Geração de testes unitários pytest, testes de integração e fixtures para código Python e data engineering |
+| `staff-engineer` | 2 | Discussão arquitetural e geração de ADRs — **em desenvolvimento** |
+| `po` | 3 | Quebra de Epic em Stories (Fibonacci) e Tasks no Jira — **em desenvolvimento** |
 
 ---
 

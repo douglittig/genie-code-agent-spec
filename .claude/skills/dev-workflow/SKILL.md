@@ -18,9 +18,21 @@ description: |
 
 > Fluxo de desenvolvimento seguro para repositórios com branch protection em `main`.
 
-## Regra de Ouro
+## Regras de Ouro
 
 **Nunca modificar código sem discussão prévia. Nunca commitar diretamente na `main`.**
+
+**Nunca avançar para o próximo passo sem aprovação explícita do usuário.**
+
+Cada passo requer um "ok" antes de executar o seguinte. Não encadear passos automaticamente — mesmo que pareça natural. Exemplos do que NÃO fazer:
+
+| Errado | Certo |
+|--------|-------|
+| Commitar e já abrir PR | Commitar → reportar → aguardar ok → abrir PR |
+| Fazer push e já criar PR | Push → reportar → aguardar ok → criar PR |
+| Completar código e já commitar | Reportar o que foi feito → aguardar ok → commitar |
+
+Exceção: quando o usuário pedir explicitamente múltiplos passos em uma instrução — ex: *"faz o commit, push e abre a PR"*.
 
 ---
 
