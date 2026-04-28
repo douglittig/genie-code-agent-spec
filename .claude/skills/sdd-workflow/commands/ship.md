@@ -1,71 +1,71 @@
 ---
 name: ship
-description: Archive completed feature with lessons learned (Phase 4)
+description: Archive a feature concluída com lições aprendidas (Fase 4)
 ---
 
-# Ship Command
+# Ship
 
-> Archive completed feature with lessons learned (Phase 4)
+> Archive da feature concluída com lições aprendidas (Fase 4)
 
-## Usage
+## Uso
 
-```bash
-/ship <define-file>
+```
+ship <define-file>
 ```
 
-## Examples
+## Exemplos
 
-```bash
-/ship .claude/sdd/features/DEFINE_NOTIFICATION_SYSTEM.md
-/ship DEFINE_USER_AUTH.md
+```
+ship .claude/sdd/features/DEFINE_SISTEMA_NOTIFICACOES.md
+ship DEFINE_AUTH_USUARIO.md
 ```
 
 ---
 
-## Overview
+## Visão Geral
 
-This is **Phase 4** of the 5-phase AgentSpec workflow:
+Esta é a **Fase 4** do workflow SDD de 5 fases:
 
 ```text
-Phase 0: /brainstorm → .claude/sdd/features/BRAINSTORM_{FEATURE}.md (optional)
-Phase 1: /define     → .claude/sdd/features/DEFINE_{FEATURE}.md
-Phase 2: /design     → .claude/sdd/features/DESIGN_{FEATURE}.md
-Phase 3: /build      → Code + .claude/sdd/reports/BUILD_REPORT_{FEATURE}.md
-Phase 4: /ship       → .claude/sdd/archive/{FEATURE}/SHIPPED_{DATE}.md (THIS COMMAND)
+Fase 0: brainstorm → .claude/sdd/features/BRAINSTORM_{FEATURE}.md (opcional)
+Fase 1: define     → .claude/sdd/features/DEFINE_{FEATURE}.md
+Fase 2: design     → .claude/sdd/features/DESIGN_{FEATURE}.md
+Fase 3: build      → Código + .claude/sdd/reports/BUILD_REPORT_{FEATURE}.md
+Fase 4: ship       → .claude/sdd/archive/{FEATURE}/SHIPPED_{DATE}.md (ESTA FASE)
 ```
 
-The `/ship` command archives all feature artifacts and captures lessons learned.
+A fase de ship arquiva todos os artefatos da feature e captura as lições aprendidas.
 
 ---
 
-## What This Command Does
+## O que Esta Fase Faz
 
-1. **Verify** - Confirm all artifacts exist and build passed
-2. **Archive** - Move feature documents to archive folder
-3. **Document** - Create SHIPPED summary with lessons learned
-4. **Clean** - Remove working files from features folder
+1. **Verificar** — Confirmar que todos os artefatos existem e o build passou
+2. **Arquivar** — Mover documentos da feature para a pasta archive
+3. **Documentar** — Criar resumo SHIPPED com lições aprendidas
+4. **Limpar** — Remover arquivos de trabalho da pasta features
 
 ---
 
-## Process
+## Processo
 
-### Step 1: Verify Completion
+### Passo 1: Verificar Conclusão
 
 ```markdown
-Read(.claude/sdd/features/DEFINE_{FEATURE}.md)
-Read(.claude/sdd/features/DESIGN_{FEATURE}.md)
-Read(.claude/sdd/reports/BUILD_REPORT_{FEATURE}.md)
+Ler .claude/sdd/features/DEFINE_{FEATURE}.md
+Ler .claude/sdd/features/DESIGN_{FEATURE}.md
+Ler .claude/sdd/reports/BUILD_REPORT_{FEATURE}.md
 
-# Verify build report shows success
+# Verificar se o build report mostra sucesso
 ```
 
-### Step 2: Create Archive Folder
+### Passo 2: Criar Pasta Archive
 
 ```bash
 mkdir -p .claude/sdd/archive/{FEATURE_NAME}/
 ```
 
-### Step 3: Copy Artifacts to Archive
+### Passo 3: Copiar Artefatos para o Archive
 
 ```bash
 cp .claude/sdd/features/DEFINE_{FEATURE}.md .claude/sdd/archive/{FEATURE}/
@@ -73,33 +73,33 @@ cp .claude/sdd/features/DESIGN_{FEATURE}.md .claude/sdd/archive/{FEATURE}/
 cp .claude/sdd/reports/BUILD_REPORT_{FEATURE}.md .claude/sdd/archive/{FEATURE}/
 ```
 
-### Step 4: Generate SHIPPED Document
+### Passo 4: Gerar Documento SHIPPED
 
-Create summary with:
+Crie o resumo com:
 
-| Section | Content |
-|---------|---------|
-| **Summary** | What was built |
-| **Timeline** | Start → Ship dates |
-| **Metrics** | Lines of code, files created |
-| **Lessons Learned** | What went well, what to improve |
-| **Artifacts** | List of all archived documents |
+| Seção | Conteúdo |
+|-------|---------|
+| **Resumo** | O que foi construído |
+| **Timeline** | Datas Início → Ship |
+| **Métricas** | Linhas de código, arquivos criados |
+| **Lições Aprendidas** | O que funcionou, o que melhorar |
+| **Artefatos** | Lista de todos os documentos arquivados |
 
-### Step 5: Update Document Statuses
+### Passo 5: Atualizar Status dos Documentos
 
-Update archived documents to "Shipped" status:
+Atualize os documentos arquivados para status "Shipped":
 
 ```markdown
-Edit: archive/{FEATURE}/DEFINE_{FEATURE}.md
+Editar: archive/{FEATURE}/DEFINE_{FEATURE}.md
   - Status: → "✅ Shipped"
-  - Add revision: "Shipped and archived"
+  - Adicionar revisão: "Shipped e arquivado"
 
-Edit: archive/{FEATURE}/DESIGN_{FEATURE}.md
+Editar: archive/{FEATURE}/DESIGN_{FEATURE}.md
   - Status: → "✅ Shipped"
-  - Add revision: "Shipped and archived"
+  - Adicionar revisão: "Shipped e arquivado"
 ```
 
-### Step 6: Clean Up Working Files
+### Passo 6: Limpar Arquivos de Trabalho
 
 ```bash
 rm .claude/sdd/features/DEFINE_{FEATURE}.md
@@ -107,74 +107,74 @@ rm .claude/sdd/features/DESIGN_{FEATURE}.md
 rm .claude/sdd/reports/BUILD_REPORT_{FEATURE}.md
 ```
 
-### Step 7: Save SHIPPED Document
+### Passo 7: Salvar Documento SHIPPED
 
 ```markdown
-Write(.claude/sdd/archive/{FEATURE}/SHIPPED_{DATE}.md)
+Salvar em: .claude/sdd/archive/{FEATURE}/SHIPPED_{DATE}.md
 ```
 
 ---
 
 ## Output
 
-| Artifact | Location |
-|----------|----------|
+| Artefato | Localização |
+|----------|-------------|
 | **SHIPPED** | `.claude/sdd/archive/{FEATURE}/SHIPPED_{DATE}.md` |
 | **DEFINE** | `.claude/sdd/archive/{FEATURE}/DEFINE_{FEATURE}.md` |
 | **DESIGN** | `.claude/sdd/archive/{FEATURE}/DESIGN_{FEATURE}.md` |
 | **BUILD_REPORT** | `.claude/sdd/archive/{FEATURE}/BUILD_REPORT_{FEATURE}.md` |
 
-**Next Step:** Start new feature with `/define`
+**Próximo Passo:** Iniciar nova feature com Define
 
 ---
 
-## Quality Gate
+## Gate de Qualidade
 
-Before shipping, verify:
+Antes de fazer o ship, verifique:
 
 ```text
-[ ] BUILD_REPORT shows all tasks completed
-[ ] No critical issues in build report
-[ ] All tests passing
-[ ] Code deployed (if applicable)
+[ ] BUILD_REPORT mostra todas as tarefas concluídas
+[ ] Sem problemas críticos no build report
+[ ] Todos os testes passando
+[ ] Código deployado (se aplicável)
 ```
 
 ---
 
-## When to Ship
+## Quando Fazer o Ship
 
-Ship when:
-- All acceptance tests from DEFINE pass
-- Build report shows 100% completion
-- No blocking issues remain
-
----
-
-## Lessons Learned Categories
-
-Document lessons in these areas:
-
-| Category | Example |
-|----------|---------|
-| **Process** | "Breaking tasks into smaller chunks helped" |
-| **Technical** | "Config files work better than env vars" |
-| **Communication** | "Early clarification saved rework" |
-| **Tools** | "Using X library simplified Y" |
+Faça o ship quando:
+- Todos os acceptance tests do DEFINE passaram
+- Build report mostra 100% de conclusão
+- Sem problemas bloqueadores restantes
 
 ---
 
-## Tips
+## Categorias de Lições Aprendidas
 
-1. **Don't Skip This** - Lessons learned prevent future mistakes
-2. **Be Honest** - Document what didn't work too
-3. **Be Specific** - "Better planning" → "Create architecture diagram before coding"
-4. **Archive Everything** - Future you will thank present you
+Documente as lições nestas áreas:
+
+| Categoria | Exemplo |
+|-----------|---------|
+| **Processo** | "Quebrar tarefas em partes menores ajudou" |
+| **Técnico** | "Arquivos de config funcionam melhor que env vars" |
+| **Comunicação** | "Esclarecimento antecipado evitou retrabalho" |
+| **Ferramentas** | "Usar a biblioteca X simplificou Y" |
 
 ---
 
-## References
+## Dicas
 
-- Agent: `${CLAUDE_PLUGIN_ROOT}/agents/workflow/ship-agent.md`
-- Template: `${CLAUDE_PLUGIN_ROOT}/sdd/templates/SHIPPED_TEMPLATE.md`
-- Contracts: `${CLAUDE_PLUGIN_ROOT}/sdd/architecture/WORKFLOW_CONTRACTS.yaml`
-- Previous Phase: `${CLAUDE_PLUGIN_ROOT}/commands/workflow/build.md`
+1. **Não Pule Esta Etapa** — Lições aprendidas previnem erros futuros
+2. **Seja Honesto** — Documente o que não funcionou também
+3. **Seja Específico** — "Melhor planejamento" → "Criar diagrama de arquitetura antes de codificar"
+4. **Archive Tudo** — O você do futuro agradecerá o você do presente
+
+---
+
+## Referências
+
+- Agente: `agents/ship-agent.md`
+- Template: `templates/SHIPPED_TEMPLATE.md`
+- Contratos: `architecture/WORKFLOW_CONTRACTS.yaml`
+- Fase Anterior: `commands/build.md`

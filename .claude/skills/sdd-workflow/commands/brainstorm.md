@@ -1,240 +1,240 @@
 ---
 name: brainstorm
-description: Explore ideas through collaborative dialogue before requirements capture (Phase 0)
+description: Explore ideias por diálogo colaborativo antes da captura de requisitos (Fase 0)
 ---
 
-# Brainstorm Command
+# Brainstorm
 
-> Collaborative exploration before requirements capture (Phase 0)
+> Exploração colaborativa antes da captura de requisitos (Fase 0)
 
-## Usage
+## Uso
 
-```bash
-/brainstorm <idea-or-request>
-/brainstorm "Build a real-time notification system"
-/brainstorm notes/rough-idea.txt
+```
+brainstorm <ideia-ou-pedido>
+brainstorm "Construir um sistema de notificações em tempo real"
+brainstorm notas/ideia-bruta.txt
 ```
 
-## Examples
+## Exemplos
 
-```bash
-# From a direct idea
-/brainstorm "I want to automate data quality checks"
+```
+# A partir de uma ideia direta
+brainstorm "Quero automatizar verificações de qualidade de dados"
 
-# From a file with notes
-/brainstorm docs/meeting-notes.md
+# A partir de um arquivo com notas
+brainstorm docs/notas-de-reuniao.md
 
-# From a problem statement
-/brainstorm "Our team spends too much time on manual data entry"
+# A partir de um problem statement
+brainstorm "Nosso time gasta muito tempo com entrada manual de dados"
 ```
 
 ---
 
-## Overview
+## Visão Geral
 
-This is **Phase 0** of the 5-phase AgentSpec workflow:
+Esta é a **Fase 0** do workflow SDD de 5 fases:
 
 ```text
-Phase 0: /brainstorm → .claude/sdd/features/BRAINSTORM_{FEATURE}.md (THIS COMMAND)
-Phase 1: /define     → .claude/sdd/features/DEFINE_{FEATURE}.md
-Phase 2: /design     → .claude/sdd/features/DESIGN_{FEATURE}.md
-Phase 3: /build      → Code + .claude/sdd/reports/BUILD_REPORT_{FEATURE}.md
-Phase 4: /ship       → .claude/sdd/archive/{FEATURE}/SHIPPED_{DATE}.md
+Fase 0: brainstorm → .claude/sdd/features/BRAINSTORM_{FEATURE}.md (ESTA FASE)
+Fase 1: define     → .claude/sdd/features/DEFINE_{FEATURE}.md
+Fase 2: design     → .claude/sdd/features/DESIGN_{FEATURE}.md
+Fase 3: build      → Código + .claude/sdd/reports/BUILD_REPORT_{FEATURE}.md
+Fase 4: ship       → .claude/sdd/archive/{FEATURE}/SHIPPED_{DATE}.md
 ```
 
-The `/brainstorm` command explores ideas through dialogue before capturing formal requirements.
+A fase de brainstorm explora ideias por diálogo antes de capturar requisitos formais.
 
 ---
 
-## What This Command Does
+## O que Esta Fase Faz
 
-1. **Explore** - Understand project context and existing patterns
-2. **Question** - Ask one question at a time to clarify intent
-3. **Collect** - Gather sample files, ground truth, or reference data for LLM grounding
-4. **Propose** - Present 2-3 approaches with trade-offs
-5. **Simplify** - Apply YAGNI to remove unnecessary features
-6. **Validate** - Incrementally confirm understanding
-7. **Document** - Generate BRAINSTORM document for /define
+1. **Explorar** — Entender o contexto do projeto e padrões existentes
+2. **Questionar** — Fazer uma pergunta por vez para clarificar a intenção
+3. **Coletar** — Reunir arquivos de exemplo, ground truth ou dados de referência para grounding do LLM
+4. **Propor** — Apresentar 2-3 abordagens com trade-offs
+5. **Simplificar** — Aplicar YAGNI para remover features desnecessárias
+6. **Validar** — Confirmar o entendimento de forma incremental
+7. **Documentar** — Gerar o documento BRAINSTORM para o Define
 
 ---
 
-## Process
+## Processo
 
-### Step 1: Gather Context
-
-```markdown
-Read(CLAUDE.md)
-Read(${CLAUDE_PLUGIN_ROOT}/sdd/templates/BRAINSTORM_TEMPLATE.md)
-Explore project structure, recent commits, existing patterns
-```
-
-### Step 2: Discovery Questions
-
-Ask questions ONE AT A TIME:
-
-| Question Type | When to Use |
-|---------------|-------------|
-| Multiple Choice | When options are clear (preferred) |
-| Open-Ended | When exploring unknown territory |
-| Clarifying | When answer was vague |
-
-**Minimum:** 3 questions before proposing approaches
-
-### Step 3: Sample Collection (LLM Grounding)
-
-Ask about available samples to improve AI/LLM accuracy:
+### Passo 1: Coletar Contexto
 
 ```markdown
-"Do you have any samples that could help ground the solution?
-(a) Sample input files
-(b) Expected output examples
-(c) Ground truth / verified data
-(d) None available"
+Ler CLAUDE.md
+Ler template BRAINSTORM_TEMPLATE.md
+Explorar estrutura do projeto, commits recentes, padrões existentes
 ```
 
-If samples exist, analyze and document them in the BRAINSTORM output.
+### Passo 2: Perguntas de Descoberta
 
-### Step 4: Explore Approaches
+Faça perguntas UMA DE CADA VEZ:
 
-Present 2-3 distinct approaches:
+| Tipo de Pergunta | Quando Usar |
+|-----------------|-------------|
+| Múltipla Escolha | Quando as opções são claras (preferido) |
+| Aberta | Quando explorando território desconhecido |
+| Esclarecedora | Quando a resposta foi vaga |
+
+**Mínimo:** 3 perguntas antes de propor abordagens
+
+### Passo 3: Coleta de Amostras (Grounding do LLM)
+
+Pergunte sobre amostras disponíveis para melhorar a precisão:
 
 ```markdown
-### Approach A: {Name} ⭐ Recommended
-**Why:** {Reasoning}
-**Pros:** {Benefits}
-**Cons:** {Trade-offs}
-
-### Approach B: {Name}
-**Why not recommended:** {Reasoning}
+"Você tem alguma amostra que possa ajudar a embasar a solução?
+(a) Arquivos de input de exemplo
+(b) Exemplos de output esperado
+(c) Ground truth / dados verificados
+(d) Nenhum disponível"
 ```
 
-### Step 5: Apply YAGNI
+Se existirem amostras, analise-as e documente no output do BRAINSTORM.
 
-For each feature, ask:
-- Do we need this for MVP?
-- Does this solve the core problem?
+### Passo 4: Explorar Abordagens
 
-Remove features that don't pass. Document what was removed and why.
+Apresente 2-3 abordagens distintas:
 
-### Step 6: Validate Incrementally
+```markdown
+### Approach A: {Nome} ⭐ Recomendada
+**Por quê:** {Raciocínio}
+**Prós:** {Benefícios}
+**Contras:** {Trade-offs}
 
-Present design in sections (200-300 words each):
+### Approach B: {Nome}
+**Por que não recomendada:** {Raciocínio}
+```
+
+### Passo 5: Aplicar YAGNI
+
+Para cada feature, pergunte:
+- Precisamos disso para o MVP?
+- Isso resolve o problema central?
+
+Remova as features que não passarem. Documente o que foi removido e por quê.
+
+### Passo 6: Validar Incrementalmente
+
+Apresente o design em seções (200-300 palavras cada):
 
 ```text
-Section → Check with user → Adjust if needed → Next section
+Seção → Verificar com o usuário → Ajustar se necessário → Próxima seção
 ```
 
-**Minimum:** 2 validation checkpoints
+**Mínimo:** 2 checkpoints de validação
 
-### Step 7: Generate Document
+### Passo 7: Gerar Documento
 
 ```markdown
-Write(.claude/sdd/features/BRAINSTORM_{FEATURE}.md)
+Salvar em: .claude/sdd/features/BRAINSTORM_{FEATURE}.md
 ```
 
 ---
 
 ## Output
 
-| Artifact | Location |
-|----------|----------|
-| **Brainstorm Document** | `.claude/sdd/features/BRAINSTORM_{FEATURE}.md` |
+| Artefato | Localização |
+|----------|-------------|
+| **Documento Brainstorm** | `.claude/sdd/features/BRAINSTORM_{FEATURE}.md` |
 
-**Next Step:** `/define .claude/sdd/features/BRAINSTORM_{FEATURE}.md`
+**Próximo Passo:** Define — `BRAINSTORM_{FEATURE}.md`
 
 ---
 
-## Quality Gate
+## Gate de Qualidade
 
-Before marking complete:
+Antes de marcar como completo:
 
 ```text
-[ ] Minimum 3 discovery questions asked
-[ ] Sample collection question asked
-[ ] At least 2 approaches explored
-[ ] YAGNI applied (features removed)
-[ ] Minimum 2 validations completed
-[ ] User confirmed selected approach
-[ ] Draft requirements included
+[ ] Mínimo de 3 perguntas de descoberta feitas
+[ ] Pergunta sobre coleta de amostras feita
+[ ] Pelo menos 2 abordagens exploradas
+[ ] YAGNI aplicado (features removidas)
+[ ] Mínimo de 2 validações concluídas
+[ ] Usuário confirmou a abordagem selecionada
+[ ] Requisitos de rascunho incluídos
 ```
 
 ---
 
-## Interaction Style
+## Estilo de Interação
 
-### One Question at a Time
+### Uma Pergunta por Vez
 
 ```markdown
-GOOD:
-"What's the primary use case?
-(a) Internal reporting
-(b) Customer-facing
-(c) Both"
+BOM:
+"Qual é o caso de uso principal?
+(a) Relatório interno
+(b) Voltado ao cliente
+(c) Ambos"
 
-BAD:
-"What's the use case? Who are the users? What's the timeline?"
+RUIM:
+"Qual é o caso de uso? Quem são os usuários? Qual é o prazo?"
 ```
 
-### Lead with Recommendation
+### Lidere com a Recomendação
 
 ```markdown
-GOOD:
-"I recommend Approach A because [reasoning].
-Here are the alternatives to consider..."
+BOM:
+"Recomendo a Approach A porque [raciocínio].
+Aqui estão as alternativas a considerar..."
 
-BAD:
-"Here are three approaches. Which one do you want?"
+RUIM:
+"Aqui estão três abordagens. Qual você quer?"
 ```
 
-### Be Ready to Go Back
+### Esteja Pronto para Voltar
 
 ```markdown
-GOOD:
-"That's different from what I understood. Let me revise..."
+BOM:
+"Isso é diferente do que eu entendi. Deixa eu revisar..."
 
-BAD:
-"Moving on to the next section..."
+RUIM:
+"Passando para a próxima seção..."
 ```
 
 ---
 
-## When to Use /brainstorm vs /define
+## Quando Usar Brainstorm vs Define
 
-| Scenario | Use |
-|----------|-----|
-| Vague idea, need to explore | `/brainstorm` |
-| Clear requirements, ready to capture | `/define` directly |
-| Existing BRAINSTORM document | `/define <brainstorm-file>` |
-| Meeting notes with clear asks | `/define` directly |
-| "I want to build something but not sure what" | `/brainstorm` |
-
----
-
-## Tips
-
-1. **Take your time** - Exploration is about understanding, not speed
-2. **Ask why** - "Why do you need this?" reveals true requirements
-3. **Challenge scope** - Most features aren't needed for MVP
-4. **Trust the user** - They know their domain, you know patterns
-5. **Document removed features** - They might come back later
+| Cenário | Use |
+|---------|-----|
+| Ideia vaga, precisa explorar | `brainstorm` |
+| Requisitos claros, pronto para capturar | `define` diretamente |
+| Documento BRAINSTORM existente | `define <brainstorm-file>` |
+| Notas de reunião com pedidos claros | `define` diretamente |
+| "Quero construir algo mas não sei exatamente o quê" | `brainstorm` |
 
 ---
 
-## Handling Different Inputs
+## Dicas
 
-| Input Type | Approach |
-|------------|----------|
-| Vague idea | Start with "Tell me more about..." |
-| Specific request | Validate understanding, then explore approaches |
-| Problem statement | Focus on pain points, then solutions |
-| Feature request | Question the need, explore alternatives |
-| Comparison request | Explore trade-offs, make recommendation |
+1. **Tome seu tempo** — Exploração é sobre entendimento, não velocidade
+2. **Pergunte o porquê** — "Por que você precisa disso?" revela os requisitos reais
+3. **Desafie o escopo** — A maioria das features não é necessária para o MVP
+4. **Confie no usuário** — Ele conhece o domínio, você conhece os padrões
+5. **Documente features removidas** — Elas podem voltar mais tarde
 
 ---
 
-## References
+## Tratando Diferentes Tipos de Input
 
-- Agent: `${CLAUDE_PLUGIN_ROOT}/agents/workflow/brainstorm-agent.md`
-- Template: `${CLAUDE_PLUGIN_ROOT}/sdd/templates/BRAINSTORM_TEMPLATE.md`
-- Contracts: `${CLAUDE_PLUGIN_ROOT}/sdd/architecture/WORKFLOW_CONTRACTS.yaml`
-- Next Phase: `${CLAUDE_PLUGIN_ROOT}/commands/workflow/define.md`
+| Tipo de Input | Abordagem |
+|---------------|-----------|
+| Ideia vaga | Comece com "Me conta mais sobre..." |
+| Pedido específico | Valide o entendimento, depois explore abordagens |
+| Problem statement | Foque nos pain points, depois nas soluções |
+| Feature request | Questione a necessidade, explore alternativas |
+| Pedido de comparação | Explore trade-offs, faça uma recomendação |
+
+---
+
+## Referências
+
+- Agente: `agents/brainstorm-agent.md`
+- Template: `templates/BRAINSTORM_TEMPLATE.md`
+- Contratos: `architecture/WORKFLOW_CONTRACTS.yaml`
+- Próxima Fase: `commands/define.md`

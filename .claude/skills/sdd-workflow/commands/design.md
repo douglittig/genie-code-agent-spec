@@ -1,174 +1,174 @@
 ---
 name: design
-description: Create architecture and technical specification (Phase 2)
+description: Crie arquitetura e especificação técnica em uma passagem (Fase 2)
 ---
 
-# Design Command
+# Design
 
-> Create architecture and technical specification in one pass (Phase 2)
+> Criação de arquitetura e especificação técnica em uma passagem (Fase 2)
 
-## Usage
+## Uso
 
-```bash
-/design <define-file>
+```
+design <define-file>
 ```
 
-## Examples
+## Exemplos
 
-```bash
-/design .claude/sdd/features/DEFINE_NOTIFICATION_SYSTEM.md
-/design DEFINE_USER_AUTH.md
-/design .claude/sdd/features/DEFINE_SEARCH_API.md
+```
+design .claude/sdd/features/DEFINE_SISTEMA_NOTIFICACOES.md
+design DEFINE_AUTH_USUARIO.md
+design .claude/sdd/features/DEFINE_API_BUSCA.md
 ```
 
 ---
 
-## Overview
+## Visão Geral
 
-This is **Phase 2** of the 5-phase AgentSpec workflow:
+Esta é a **Fase 2** do workflow SDD de 5 fases:
 
 ```text
-Phase 0: /brainstorm → .claude/sdd/features/BRAINSTORM_{FEATURE}.md (optional)
-Phase 1: /define     → .claude/sdd/features/DEFINE_{FEATURE}.md
-Phase 2: /design     → .claude/sdd/features/DESIGN_{FEATURE}.md (THIS COMMAND)
-Phase 3: /build      → Code + .claude/sdd/reports/BUILD_REPORT_{FEATURE}.md
-Phase 4: /ship       → .claude/sdd/archive/{FEATURE}/SHIPPED_{DATE}.md
+Fase 0: brainstorm → .claude/sdd/features/BRAINSTORM_{FEATURE}.md (opcional)
+Fase 1: define     → .claude/sdd/features/DEFINE_{FEATURE}.md
+Fase 2: design     → .claude/sdd/features/DESIGN_{FEATURE}.md (ESTA FASE)
+Fase 3: build      → Código + .claude/sdd/reports/BUILD_REPORT_{FEATURE}.md
+Fase 4: ship       → .claude/sdd/archive/{FEATURE}/SHIPPED_{DATE}.md
 ```
 
-The `/design` command combines what used to be Plan + Spec + ADRs into a single document with architecture decisions inline.
+O Design combina o que antes era Plan + Spec + ADRs em um único documento com decisões arquiteturais inline.
 
 ---
 
-## What This Command Does
+## O que Esta Fase Faz
 
-1. **Analyze** - Understand requirements from DEFINE
-2. **Architect** - Design high-level solution with diagrams
-3. **Decide** - Document key decisions with rationale (inline ADRs)
-4. **Specify** - Create file manifest and code patterns
-5. **Plan Testing** - Define testing strategy
+1. **Analisar** — Entender os requisitos do DEFINE
+2. **Arquitetar** — Projetar a solução de alto nível com diagramas
+3. **Decidir** — Documentar decisões principais com justificativa (ADRs inline)
+4. **Especificar** — Criar o File Manifest e padrões de código
+5. **Planejar Testes** — Definir a estratégia de testes
 
 ---
 
-## Process
+## Processo
 
-### Step 1: Load Context
+### Passo 1: Carregar Contexto
 
 ```markdown
-Read(.claude/sdd/features/DEFINE_{FEATURE}.md)
-Read(${CLAUDE_PLUGIN_ROOT}/sdd/templates/DESIGN_TEMPLATE.md)
-Read(CLAUDE.md)
+Ler .claude/sdd/features/DEFINE_{FEATURE}.md
+Ler template DESIGN_TEMPLATE.md
+Ler CLAUDE.md
 
-# Explore codebase for patterns:
+# Explorar padrões no codebase:
 Glob(**/*.py) | head -20
 Grep("class |def ") | sample
 ```
 
-### Step 2: Create Architecture
+### Passo 2: Criar Arquitetura
 
-Design the solution:
+Projete a solução:
 
-| Component | Content |
-|-----------|---------|
-| **Overview** | ASCII diagram of system |
-| **Components** | List of modules/services |
-| **Data Flow** | How data moves through system |
-| **Integration Points** | External dependencies |
+| Componente | Conteúdo |
+|------------|---------|
+| **Visão Geral** | Diagrama ASCII do sistema |
+| **Componentes** | Lista de módulos/serviços |
+| **Fluxo de Dados** | Como os dados se movem pelo sistema |
+| **Pontos de Integração** | Dependências externas |
 
-### Step 3: Document Decisions (Inline ADRs)
+### Passo 3: Documentar Decisões (ADRs Inline)
 
-For each significant choice:
+Para cada escolha significativa:
 
 ```markdown
-### Decision: {Name}
+### Decisão: {Nome}
 
-| Attribute | Value |
-|-----------|-------|
-| **Status** | Accepted |
-| **Date** | YYYY-MM-DD |
+| Atributo | Valor |
+|----------|-------|
+| **Status** | Aceita |
+| **Data** | YYYY-MM-DD |
 
-**Context:** Why this decision was needed
+**Contexto:** Por que esta decisão foi necessária
 
-**Choice:** What we're doing
+**Escolha:** O que estamos fazendo
 
-**Rationale:** Why this approach
+**Justificativa:** Por que esta abordagem
 
-**Alternatives Rejected:**
-1. Option A - rejected because X
-2. Option B - rejected because Y
+**Alternativas Rejeitadas:**
+1. Opção A — rejeitada porque X
+2. Opção B — rejeitada porque Y
 
-**Consequences:**
-- Trade-off we accept
-- Benefit we gain
+**Consequências:**
+- Trade-off que aceitamos
+- Benefício que obtemos
 ```
 
-### Step 4: Create File Manifest
+### Passo 4: Criar o File Manifest
 
-List all files to create/modify:
+Liste todos os arquivos a criar/modificar:
 
-| # | File | Action | Purpose | Dependencies |
-|---|------|--------|---------|--------------|
-| 1 | `path/to/file.py` | Create | Main handler | None |
-| 2 | `path/to/config.yaml` | Create | Configuration | None |
-| 3 | `path/to/handler.py` | Create | Request handler | 1, 2 |
+| # | Arquivo | Ação | Propósito | Dependências |
+|---|---------|------|-----------|--------------|
+| 1 | `caminho/para/arquivo.py` | Criar | Handler principal | Nenhuma |
+| 2 | `caminho/para/config.yaml` | Criar | Configuração | Nenhuma |
+| 3 | `caminho/para/handler.py` | Criar | Handler de requisições | 1, 2 |
 
-### Step 5: Define Code Patterns
+### Passo 5: Definir Padrões de Código
 
-Provide copy-paste ready code snippets for key patterns.
+Forneça snippets prontos para copiar e colar para os padrões principais.
 
-### Step 6: Plan Testing Strategy
+### Passo 6: Planejar Estratégia de Testes
 
-| Test Type | Scope | Tools |
-|-----------|-------|-------|
-| Unit | Functions | pytest |
-| Integration | API | pytest + requests |
-| E2E | Full flow | Manual/automated |
+| Tipo de Teste | Escopo | Ferramentas |
+|---------------|--------|-------------|
+| Unitário | Funções | pytest |
+| Integração | API | pytest + requests |
+| E2E | Fluxo completo | Manual/automatizado |
 
-### Step 7: Save
+### Passo 7: Salvar
 
 ```markdown
-Write(.claude/sdd/features/DESIGN_{FEATURE_NAME}.md)
+Salvar em: .claude/sdd/features/DESIGN_{FEATURE_NAME}.md
 ```
 
 ---
 
 ## Output
 
-| Artifact | Location |
-|----------|----------|
+| Artefato | Localização |
+|----------|-------------|
 | **DESIGN** | `.claude/sdd/features/DESIGN_{FEATURE_NAME}.md` |
 
-**Next Step:** `/build .claude/sdd/features/DESIGN_{FEATURE_NAME}.md`
+**Próximo Passo:** Build — `DESIGN_{FEATURE_NAME}.md`
 
 ---
 
-## Quality Gate
+## Gate de Qualidade
 
-Before saving, verify:
+Antes de salvar, verifique:
 
 ```text
-[ ] Architecture diagram is clear
-[ ] All major decisions documented with rationale
-[ ] File manifest is complete (all files listed)
-[ ] Code patterns are copy-paste ready
-[ ] Testing strategy covers requirements
-[ ] No circular dependencies in architecture
+[ ] Diagrama de arquitetura está claro
+[ ] Todas as decisões principais documentadas com justificativa
+[ ] File Manifest está completo (todos os arquivos listados)
+[ ] Padrões de código estão prontos para copiar e colar
+[ ] Estratégia de testes cobre os requisitos
+[ ] Sem dependências circulares na arquitetura
 ```
 
 ---
 
-## Tips
+## Dicas
 
-1. **Diagram First** - ASCII art clarifies thinking
-2. **Decisions Are Permanent** - Document the "why" not just "what"
-3. **Self-Contained Files** - Each file should work independently
-4. **Config Over Code** - Use YAML for tunables, not hardcoded values
-5. **Test Early** - Design for testability from the start
+1. **Diagrama Primeiro** — ASCII art clarifica o pensamento
+2. **Decisões São Permanentes** — Documente o "por quê" e não apenas o "o quê"
+3. **Arquivos Autocontidos** — Cada arquivo deve funcionar de forma independente
+4. **Config, Não Código** — Use YAML para valores configuráveis, não valores hardcoded
+5. **Teste Desde o Início** — Projete para testabilidade desde o começo
 
 ---
 
-## References
+## Referências
 
-- Agent: `${CLAUDE_PLUGIN_ROOT}/agents/workflow/design-agent.md`
-- Template: `${CLAUDE_PLUGIN_ROOT}/sdd/templates/DESIGN_TEMPLATE.md`
-- Contracts: `${CLAUDE_PLUGIN_ROOT}/sdd/architecture/WORKFLOW_CONTRACTS.yaml`
-- Next Phase: `${CLAUDE_PLUGIN_ROOT}/commands/workflow/build.md`
+- Agente: `agents/design-agent.md`
+- Template: `templates/DESIGN_TEMPLATE.md`
+- Contratos: `architecture/WORKFLOW_CONTRACTS.yaml`
+- Próxima Fase: `commands/build.md`

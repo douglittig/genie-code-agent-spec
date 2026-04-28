@@ -1,12 +1,11 @@
 ---
 name: sdd-workflow
 description: |
-  Spec-Driven Development (SDD) workflow for Genie Code. Use PROACTIVELY when
-  the user discusses building features, reading specs from Confluence, generating
-  code from business requirements, updating Jira tickets, creating PRs, or
-  reviewing code. Guides through the 5-phase workflow:
-  Brainstorm → Define → Design → Build → Ship,
-  with Confluence MCP (spec ingestion) and Jira MCP (ticket update) integrated.
+  Workflow de Spec-Driven Development (SDD) para o Genie Code. Use de forma PROATIVA
+  quando o usuário falar em construir features, ler specs do Confluence, gerar código
+  a partir de requisitos de negócio, atualizar tickets no Jira, criar PRs ou revisar
+  código. Guia pelas 5 fases: Brainstorm → Define → Design → Build → Ship,
+  com integração Confluence MCP (ingestão de spec) e Jira MCP (atualização de ticket).
 ---
 
 # SDD Workflow — Genie Code
@@ -28,25 +27,25 @@ Confluence (SPEC) → DEFINE → DESIGN → BUILD → Jira (update) → PR → R
 |------|--------|-------------------|
 | 0 — Brainstorm (opcional) | `BRAINSTORM_{FEATURE}.md` | Mín. 3 perguntas, 2 abordagens, YAGNI aplicado |
 | 1 — Define | `DEFINE_{FEATURE}.md` | Clarity Score ≥ 12/15 |
-| 2 — Design | `DESIGN_{FEATURE}.md` | Todos os arquivos têm agente atribuído |
-| 3 — Build | Código + `BUILD_REPORT_{FEATURE}.md` | Testes passam, atribuição por especialista |
-| 4 — Ship | `SHIPPED_{DATE}.md` + Jira atualizado | Lições capturadas |
+| 2 — Design | `DESIGN_{FEATURE}.md` | Todos os arquivos têm agente atribuído no File Manifest |
+| 3 — Build | Código + `BUILD_REPORT_{FEATURE}.md` | Testes passam, atribuição por especialista documentada |
+| 4 — Ship | `SHIPPED_{DATE}.md` + Jira atualizado | Lições capturadas, ticket fechado |
 
 ## Quando Guiar o Usuário
 
 - "Quero construir..." → Sugerir Brainstorm ou Define
-- "Tenha a SPEC no Confluence" → Ler via MCP e gerar Define
+- "Tenho a SPEC no Confluence" → Ler via MCP e gerar Define
 - Tem DEFINE pronto → Sugerir Design
 - Tem DESIGN pronto → Executar Build
-- Build completo → Atualizar Jira, criar PR, review, ship
+- Build completo → Atualizar Jira, criar PR, fazer review, executar Ship
 
 ## Regras do Fluxo
 
-1. **Brainstorm** é opcional — pular para DEFINE se a SPEC já está clara
-2. **Define** exige Clarity Score ≥ 12/15 antes de avançar — se menor, pedir esclarecimentos
+1. **Brainstorm** é opcional — pular para Define se a SPEC já está clara
+2. **Define** exige Clarity Score ≥ 12/15 antes de avançar — se menor, pedir esclarecimentos à área de negócio
 3. **Design** deve ter File Manifest completo — nenhum arquivo sem agente atribuído
-4. **Build** delega cada arquivo ao agente especializado, gera BUILD_REPORT com atribuição
-5. **Ship** arquiva tudo e atualiza o Jira antes de fechar
+4. **Build** delega cada arquivo ao agente especializado e gera BUILD_REPORT com atribuição por arquivo
+5. **Ship** arquiva todos os artefatos e atualiza o Jira antes de fechar
 
 ## Integração Confluence → Define
 
@@ -63,12 +62,12 @@ Quando o usuário fornecer uma URL ou page-id do Confluence:
 Após BUILD e antes do archive:
 
 1. Mover ticket para "In Review"
-2. Adicionar link do PR como comentário
-3. Após merge: mover para "Done" + link do commit
+2. Adicionar link do PR como comentário no ticket
+3. Após merge: mover para "Done" + adicionar link do commit
 
 ## File Manifest (Design)
 
-Cada arquivo recebe um agente especializado do ecossistema Databricks:
+Cada arquivo do manifest recebe um agente especializado do ecossistema Databricks:
 
 | Agente | Especialidade |
 |--------|--------------|
@@ -76,8 +75,8 @@ Cada arquivo recebe um agente especializado do ecossistema Databricks:
 | `@spark-engineer` | PySpark, DataFrames, transformações |
 | `@spark-streaming-architect` | Streaming, checkpoints, stateful operations |
 | `@sql-optimizer` | SQL, performance, particionamento |
-| `@medallion-architect` | Bronze/Silver/Gold layers |
-| `@data-quality-analyst` | Testes de qualidade, assertions |
+| `@medallion-architect` | Camadas Bronze/Silver/Gold |
+| `@data-quality-analyst` | Testes de qualidade, assertions, observabilidade |
 | `@python-developer` | Scripts Python, SDK calls |
 | `@test-generator` | pytest, fixtures, suites de teste |
 | `@code-reviewer` | Review arquitetural, boas práticas |
@@ -86,15 +85,15 @@ Cada arquivo recebe um agente especializado do ecossistema Databricks:
 
 Após BUILD completo:
 
-1. Rodar review antes do PR: verificar acceptance tests do DEFINE, segurança, qualidade
+1. Rodar review antes do PR: verificar acceptance tests do DEFINE, segurança, qualidade de código
 2. Criar PR com conventional commits (`feat:`, `fix:`, `refactor:`, `test:`, `chore:`)
-3. Bloqueadores que impedem merge: falha em acceptance test, credencial exposta, breaking change sem deprecation
+3. Bloqueadores que impedem merge: falha em acceptance test, credencial exposta, breaking change sem deprecation period
 
-## Iterate (Mudanças Mid-Stream)
+## Iterate — Mudanças Mid-Stream
 
 Quando requisitos mudarem durante qualquer fase, propagar a mudança pelo pipeline:
 - Atualizar o documento da fase onde a mudança entrou
-- Verificar impacto cascata nas fases seguintes
+- Verificar impacto cascata nas fases seguintes (DEFINE → DESIGN → código)
 - Documentar no revision history do artefato
 
 ## Localização dos Artefatos
@@ -108,15 +107,15 @@ Todos os documentos SDD ficam no workspace do projeto:
 └── archive/        {FEATURE}/ com todos os docs + SHIPPED_*.md
 ```
 
-## Reference Files nesta Skill
+## Reference Files desta Skill
 
 | Arquivo | Conteúdo |
 |---------|---------|
-| `templates/BRAINSTORM_TEMPLATE.md` | Template fase 0 |
-| `templates/DEFINE_TEMPLATE.md` | Template fase 1 (com Clarity Score) |
-| `templates/DESIGN_TEMPLATE.md` | Template fase 2 (com File Manifest) |
-| `templates/BUILD_REPORT_TEMPLATE.md` | Template fase 3 |
-| `templates/SHIPPED_TEMPLATE.md` | Template fase 4 |
+| `templates/BRAINSTORM_TEMPLATE.md` | Template da fase 0 |
+| `templates/DEFINE_TEMPLATE.md` | Template da fase 1 (com Clarity Score) |
+| `templates/DESIGN_TEMPLATE.md` | Template da fase 2 (com File Manifest) |
+| `templates/BUILD_REPORT_TEMPLATE.md` | Template da fase 3 |
+| `templates/SHIPPED_TEMPLATE.md` | Template da fase 4 |
 | `architecture/WORKFLOW_CONTRACTS.yaml` | Regras de transição entre fases |
 | `architecture/ARCHITECTURE.md` | Arquitetura completa do framework |
 | `commands/define.md` | Instrução detalhada da fase Define |
@@ -124,9 +123,9 @@ Todos os documentos SDD ficam no workspace do projeto:
 | `commands/build.md` | Instrução detalhada da fase Build |
 | `commands/ship.md` | Instrução detalhada da fase Ship |
 | `commands/create-pr.md` | Criação de PR com conventional commits |
-| `commands/review.md` | Dual AI review (estático + arquitetural) |
+| `commands/review.md` | Dual AI review (análise estática + arquitetural) |
 | `agents/define-agent.md` | Capacidades do agente de Define |
 | `agents/design-agent.md` | Capacidades do agente de Design |
 | `agents/build-agent.md` | Capacidades do agente de Build |
-| `agents/code-reviewer.md` | Capacidades do agente de review |
-| `agents/test-generator.md` | Capacidades do agente de testes |
+| `agents/code-reviewer.md` | Capacidades do agente de review de código |
+| `agents/test-generator.md` | Capacidades do agente de geração de testes |

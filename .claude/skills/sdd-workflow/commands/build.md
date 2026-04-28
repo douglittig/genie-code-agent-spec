@@ -1,183 +1,184 @@
 ---
 name: build
-description: Execute implementation with on-the-fly task generation (Phase 3)
+description: Execute a implementação com geração de tarefas on-the-fly (Fase 3)
 ---
 
-# Build Command
+# Build
 
-> Execute implementation with on-the-fly task generation (Phase 3)
+> Execução da implementação com geração de tarefas on-the-fly (Fase 3)
 
-## Usage
+## Uso
 
-```bash
-/build <design-file>
+```
+build <design-file>
 ```
 
-## Examples
+## Exemplos
 
-```bash
-/build .claude/sdd/features/DESIGN_NOTIFICATION_SYSTEM.md
-/build DESIGN_USER_AUTH.md
+```
+build .claude/sdd/features/DESIGN_SISTEMA_NOTIFICACOES.md
+build DESIGN_AUTH_USUARIO.md
 ```
 
 ---
 
-## Overview
+## Visão Geral
 
-This is **Phase 3** of the 5-phase AgentSpec workflow:
+Esta é a **Fase 3** do workflow SDD de 5 fases:
 
 ```text
-Phase 0: /brainstorm → .claude/sdd/features/BRAINSTORM_{FEATURE}.md (optional)
-Phase 1: /define     → .claude/sdd/features/DEFINE_{FEATURE}.md
-Phase 2: /design   → .claude/sdd/features/DESIGN_{FEATURE}.md
-Phase 3: /build    → Code + .claude/sdd/reports/BUILD_REPORT_{FEATURE}.md (THIS COMMAND)
-Phase 4: /ship     → .claude/sdd/archive/{FEATURE}/SHIPPED_{DATE}.md
+Fase 0: brainstorm → .claude/sdd/features/BRAINSTORM_{FEATURE}.md (opcional)
+Fase 1: define     → .claude/sdd/features/DEFINE_{FEATURE}.md
+Fase 2: design     → .claude/sdd/features/DESIGN_{FEATURE}.md
+Fase 3: build      → Código + .claude/sdd/reports/BUILD_REPORT_{FEATURE}.md (ESTA FASE)
+Fase 4: ship       → .claude/sdd/archive/{FEATURE}/SHIPPED_{DATE}.md
 ```
 
-The `/build` command executes the implementation, generating tasks on-the-fly from the file manifest.
+A fase de build executa a implementação, gerando tarefas on-the-fly a partir do File Manifest.
 
 ---
 
-## What This Command Does
+## O que Esta Fase Faz
 
-1. **Parse** - Extract file manifest from DESIGN
-2. **Prioritize** - Order files by dependencies
-3. **Execute** - Create each file with verification
-4. **Validate** - Run tests after each significant change
-5. **Report** - Generate build report
+1. **Parsear** — Extrair o File Manifest do DESIGN
+2. **Priorizar** — Ordenar arquivos por dependências
+3. **Executar** — Criar cada arquivo com verificação
+4. **Validar** — Rodar testes após cada mudança significativa
+5. **Reportar** — Gerar o build report
 
 ---
 
-## Process
+## Processo
 
-### Step 1: Load Context
+### Passo 1: Carregar Contexto
 
 ```markdown
-Read(.claude/sdd/features/DESIGN_{FEATURE}.md)
-Read(.claude/sdd/features/DEFINE_{FEATURE}.md)
-Read(CLAUDE.md)
+Ler .claude/sdd/features/DESIGN_{FEATURE}.md
+Ler .claude/sdd/features/DEFINE_{FEATURE}.md
+Ler CLAUDE.md
 ```
 
-### Step 2: Extract Tasks from File Manifest
+### Passo 2: Extrair Tarefas do File Manifest
 
-Convert the file manifest to a task list:
+Converta o File Manifest em uma lista de tarefas:
 
 ```markdown
-From DESIGN file manifest:
-| File | Action | Purpose |
+Do File Manifest do DESIGN:
+| Arquivo | Ação | Propósito |
 
-Generate:
-- [ ] Create/Modify {file1}
-- [ ] Create/Modify {file2}
+Gerar:
+- [ ] Criar/Modificar {arquivo1}
+- [ ] Criar/Modificar {arquivo2}
 - [ ] ...
 ```
 
-### Step 3: Order by Dependencies
+### Passo 3: Ordenar por Dependências
 
-Analyze imports and dependencies to determine execution order.
+Analise imports e dependências para determinar a ordem de execução.
 
-### Step 4: Execute Each Task
+### Passo 4: Executar Cada Tarefa
 
-For each file:
+Para cada arquivo:
 
-1. **Write** - Create the file following code patterns from DESIGN
-2. **Verify** - Run verification command (lint, type check, import test)
-3. **Mark Complete** - Update progress
+1. **Escrever** — Criar o arquivo seguindo os padrões de código do DESIGN
+2. **Verificar** — Rodar comando de verificação (lint, type check, import test)
+3. **Marcar Completo** — Atualizar progresso
 
-### Step 5: Run Full Validation
+### Passo 5: Rodar Validação Completa
 
-After all files created:
+Após todos os arquivos criados:
 
 ```bash
 # Lint check
 ruff check .
 
-# Type check (if applicable)
+# Type check (se aplicável)
 mypy .
 
-# Run tests
+# Rodar testes
 pytest
 ```
 
-### Step 6: Generate Build Report
+### Passo 6: Gerar Build Report
 
 ```markdown
-Write(.claude/sdd/reports/BUILD_REPORT_{FEATURE}.md)
+Salvar em: .claude/sdd/reports/BUILD_REPORT_{FEATURE}.md
 ```
 
 ---
 
 ## Output
 
-| Artifact | Location |
-|----------|----------|
-| **Code** | As specified in DESIGN file manifest |
+| Artefato | Localização |
+|----------|-------------|
+| **Código** | Conforme especificado no File Manifest do DESIGN |
 | **Build Report** | `.claude/sdd/reports/BUILD_REPORT_{FEATURE}.md` |
 
-**Next Step:** `/ship .claude/sdd/features/DEFINE_{FEATURE}.md` (when ready)
+**Próximo Passo:** Ship — `DEFINE_{FEATURE}.md` (quando pronto)
 
 ---
 
-## Execution Loop
+## Loop de Execução
 
-The build agent follows this loop for each task:
+O build-agent segue este loop para cada tarefa:
 
 ```text
 ┌─────────────────────────────────────────────────────┐
-│                    EXECUTE TASK                      │
+│                  EXECUTAR TAREFA                     │
 ├─────────────────────────────────────────────────────┤
-│  1. Read task from manifest                         │
-│  2. Write code following DESIGN patterns            │
-│  3. Run verification command                        │
-│     └─ If FAIL → Fix and retry (max 3)             │
-│  4. Mark task complete                              │
-│  5. Move to next task                               │
+│  1. Ler tarefa do manifest                          │
+│  2. Escrever código seguindo padrões do DESIGN      │
+│  3. Rodar comando de verificação                    │
+│     └─ Se FALHAR → Corrigir e tentar novamente      │
+│        (máx. 3 tentativas)                          │
+│  4. Marcar tarefa completa                          │
+│  5. Mover para a próxima tarefa                     │
 └─────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## Quality Gate
+## Gate de Qualidade
 
-Before marking complete, verify:
+Antes de marcar como completo, verifique:
 
 ```text
-[ ] All files from manifest created
-[ ] All verification commands pass
-[ ] Lint check passes
-[ ] Tests pass (if applicable)
-[ ] No TODO comments left in code
-[ ] Build report generated
+[ ] Todos os arquivos do manifest criados
+[ ] Todos os comandos de verificação passaram
+[ ] Lint check passou
+[ ] Testes passaram (se aplicável)
+[ ] Sem comentários TODO no código
+[ ] Build report gerado
 ```
 
 ---
 
-## Tips
+## Dicas
 
-1. **Follow the DESIGN** - Don't improvise, use the code patterns
-2. **Verify Incrementally** - Test after each file, not at the end
-3. **Fix Forward** - If something breaks, fix it immediately
-4. **Self-Contained** - Each file should be independently functional
-5. **No Comments** - Code should be self-documenting
-
----
-
-## Handling Issues During Build
-
-If you encounter issues:
-
-| Issue | Action |
-|-------|--------|
-| Missing requirement | Use `/iterate` to update DEFINE |
-| Architecture problem | Use `/iterate` to update DESIGN |
-| Simple bug | Fix immediately and continue |
-| Major blocker | Stop and report in build report |
+1. **Siga o DESIGN** — Não improvise, use os padrões de código
+2. **Verifique Incrementalmente** — Teste após cada arquivo, não no final
+3. **Corrija Para Frente** — Se algo quebrar, corrija imediatamente
+4. **Autocontido** — Cada arquivo deve ser funcionalmente independente
+5. **Sem Comentários** — O código deve ser autodocumentado
 
 ---
 
-## References
+## Tratando Problemas Durante o Build
 
-- Agent: `${CLAUDE_PLUGIN_ROOT}/agents/workflow/build-agent.md`
-- Template: `${CLAUDE_PLUGIN_ROOT}/sdd/templates/BUILD_REPORT_TEMPLATE.md`
-- Contracts: `${CLAUDE_PLUGIN_ROOT}/sdd/architecture/WORKFLOW_CONTRACTS.yaml`
-- Next Phase: `${CLAUDE_PLUGIN_ROOT}/commands/workflow/ship.md`
+Se encontrar problemas:
+
+| Problema | Ação |
+|----------|------|
+| Requisito faltando | Use iterate para atualizar o DEFINE |
+| Problema de arquitetura | Use iterate para atualizar o DESIGN |
+| Bug simples | Corrija imediatamente e continue |
+| Bloqueador grave | Pare e reporte no build report |
+
+---
+
+## Referências
+
+- Agente: `agents/build-agent.md`
+- Template: `templates/BUILD_REPORT_TEMPLATE.md`
+- Contratos: `architecture/WORKFLOW_CONTRACTS.yaml`
+- Próxima Fase: `commands/ship.md`

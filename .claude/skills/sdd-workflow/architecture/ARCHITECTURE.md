@@ -1,42 +1,42 @@
-# AgentSpec Architecture
+# Arquitetura SDD
 
-> Visual reference for the AgentSpec 5-phase development workflow
+> Referência visual para o workflow de desenvolvimento Spec-Driven de 5 fases
 
 ---
 
-## System Overview
+## Visão Geral do Sistema
 
 ```text
 ┌─────────────────────────────────────────────────────────────────────────────────────────────────────────┐
-│                                   AGENTSPEC 5-PHASE PIPELINE                                             │
+│                                   PIPELINE SDD — 5 FASES                                                 │
 ├─────────────────────────────────────────────────────────────────────────────────────────────────────────┤
 │                                                                                                          │
-│   PHASE 0              PHASE 1              PHASE 2              PHASE 3              PHASE 4           │
-│   ════════             ════════             ════════             ════════             ════════          │
+│   FASE 0              FASE 1              FASE 2              FASE 3              FASE 4                │
+│   ════════             ════════             ════════             ════════             ════════            │
 │   BRAINSTORM           DEFINE               DESIGN               BUILD                SHIP              │
-│   (Explore)            (What + Why)         (How)                (Do)                 (Close)           │
-│   [Optional]                                                                                            │
+│   (Explorar)           (O quê + Por quê)    (Como)               (Fazer)              (Fechar)          │
+│   [Opcional]                                                                                             │
 │                                                                                                          │
-│   /brainstorm          /define              /design              /build               /ship             │
-│        │                    │                    │                    │                    │            │
-│        ▼                    ▼                    ▼                    ▼                    ▼            │
-│   ┌──────────┐         ┌─────────┐          ┌─────────┐          ┌─────────┐          ┌─────────┐      │
-│   │BRAINSTORM│────────▶│ DEFINE  │─────────▶│ DESIGN  │─────────▶│  BUILD  │─────────▶│  SHIP   │      │
-│   │  AGENT   │ or skip │  AGENT  │          │  AGENT  │          │  AGENT  │          │  AGENT  │      │
-│   │  (Opus)  │         │ (Opus)  │          │ (Opus)  │          │(Sonnet) │          │(Haiku)  │      │
-│   └──────────┘         └─────────┘          └─────────┘          └─────────┘          └─────────┘      │
-│        │                    │                    │                    │                    │            │
-│        ▼                    ▼                    ▼                    ▼                    ▼            │
-│   features/            features/            features/            reports/ +           archive/         │
-│   BRAINSTORM_*.md      DEFINE_*.md          DESIGN_*.md          CODE FILES           {FEATURE}/       │
-│                                                                  BUILD_REPORT_*.md    SHIPPED_*.md     │
+│   brainstorm           define               design               build                ship              │
+│        │                    │                    │                    │                    │             │
+│        ▼                    ▼                    ▼                    ▼                    ▼             │
+│   ┌──────────┐         ┌─────────┐          ┌─────────┐          ┌─────────┐          ┌─────────┐       │
+│   │BRAINSTORM│────────▶│ DEFINE  │─────────▶│ DESIGN  │─────────▶│  BUILD  │─────────▶│  SHIP   │       │
+│   │  AGENT   │ ou pula │  AGENT  │          │  AGENT  │          │  AGENT  │          │  AGENT  │       │
+│   │  (Opus)  │         │ (Opus)  │          │ (Opus)  │          │(Sonnet) │          │(Haiku)  │       │
+│   └──────────┘         └─────────┘          └─────────┘          └─────────┘          └─────────┘       │
+│        │                    │                    │                    │                    │             │
+│        ▼                    ▼                    ▼                    ▼                    ▼             │
+│   features/            features/            features/            reports/ +           archive/          │
+│   BRAINSTORM_*.md      DEFINE_*.md          DESIGN_*.md          ARQUIVOS DE CÓDIGO   {FEATURE}/        │
+│                                                                  BUILD_REPORT_*.md    SHIPPED_*.md      │
 │                                                                                                          │
 ├─────────────────────────────────────────────────────────────────────────────────────────────────────────┤
 │                                                                                                          │
 │                                      CROSS-PHASE: ITERATE                                                │
 │                                      ═══════════════════                                                 │
 │                                                                                                          │
-│                                           /iterate                                                       │
+│                                           iterate                                                        │
 │                                                │                                                         │
 │                                                ▼                                                         │
 │                                           ┌─────────┐                                                    │
@@ -47,155 +47,147 @@
 │                                                │                                                         │
 │                              ┌─────────────────┼─────────────────┐                                       │
 │                              ▼                 ▼                 ▼                                       │
-│                       Updates BRAINSTORM  Updates DEFINE    Updates DESIGN                               │
-│                       (with cascade)      (with cascade)    (with cascade)                               │
+│                       Atualiza BRAINSTORM  Atualiza DEFINE   Atualiza DESIGN                             │
+│                       (com cascata)        (com cascata)     (com cascata)                               │
 │                                                                                                          │
 └─────────────────────────────────────────────────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## Phase Flow
+## Fluxo das Fases
 
 ```text
 ┌─────────────────────────────────────────────────────────────────────────────────────────┐
-│                                    WORKFLOW FLOW                                         │
+│                                    WORKFLOW DE DESENVOLVIMENTO                            │
 ├─────────────────────────────────────────────────────────────────────────────────────────┤
 │                                                                                          │
-│   RAW IDEA                                                                               │
-│   (vague request,         PHASE 0: BRAINSTORM (Optional)                                │
-│    problem)          ────────────────────────▶   BRAINSTORM_{FEATURE}.md                │
-│                           One Q at a time        - Discovery Q&A                         │
-│                           2-3 Approaches         - Approaches Explored                   │
-│                           YAGNI Ruthlessly       - Features Removed                      │
-│                                                  - Selected Approach                     │
+│   IDEIA BRUTA                                                                            │
+│   (pedido vago,         FASE 0: BRAINSTORM (Opcional)                                   │
+│    problema)       ──────────────────────────▶   BRAINSTORM_{FEATURE}.md                │
+│                           Uma pergunta por vez    - Perguntas de Descoberta              │
+│                           2-3 Abordagens          - Abordagens Exploradas                │
+│                           YAGNI Aplicado          - Features Removidas                  │
+│                                                   - Abordagem Selecionada               │
 │                                  │                                                       │
 │                                  ▼                                                       │
-│   RAW INPUT                                                                              │
-│   (notes, emails,         PHASE 1: DEFINE                                               │
-│    brainstorm doc)   ────────────────────────▶   DEFINE_{FEATURE}.md                    │
-│                           Extract + Validate     - Problem Statement                     │
-│                           Clarity Score ≥12      - Target Users                          │
-│                                                  - Success Criteria                      │
-│                                                  - Acceptance Tests                      │
-│                                                  - Out of Scope                          │
+│   INPUT BRUTO                                                                            │
+│   (notas, e-mails,      FASE 1: DEFINE                                                  │
+│    brainstorm doc)  ──────────────────────────▶   DEFINE_{FEATURE}.md                   │
+│                           Extrair + Validar       - Problem Statement                    │
+│                           Clarity Score ≥12       - Usuários-Alvo                        │
+│                                                   - Critérios de Sucesso                 │
+│                                                   - Acceptance Tests                    │
+│                                                   - Fora do Escopo                      │
 │                                  │                                                       │
 │                                  ▼                                                       │
-│                           PHASE 2: DESIGN                                               │
-│   DEFINE_{FEATURE}.md ───────────────────────▶   DESIGN_{FEATURE}.md                    │
-│                           Architect + Decide     - Architecture Diagram                  │
-│                           No Shared Deps         - Key Decisions (inline)                │
-│                                                  - File Manifest                         │
-│                                                  - Code Patterns                         │
-│                                                  - Testing Strategy                      │
+│                           FASE 2: DESIGN                                                │
+│   DEFINE_{FEATURE}.md ─────────────────────▶     DESIGN_{FEATURE}.md                   │
+│                           Arquitetar + Decidir    - Diagrama de Arquitetura              │
+│                           Sem Dependências        - Decisões Principais                  │
+│                           Compartilhadas          - File Manifest                        │
+│                                                   - Padrões de Código                   │
+│                                                   - Estratégia de Testes                │
 │                                  │                                                       │
 │                                  ▼                                                       │
-│                           PHASE 3: BUILD                                                │
-│   DESIGN_{FEATURE}.md ───────────────────────▶   CODE + BUILD_REPORT                    │
-│                           Execute + Verify       - All files from manifest               │
-│                           Tests Pass             - Verification results                  │
-│                                                  - Issues encountered                    │
+│                           FASE 3: BUILD                                                 │
+│   DESIGN_{FEATURE}.md ─────────────────────▶     CÓDIGO + BUILD_REPORT                  │
+│                           Executar + Verificar    - Todos os arquivos do manifest        │
+│                                                   - Resultados de verificação            │
+│                           Testes Passam           - Problemas encontrados                │
 │                                  │                                                       │
 │                                  ▼                                                       │
-│                           PHASE 4: SHIP                                                 │
-│   All Artifacts      ────────────────────────▶   archive/{FEATURE}/                     │
-│                           Archive + Learn        - All artifacts moved                   │
-│                                                  - SHIPPED_{DATE}.md                     │
-│                                                  - Lessons learned                       │
+│                           FASE 4: SHIP                                                  │
+│   Todos os Artefatos ───────────────────────▶     archive/{FEATURE}/                    │
+│                           Arquivar + Aprender     - Todos os artefatos movidos           │
+│                                                   - SHIPPED_{DATE}.md                   │
+│                                                   - Lições aprendidas                   │
 │                                                                                          │
 └─────────────────────────────────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## Folder Structure
+## Estrutura de Pastas (dentro da Skill)
 
 ```text
-.claude/
-+-- commands/                    # 29 slash commands
-|   +-- workflow/                # 7 SDD commands
-|   +-- data-engineering/        # 8 DE commands
-|   +-- core/                    # 4 utility commands
-|   +-- visual-explainer/         # 8 visual documentation commands
-|   +-- knowledge/               # 1 KB command
-|   +-- review/                  # 1 review command
-|
-+-- agents/                      # 58 specialized agents
-|   +-- workflow/                # 6 SDD phase agents
-|   +-- architect/               # 8 system-level design
-|   +-- cloud/                   # 10 AWS, GCP, CI/CD
-|   +-- platform/                # 6 Microsoft Fabric
-|   +-- python/                  # 6 code quality, prompts
-|   +-- test/                    # 3 testing, contracts
-|   +-- data-engineering/        # 15 DE implementation
-|   +-- dev/                     # 4 developer productivity
-|
-+-- kb/                          # 23 curated KB domains
-|   +-- dbt/                     # dbt patterns
-|   +-- spark/                   # PySpark, Spark SQL
-|   +-- sql-patterns/            # SQL best practices
-|   +-- airflow/                 # DAG patterns
-|   +-- streaming/               # Flink, Kafka, CDC
-|   +-- data-modeling/           # Star schema, Data Vault
-|   +-- ... (17 more domains)
-|
-+-- sdd/
-    +-- _index.md                # Workflow overview
-    +-- README.md                # Comprehensive documentation
-    +-- features/                # Active feature documents
-    +-- reports/                 # Build reports
-    +-- archive/                 # Shipped features
-    +-- templates/               # 5 document templates
-    +-- architecture/            # Workflow contracts
-        +-- WORKFLOW_CONTRACTS.yaml
-        +-- ARCHITECTURE.md      # This file
+.claude/skills/sdd-workflow/
+├── SKILL.md                     # Ponto de entrada da skill
+├── templates/                   # 5 templates de documentos
+│   ├── BRAINSTORM_TEMPLATE.md
+│   ├── DEFINE_TEMPLATE.md
+│   ├── DESIGN_TEMPLATE.md
+│   ├── BUILD_REPORT_TEMPLATE.md
+│   └── SHIPPED_TEMPLATE.md
+├── architecture/                # Referência arquitetural
+│   ├── WORKFLOW_CONTRACTS.yaml
+│   └── ARCHITECTURE.md          (este arquivo)
+├── commands/                    # Instruções detalhadas por fase
+│   ├── brainstorm.md
+│   ├── define.md
+│   ├── design.md
+│   ├── build.md
+│   ├── ship.md
+│   ├── iterate.md
+│   ├── create-pr.md
+│   └── review.md
+└── agents/                      # Capacidades dos agentes especializados
+    ├── brainstorm-agent.md
+    ├── define-agent.md
+    ├── design-agent.md
+    ├── build-agent.md
+    ├── ship-agent.md
+    ├── iterate-agent.md
+    ├── code-reviewer.md
+    └── test-generator.md
 ```
 
 ---
 
-## Model Assignment
+## Atribuição de Modelos
 
 ```text
 ┌─────────────────────────────────────────────────────────────────────────────────────────┐
-│                              STRATEGIC MODEL ASSIGNMENT                                  │
+│                              ATRIBUIÇÃO ESTRATÉGICA DE MODELOS                           │
 ├─────────────────────────────────────────────────────────────────────────────────────────┤
 │                                                                                          │
 │   ┌────────────────────────────────────────────────────────────────────────────────┐    │
 │   │                                    OPUS                                         │    │
-│   │                    (Nuanced Understanding & Creative Thinking)                  │    │
+│   │                    (Compreensão Nuançada e Pensamento Criativo)                  │    │
 │   │                                                                                 │    │
 │   │   ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐            │    │
 │   │   │   BRAINSTORM    │    │     DEFINE      │    │     DESIGN      │            │    │
 │   │   │     AGENT       │    │     AGENT       │    │     AGENT       │            │    │
 │   │   │                 │    │                 │    │                 │            │    │
-│   │   │ Collaborative   │    │ Requirements    │    │ Architecture    │            │    │
-│   │   │ exploration     │    │ extraction      │    │ decisions       │            │    │
+│   │   │ Exploração      │    │ Extração de     │    │ Decisões de     │            │    │
+│   │   │ colaborativa    │    │ requisitos      │    │ arquitetura     │            │    │
 │   │   └─────────────────┘    └─────────────────┘    └─────────────────┘            │    │
 │   └────────────────────────────────────────────────────────────────────────────────┘    │
 │                                                                                          │
 │   ┌────────────────────────────────────────────────────────────────────────────────┐    │
 │   │                                   SONNET                                        │    │
-│   │                           (Fast, Accurate Coding)                               │    │
+│   │                           (Codificação Rápida e Precisa)                        │    │
 │   │                                                                                 │    │
 │   │   ┌─────────────────┐              ┌─────────────────┐                         │    │
 │   │   │      BUILD      │              │     ITERATE     │                         │    │
 │   │   │      AGENT      │              │      AGENT      │                         │    │
 │   │   │                 │              │                 │                         │    │
-│   │   │ Code generation │              │ Change          │                         │    │
-│   │   │ & verification  │              │ management      │                         │    │
+│   │   │ Geração de      │              │ Gerenciamento   │                         │    │
+│   │   │ código e        │              │ de mudanças     │                         │    │
+│   │   │ verificação     │              │                 │                         │    │
 │   │   └─────────────────┘              └─────────────────┘                         │    │
 │   └────────────────────────────────────────────────────────────────────────────────┘    │
 │                                                                                          │
 │   ┌────────────────────────────────────────────────────────────────────────────────┐    │
 │   │                                    HAIKU                                        │    │
-│   │                             (Fast, Simple Tasks)                                │    │
+│   │                             (Rápido, Tarefas Simples)                           │    │
 │   │                                                                                 │    │
 │   │   ┌─────────────────┐                                                          │    │
 │   │   │      SHIP       │                                                          │    │
 │   │   │      AGENT      │                                                          │    │
 │   │   │                 │                                                          │    │
-│   │   │ Archive &       │                                                          │    │
-│   │   │ document        │                                                          │    │
+│   │   │ Arquivamento    │                                                          │    │
+│   │   │ e documentação  │                                                          │    │
 │   │   └─────────────────┘                                                          │    │
 │   └────────────────────────────────────────────────────────────────────────────────┘    │
 │                                                                                          │
@@ -204,48 +196,48 @@
 
 ---
 
-## Data Flow
+## Fluxo de Dados
 
 ```text
 ┌─────────────────────────────────────────────────────────────────────────────────────────┐
-│                                    DATA FLOW                                             │
+│                                    FLUXO DE DADOS                                        │
 ├─────────────────────────────────────────────────────────────────────────────────────────┤
 │                                                                                          │
 │   ╔═══════════════════╗                                                                 │
-│   ║    RAW IDEA       ║   (Optional Phase 0)                                            │
-│   ║  (Vague request)  ║                                                                 │
+│   ║    IDEIA BRUTA    ║   (Fase 0 Opcional)                                             │
+│   ║  (Pedido vago)    ║                                                                 │
 │   ╚═════════╤═════════╝                                                                 │
 │             │                                                                            │
 │             ▼                                                                            │
 │   ┌───────────────────┐                                                                 │
 │   │ BRAINSTORM_*.md   │─────┐                                                           │
 │   │                   │     │                                                           │
-│   │ - Discovery Q&A   │     │                                                           │
-│   │ - Approaches      │     │ (or skip to DEFINE                                        │
-│   │ - YAGNI List      │     │  with raw input)                                          │
-│   │ - Selected Path   │     │                                                           │
+│   │ - Perguntas Q&A   │     │                                                           │
+│   │ - Abordagens      │     │ (ou pular para DEFINE                                     │
+│   │ - Lista YAGNI     │     │  com input bruto)                                         │
+│   │ - Caminho Escolh. │     │                                                           │
 │   └─────────┬─────────┘     │                                                           │
 │             │               │                                                           │
 │             ▼               ▼                                                           │
 │   ┌───────────────────┐         ┌───────────────────┐                                   │
 │   │ DEFINE_*.md       │────────▶│ DESIGN_*.md       │                                   │
 │   │                   │         │                   │                                   │
-│   │ - Problem         │         │ - Architecture    │                                   │
-│   │ - Users           │         │ - Decisions       │                                   │
-│   │ - Success         │         │ - File Manifest   │                                   │
-│   │ - Tests           │         │ - Patterns        │                                   │
-│   │ - Scope           │         │ - Testing         │                                   │
+│   │ - Problema        │         │ - Arquitetura     │                                   │
+│   │ - Usuários        │         │ - Decisões        │                                   │
+│   │ - Sucesso         │         │ - File Manifest   │                                   │
+│   │ - Testes          │         │ - Padrões         │                                   │
+│   │ - Escopo          │         │ - Testes          │                                   │
 │   └───────────────────┘         └─────────┬─────────┘                                   │
 │                                           │                                              │
 │             ┌─────────────────────────────┴─────────────────────────────┐               │
 │             │                                                           │               │
 │             ▼                                                           ▼               │
 │   ┌───────────────────┐                                       ┌───────────────────┐    │
-│   │ CODE FILES        │                                       │ BUILD_REPORT_*.md │    │
-│   │                   │                                       │                   │    │
-│   │ (From manifest)   │                                       │ - Tasks completed │    │
-│   │                   │                                       │ - Verification    │    │
-│   │                   │                                       │ - Issues          │    │
+│   │ ARQUIVOS DE       │                                       │ BUILD_REPORT_*.md │    │
+│   │ CÓDIGO            │                                       │                   │    │
+│   │                   │                                       │ - Tarefas concl.  │    │
+│   │ (Do manifest)     │                                       │ - Verificação     │    │
+│   │                   │                                       │ - Problemas       │    │
 │   └─────────┬─────────┘                                       └─────────┬─────────┘    │
 │             │                                                           │               │
 │             └─────────────────────────────┬─────────────────────────────┘               │
@@ -266,45 +258,48 @@
 
 ---
 
-## Iteration Flow
+## Fluxo de Iteração
 
 ```text
 ┌─────────────────────────────────────────────────────────────────────────────────────────┐
-│                                  ITERATION FLOW                                          │
+│                                  FLUXO DE ITERAÇÃO                                       │
 ├─────────────────────────────────────────────────────────────────────────────────────────┤
 │                                                                                          │
-│                         /iterate DEFINE_*.md "change"                                   │
+│                         iterate DEFINE_*.md "mudança"                                   │
 │                                      │                                                   │
 │                                      ▼                                                   │
 │                              ┌──────────────┐                                            │
-│                              │ DETECT PHASE │                                            │
+│                              │ DETECTAR     │                                            │
+│                              │ FASE         │                                            │
 │                              └──────┬───────┘                                            │
 │                                     │                                                    │
 │                    ┌────────────────┴────────────────┐                                   │
 │                    ▼                                 ▼                                   │
 │            ┌──────────────┐                  ┌──────────────┐                            │
 │            │   DEFINE_*   │                  │   DESIGN_*   │                            │
-│            │   (Phase 1)  │                  │   (Phase 2)  │                            │
+│            │   (Fase 1)   │                  │   (Fase 2)   │                            │
 │            └──────┬───────┘                  └──────┬───────┘                            │
 │                   │                                 │                                    │
 │                   ▼                                 ▼                                    │
 │            ┌──────────────┐                  ┌──────────────┐                            │
-│            │ APPLY CHANGE │                  │ APPLY CHANGE │                            │
-│            │ + VERSION    │                  │ + VERSION    │                            │
+│            │ APLICAR      │                  │ APLICAR      │                            │
+│            │ MUDANÇA +    │                  │ MUDANÇA +    │                            │
+│            │ VERSIONAR    │                  │ VERSIONAR    │                            │
 │            └──────┬───────┘                  └──────┬───────┘                            │
 │                   │                                 │                                    │
 │                   ▼                                 ▼                                    │
 │            ┌──────────────┐                  ┌──────────────┐                            │
-│            │ CASCADE      │                  │ CASCADE      │                            │
-│            │ CHECK        │                  │ CHECK        │                            │
+│            │ VERIFICAR    │                  │ VERIFICAR    │                            │
+│            │ CASCATA      │                  │ CASCATA      │                            │
 │            └──────┬───────┘                  └──────┬───────┘                            │
 │                   │                                 │                                    │
 │          ┌───────┴────────┐                ┌───────┴────────┐                            │
 │          ▼                ▼                ▼                ▼                            │
 │   ┌────────────┐   ┌────────────┐   ┌────────────┐   ┌────────────┐                      │
-│   │  No Impact │   │ DESIGN     │   │  No Impact │   │   CODE     │                      │
-│   │            │   │ may need   │   │            │   │ may need   │                      │
-│   │            │   │ update     │   │            │   │ update     │                      │
+│   │ Sem Impacto│   │ DESIGN     │   │ Sem Impacto│   │  CÓDIGO    │                      │
+│   │            │   │ pode       │   │            │   │ pode       │                      │
+│   │            │   │ precisar   │   │            │   │ precisar   │                      │
+│   │            │   │ atualizar  │   │            │   │ atualizar  │                      │
 │   └────────────┘   └────────────┘   └────────────┘   └────────────┘                      │
 │                                                                                          │
 └─────────────────────────────────────────────────────────────────────────────────────────┘
@@ -312,72 +307,72 @@
 
 ---
 
-## Quality Gates
+## Gates de Qualidade
 
 ```text
 ┌─────────────────────────────────────────────────────────────────────────────────────────┐
-│                                   QUALITY GATES                                          │
+│                                   GATES DE QUALIDADE                                     │
 ├─────────────────────────────────────────────────────────────────────────────────────────┤
 │                                                                                          │
-│   PHASE 0: BRAINSTORM (Optional)                                                         │
+│   FASE 0: BRAINSTORM (Opcional)                                                          │
 │   ══════════════════════════════                                                         │
 │   ┌─────────────────────────────────────────────────────────────────┐                   │
-│   │ Exploration Checklist                                            │                   │
+│   │ Checklist de Exploração                                          │                   │
 │   ├─────────────────────────────────────────────────────────────────┤                   │
-│   │ [ ] Minimum 3 discovery questions asked                          │                   │
-│   │ [ ] 2-3 approaches explored with trade-offs                      │                   │
-│   │ [ ] YAGNI applied (features removed section not empty)           │                   │
-│   │ [ ] Minimum 2 incremental validations completed                  │                   │
-│   │ [ ] User confirmed selected approach                             │                   │
-│   │ [ ] Draft requirements ready for /define                         │                   │
+│   │ [ ] Mínimo de 3 perguntas de descoberta feitas                   │                   │
+│   │ [ ] 2-3 abordagens exploradas com trade-offs                     │                   │
+│   │ [ ] YAGNI aplicado (seção de features removidas não vazia)       │                   │
+│   │ [ ] Mínimo de 2 validações incrementais concluídas               │                   │
+│   │ [ ] Usuário confirmou a abordagem selecionada                    │                   │
+│   │ [ ] Requisitos de rascunho prontos para o Define                  │                   │
 │   └─────────────────────────────────────────────────────────────────┘                   │
 │                                                                                          │
-│   PHASE 1: DEFINE                                                                        │
+│   FASE 1: DEFINE                                                                         │
 │   ═══════════════                                                                        │
 │   ┌─────────────────────────────────────────────────────────────────┐                   │
-│   │ Clarity Score Breakdown                         Minimum: 12/15  │                   │
+│   │ Breakdown do Clarity Score                      Mínimo: 12/15   │                   │
 │   ├─────────────────────────────────────────────────────────────────┤                   │
-│   │ Problem:  [0-3] Clear, specific, actionable?                    │                   │
-│   │ Users:    [0-3] Identified with pain points?                    │                   │
-│   │ Goals:    [0-3] Measurable outcomes?                            │                   │
-│   │ Success:  [0-3] Testable criteria?                              │                   │
-│   │ Scope:    [0-3] Explicit boundaries?                            │                   │
+│   │ Problema:  [0-3] Claro, específico, acionável?                  │                   │
+│   │ Usuários:  [0-3] Identificados com pain points?                 │                   │
+│   │ Goals:     [0-3] Resultados mensuráveis?                        │                   │
+│   │ Sucesso:   [0-3] Critérios testáveis?                           │                   │
+│   │ Escopo:    [0-3] Limites explícitos?                            │                   │
 │   └─────────────────────────────────────────────────────────────────┘                   │
 │                                                                                          │
-│   PHASE 2: DESIGN                                                                        │
+│   FASE 2: DESIGN                                                                         │
 │   ═══════════════                                                                        │
 │   ┌─────────────────────────────────────────────────────────────────┐                   │
 │   │ Checklist                                                        │                   │
 │   ├─────────────────────────────────────────────────────────────────┤                   │
-│   │ [ ] Architecture diagram present                                 │                   │
-│   │ [ ] At least one decision with rationale                         │                   │
-│   │ [ ] Complete file manifest                                       │                   │
-│   │ [ ] Code patterns are copy-paste ready                           │                   │
-│   │ [ ] Testing strategy defined                                     │                   │
-│   │ [ ] No shared dependencies across units                          │                   │
+│   │ [ ] Diagrama de arquitetura presente                             │                   │
+│   │ [ ] Pelo menos uma decisão com justificativa                     │                   │
+│   │ [ ] File Manifest completo                                       │                   │
+│   │ [ ] Padrões de código prontos para copiar e colar                │                   │
+│   │ [ ] Estratégia de testes definida                                │                   │
+│   │ [ ] Sem dependências compartilhadas entre unidades               │                   │
 │   └─────────────────────────────────────────────────────────────────┘                   │
 │                                                                                          │
-│   PHASE 3: BUILD                                                                         │
+│   FASE 3: BUILD                                                                          │
 │   ══════════════                                                                         │
 │   ┌─────────────────────────────────────────────────────────────────┐                   │
-│   │ Verification                                                     │                   │
+│   │ Verificação                                                      │                   │
 │   ├─────────────────────────────────────────────────────────────────┤                   │
-│   │ [ ] All files from manifest created                              │                   │
-│   │ [ ] All verification commands pass                               │                   │
-│   │ [ ] Lint check passes                                              │                   │
-│   │ [ ] Tests pass                                                    │                   │
-│   │ [ ] No TODO comments in code                                     │                   │
+│   │ [ ] Todos os arquivos do manifest criados                        │                   │
+│   │ [ ] Todos os comandos de verificação passaram                    │                   │
+│   │ [ ] Lint check passou                                            │                   │
+│   │ [ ] Testes passaram                                              │                   │
+│   │ [ ] Sem comentários TODO no código                               │                   │
 │   └─────────────────────────────────────────────────────────────────┘                   │
 │                                                                                          │
-│   PHASE 4: SHIP                                                                          │
+│   FASE 4: SHIP                                                                           │
 │   ═════════════                                                                          │
 │   ┌─────────────────────────────────────────────────────────────────┐                   │
-│   │ Pre-Ship Checklist                                               │                   │
+│   │ Checklist Pré-Ship                                               │                   │
 │   ├─────────────────────────────────────────────────────────────────┤                   │
-│   │ [ ] BUILD_REPORT shows 100% completion                           │                   │
-│   │ [ ] All tests passing                                            │                   │
-│   │ [ ] No blocking issues                                           │                   │
-│   │ [ ] Acceptance tests verified                                    │                   │
+│   │ [ ] BUILD_REPORT mostra 100% de conclusão                        │                   │
+│   │ [ ] Todos os testes passando                                     │                   │
+│   │ [ ] Sem problemas bloqueadores                                   │                   │
+│   │ [ ] Acceptance tests verificados                                 │                   │
 │   └─────────────────────────────────────────────────────────────────┘                   │
 │                                                                                          │
 └─────────────────────────────────────────────────────────────────────────────────────────┘
@@ -385,10 +380,11 @@
 
 ---
 
-## Version History
+## Histórico de Versões
 
-| Version | Date | Changes |
-|---------|------|---------|
-| 2.1.0 | 2026-03-26 | Updated folder structure for 58 agents, 8 categories, 23 KB domains |
-| 2.0.0 | 2026-03-26 | Data engineering pivot |
-| 1.0.0 | 2026-02-17 | Public release as AgentSpec v1.0.0 |
+| Versão | Data | Mudanças |
+|--------|------|---------|
+| 3.0.0 | 2026-04-14 | Adaptado para o Genie Code / skill system; tradução PT-BR |
+| 2.1.0 | 2026-03-26 | Cobertura multi-cloud; 58 agentes, 8 categorias, 23 KB domains |
+| 2.0.0 | 2026-03-26 | Pivot de data engineering |
+| 1.0.0 | 2026-02-17 | Release pública como AgentSpec v1.0.0 |

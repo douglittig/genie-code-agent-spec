@@ -1,190 +1,190 @@
 ---
 name: iterate
-description: Update any phase document when requirements or design change (Cross-Phase)
+description: Atualize qualquer documento de fase quando requisitos ou design mudarem (Cross-Phase)
 ---
 
-# Iterate Command
+# Iterate
 
-> Update any phase document when requirements or design changes (Cross-Phase)
+> Atualização de documentos de fase quando requisitos ou design mudam (Cross-Phase)
 
-## Usage
+## Uso
 
-```bash
-/iterate <file> "<change-description>"
+```
+iterate <arquivo> "<descrição-da-mudança>"
 ```
 
-## Examples
+## Exemplos
 
-```bash
-/iterate BRAINSTORM_SEARCH_API.md "Consider ElasticSearch instead of PostgreSQL full-text search"
-/iterate DEFINE_SEARCH_API.md "Add support for fuzzy matching, not just exact search"
-/iterate DESIGN_SEARCH_API.md "Services need to be self-contained, no shared common/"
-/iterate .claude/sdd/features/DEFINE_AUTH.md "Change from JWT to session-based auth"
+```
+iterate BRAINSTORM_API_BUSCA.md "Considerar ElasticSearch ao invés de PostgreSQL full-text search"
+iterate DEFINE_API_BUSCA.md "Adicionar suporte a busca fuzzy, não apenas busca exata"
+iterate DESIGN_API_BUSCA.md "Serviços precisam ser autocontidos, sem common/ compartilhado"
+iterate .claude/sdd/features/DEFINE_AUTH.md "Mudar de JWT para autenticação baseada em sessão"
 ```
 
 ---
 
-## Overview
+## Visão Geral
 
-The `/iterate` command works with **document phases** of the AgentSpec workflow:
+O iterate funciona com as **fases de documento** do workflow SDD:
 
 ```text
-Phase 0: /brainstorm → BRAINSTORM_{FEATURE}.md ← /iterate can update
-Phase 1: /define     → DEFINE_{FEATURE}.md     ← /iterate can update
-Phase 2: /design     → DESIGN_{FEATURE}.md     ← /iterate can update
-Phase 3: /build      → (code)                  ← Update DESIGN, then /build
-Phase 4: /ship       → (archive)               ← N/A
+Fase 0: brainstorm → BRAINSTORM_{FEATURE}.md ← iterate pode atualizar
+Fase 1: define     → DEFINE_{FEATURE}.md     ← iterate pode atualizar
+Fase 2: design     → DESIGN_{FEATURE}.md     ← iterate pode atualizar
+Fase 3: build      → (código)                ← Atualize DESIGN, depois build
+Fase 4: ship       → (archive)               ← N/A
 ```
 
-Use `/iterate` when you discover something that needs to change mid-stream.
+Use iterate quando você descobrir algo que precisa mudar no meio do processo.
 
-**Important:** To change code during Phase 3, update the DESIGN document first. The cascade to code triggers a rebuild via `/build`. This ensures traceability.
+**Importante:** Para mudar código durante a Fase 3, atualize o documento DESIGN primeiro. A cascata para o código dispara um rebuild via build. Isso garante rastreabilidade.
 
 ---
 
-## What This Command Does
+## O que Esta Fase Faz
 
-1. **Detect Phase** - Identify which phase document is being updated
-2. **Analyze Impact** - Determine downstream effects
-3. **Update Document** - Apply changes with version tracking
-4. **Cascade** - Propagate changes to downstream documents if needed
+1. **Detectar Fase** — Identificar qual documento de fase está sendo atualizado
+2. **Analisar Impacto** — Determinar efeitos downstream
+3. **Atualizar Documento** — Aplicar mudanças com controle de versão
+4. **Cascata** — Propagar mudanças para documentos downstream se necessário
 
 ---
 
-## Process
+## Processo
 
-### Step 1: Load Target Document
+### Passo 1: Carregar Documento Alvo
 
 ```markdown
-Read(<target-file>)
+Ler <arquivo-alvo>
 
-# Identify document type:
-# - BRAINSTORM_*.md → Phase 0
-# - DEFINE_*.md → Phase 1
-# - DESIGN_*.md → Phase 2
+# Identificar tipo de documento:
+# - BRAINSTORM_*.md → Fase 0
+# - DEFINE_*.md → Fase 1
+# - DESIGN_*.md → Fase 2
 ```
 
-### Step 2: Analyze Change
+### Passo 2: Analisar a Mudança
 
-Determine the change type:
+Determine o tipo de mudança:
 
-| Change Type | Example | Impact |
-|-------------|---------|--------|
-| **Additive** | "Also support PDF" | Low - adds to existing |
-| **Modifying** | "Change from X to Y" | Medium - updates existing |
-| **Removing** | "Remove feature Z" | Medium - simplifies |
-| **Architectural** | "Use different pattern" | High - may require redesign |
+| Tipo de Mudança | Exemplo | Impacto |
+|-----------------|---------|---------|
+| **Aditiva** | "Também suportar PDF" | Baixo — adiciona ao existente |
+| **Modificadora** | "Mudar de X para Y" | Médio — atualiza o existente |
+| **Removendo** | "Remover feature Z" | Médio — simplifica |
+| **Arquitetural** | "Usar padrão diferente" | Alto — pode exigir redesign |
 
-### Step 3: Apply Changes
+### Passo 3: Aplicar Mudanças
 
-Update the document with:
+Atualize o documento com:
 
-1. **Change Applied** - The actual modification
-2. **Version Bump** - Increment version in revision history
-3. **Change Note** - What changed and why
+1. **Mudança Aplicada** — A modificação real
+2. **Bump de Versão** — Incrementar versão no histórico de revisões
+3. **Nota de Mudança** — O que mudou e por quê
 
-### Step 4: Assess Cascade Need
+### Passo 4: Avaliar Necessidade de Cascata
 
-| Source | Cascades To |
-|--------|-------------|
-| DEFINE change | May need DESIGN update |
-| DESIGN change | May need code update |
+| Origem | Cascata Para |
+|--------|--------------|
+| Mudança no DEFINE | Pode precisar de atualização no DESIGN |
+| Mudança no DESIGN | Pode precisar de atualização no código |
 
-Determine if downstream documents need updates based on cascade rules.
+Determine se documentos downstream precisam de atualização com base nas regras de cascata.
 
-### Step 5: Execute Cascade (if needed)
+### Passo 5: Executar Cascata (se necessário)
 
-If cascade needed, prompt user:
+Se cascata for necessária, pergunte ao usuário:
 
 ```markdown
-"This DEFINE change affects the DESIGN. Options:
-(a) Update DESIGN automatically to match
-(b) Just update DEFINE, I'll handle DESIGN manually
-(c) Show me what would change first"
+"Esta mudança no {DOCUMENTO} afeta o {DOWNSTREAM}. Opções:
+(a) Atualizar {DOWNSTREAM} automaticamente
+(b) Apenas atualizar {DOCUMENTO}, cuido do {DOWNSTREAM} manualmente
+(c) Me mostre o que mudaria primeiro"
 ```
 
-### Step 6: Save Updates
+### Passo 6: Salvar Atualizações
 
 ```markdown
-Write(<target-file>)
-# If cascade:
-Write(<downstream-document>)
+Salvar <arquivo-alvo>
+# Se cascata:
+Salvar <documento-downstream>
 ```
 
 ---
 
 ## Output
 
-| Artifact | Location |
-|----------|----------|
-| **Updated Document** | Same location as input |
-| **Cascade Updates** | Downstream documents (if applicable) |
+| Artefato | Localização |
+|----------|-------------|
+| **Documento Atualizado** | Mesmo local do input |
+| **Atualizações de Cascata** | Documentos downstream (se aplicável) |
 
 ---
 
-## Cascade Rules
+## Regras de Cascata
 
-### DEFINE Changes → DESIGN Impact
+### Mudanças no DEFINE → Impacto no DESIGN
 
-| DEFINE Change | DESIGN Impact |
-|---------------|---------------|
-| New requirement | May need new component |
-| Changed success criteria | May need different approach |
-| Scope expansion | Needs new sections |
-| Scope reduction | Can simplify |
-| New constraint | Must be accommodated |
+| Mudança no DEFINE | Impacto no DESIGN |
+|-------------------|-------------------|
+| Novo requisito | Pode precisar de novo componente |
+| Critério de sucesso alterado | Pode precisar de abordagem diferente |
+| Expansão de escopo | Precisa de novas seções |
+| Redução de escopo | Pode simplificar |
+| Nova restrição | Deve ser acomodada |
 
-### DESIGN Changes → Code Impact
+### Mudanças no DESIGN → Impacto no Código
 
-| DESIGN Change | Code Impact |
-|---------------|-------------|
-| New file in manifest | Create file |
-| Removed file | Delete file |
-| Changed pattern | Update affected files |
-| New decision | May need refactor |
-| Architecture change | Significant updates needed |
+| Mudança no DESIGN | Impacto no Código |
+|-------------------|-------------------|
+| Novo arquivo no manifest | Criar arquivo |
+| Arquivo removido | Deletar arquivo |
+| Padrão alterado | Atualizar arquivos afetados |
+| Nova decisão | Pode precisar de refactor |
+| Mudança arquitetural | Atualizações significativas necessárias |
 
 ---
 
-## Version Tracking
+## Controle de Versão
 
-Each document maintains revision history:
+Cada documento mantém um histórico de revisões:
 
 ```markdown
-## Revision History
+## Histórico de Revisões
 
-| Version | Date | Author | Changes |
-|---------|------|--------|---------|
-| 1.0 | 2026-01-25 | define-agent | Initial version |
-| 1.1 | 2026-01-25 | iterate-agent | Added PDF support per user request |
+| Versão | Data | Autor | Mudanças |
+|--------|------|-------|---------|
+| 1.0 | 2026-01-25 | define-agent | Versão inicial |
+| 1.1 | 2026-01-25 | iterate-agent | Adicionado suporte a PDF conforme pedido |
 ```
 
 ---
 
-## Tips
+## Dicas
 
-1. **Iterate Early** - Catch changes before coding starts
-2. **Be Specific** - "Add X" is better than "make it better"
-3. **Check Cascade** - Changes ripple downstream
-4. **Keep History** - Version tracking shows evolution
-5. **Don't Fight It** - Requirements change, that's normal
-
----
-
-## When to Use /iterate vs Starting Over
-
-| Situation | Action |
-|-----------|--------|
-| < 30% change | `/iterate` |
-| Add/modify features | `/iterate` |
-| Change constraints | `/iterate` |
-| > 50% different | New `/define` |
-| Different problem entirely | New `/define` |
-| Different target users | New `/define` |
+1. **Itere Cedo** — Capture mudanças antes de começar a codificar
+2. **Seja Específico** — "Adicionar X" é melhor que "melhorar isso"
+3. **Verifique a Cascata** — Mudanças reverberam downstream
+4. **Mantenha o Histórico** — O controle de versão mostra a evolução
+5. **Não Resista** — Requisitos mudam, isso é normal
 
 ---
 
-## References
+## Quando Usar Iterate vs Começar Novamente
 
-- Agent: `${CLAUDE_PLUGIN_ROOT}/agents/workflow/iterate-agent.md`
-- Contracts: `${CLAUDE_PLUGIN_ROOT}/sdd/architecture/WORKFLOW_CONTRACTS.yaml`
+| Situação | Ação |
+|----------|------|
+| < 30% de mudança | `iterate` |
+| Adicionar/modificar features | `iterate` |
+| Mudar restrições | `iterate` |
+| > 50% diferente | Novo `define` |
+| Problema completamente diferente | Novo `define` |
+| Usuários-alvo diferentes | Novo `define` |
+
+---
+
+## Referências
+
+- Agente: `agents/iterate-agent.md`
+- Contratos: `architecture/WORKFLOW_CONTRACTS.yaml`

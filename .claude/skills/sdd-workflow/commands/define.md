@@ -1,180 +1,180 @@
 ---
 name: define
-description: Capture and validate requirements in one pass (Phase 1)
+description: Capture e valide requisitos em uma passagem (Fase 1)
 ---
 
-# Define Command
+# Define
 
-> Capture requirements and validate them in one pass (Phase 1)
+> Captura e validação de requisitos em uma passagem (Fase 1)
 
-## Usage
+## Uso
 
-```bash
-/define <input>
+```
+define <input>
 ```
 
-## Examples
+## Exemplos
 
-```bash
-# From a BRAINSTORM document (recommended after /brainstorm)
-/define .claude/sdd/features/BRAINSTORM_NOTIFICATION_SYSTEM.md
+```
+# A partir de um documento BRAINSTORM (recomendado após brainstorm)
+define .claude/sdd/features/BRAINSTORM_SISTEMA_NOTIFICACOES.md
 
-# From meeting notes or raw input
-/define notes/meeting-notes.md
-/define "Build an API gateway for user management"
-/define docs/stakeholder-email.txt
+# A partir de notas de reunião ou input bruto
+define notas/notas-de-reuniao.md
+define "Construir um API gateway para gestão de usuários"
+define docs/email-stakeholder.txt
 ```
 
 ---
 
-## Overview
+## Visão Geral
 
-This is **Phase 1** of the 5-phase AgentSpec workflow:
+Esta é a **Fase 1** do workflow SDD de 5 fases:
 
 ```text
-Phase 0: /brainstorm → .claude/sdd/features/BRAINSTORM_{FEATURE}.md (optional)
-Phase 1: /define     → .claude/sdd/features/DEFINE_{FEATURE}.md (THIS COMMAND)
-Phase 2: /design     → .claude/sdd/features/DESIGN_{FEATURE}.md
-Phase 3: /build      → Code + .claude/sdd/reports/BUILD_REPORT_{FEATURE}.md
-Phase 4: /ship       → .claude/sdd/archive/{FEATURE}/SHIPPED_{DATE}.md
+Fase 0: brainstorm → .claude/sdd/features/BRAINSTORM_{FEATURE}.md (opcional)
+Fase 1: define     → .claude/sdd/features/DEFINE_{FEATURE}.md (ESTA FASE)
+Fase 2: design     → .claude/sdd/features/DESIGN_{FEATURE}.md
+Fase 3: build      → Código + .claude/sdd/reports/BUILD_REPORT_{FEATURE}.md
+Fase 4: ship       → .claude/sdd/archive/{FEATURE}/SHIPPED_{DATE}.md
 ```
 
-The `/define` command combines what used to be Intake + PRD + Refine into a single, iterative phase. When fed a BRAINSTORM document, it extracts pre-validated requirements with minimal clarification needed.
+O Define combina o que antes era Intake + PRD + Refine em uma única fase iterativa. Quando alimentado com um documento BRAINSTORM, extrai requisitos pré-validados com mínima necessidade de esclarecimento.
 
 ---
 
-## What This Command Does
+## O que Esta Fase Faz
 
-1. **Extract** - Pull requirements from any input (notes, emails, conversations)
-2. **Structure** - Organize into problem, users, goals, success criteria
-3. **Validate** - Built-in clarity scoring (must reach 12/15 to proceed)
-4. **Clarify** - Ask targeted questions for any gaps
+1. **Extrair** — Puxar requisitos de qualquer input (notas, e-mails, conversas)
+2. **Estruturar** — Organizar em problema, usuários, goals, critérios de sucesso
+3. **Validar** — Pontuação de clareza integrada (deve atingir 12/15 para prosseguir)
+4. **Esclarecer** — Fazer perguntas direcionadas para preencher lacunas
 
 ---
 
-## Process
+## Processo
 
-### Step 1: Load Context
+### Passo 1: Carregar Contexto
 
 ```markdown
-Read(${CLAUDE_PLUGIN_ROOT}/sdd/templates/DEFINE_TEMPLATE.md)
-Read(CLAUDE.md)
+Ler template DEFINE_TEMPLATE.md
+Ler CLAUDE.md
 
-# If file provided:
-Read(<input-file>)
+# Se arquivo fornecido:
+Ler <arquivo-de-input>
 ```
 
-### Step 2: Classify Input
+### Passo 2: Classificar Input
 
-Identify the input type to guide extraction:
+Identifique o tipo de input para guiar a extração:
 
-| Input Type | Pattern | Focus |
-|------------|---------|-------|
-| `brainstorm_document` | BRAINSTORM_*.md from /brainstorm | Pre-validated, extract directly |
-| `meeting_notes` | Bullet points, action items | Decisions, requirements |
-| `email_thread` | Re:, Fwd:, signatures | Requests, constraints |
-| `conversation` | Informal language | Core problem, users |
-| `direct_requirement` | Structured request | All elements present |
-| `mixed_sources` | Multiple formats | Consolidate, deduplicate |
+| Tipo de Input | Padrão | Foco |
+|---------------|--------|------|
+| `brainstorm_document` | BRAINSTORM_*.md do brainstorm | Pré-validado, extrair diretamente |
+| `meeting_notes` | Bullet points, ações | Decisões, requisitos |
+| `email_thread` | Re:, Fwd:, assinaturas | Pedidos, restrições |
+| `conversation` | Linguagem informal | Problema central, usuários |
+| `direct_requirement` | Pedido estruturado | Todos os elementos presentes |
+| `mixed_sources` | Múltiplos formatos | Consolidar, desduplicar |
 
-**Note:** When input is a BRAINSTORM document, extraction is streamlined because:
-- Discovery questions are already answered
-- Approaches have been evaluated
-- YAGNI has been applied
-- User has validated the direction
+**Nota:** Quando o input é um documento BRAINSTORM, a extração é simplificada porque:
+- Perguntas de descoberta já foram respondidas
+- Abordagens já foram avaliadas
+- YAGNI já foi aplicado
+- Usuário validou a direção
 
-### Step 3: Extract Entities
+### Passo 3: Extrair Entidades
 
-Extract these elements from input:
+Extraia estes elementos do input:
 
-| Element | Extraction Patterns |
-|---------|---------------------|
-| **Problem** | "We're struggling with...", "The issue is...", "Pain point:" |
-| **Users** | "For the team...", "Customers want...", "Users need..." |
-| **Goals** | "We need to...", "Goal is to...", "Success looks like..." |
-| **Success Criteria** | "Success means...", "We'll know when...", "Measured by..." |
-| **Acceptance Tests** | "Given/When/Then", "Test case:", "Scenario:" |
-| **Constraints** | "Must work with...", "Can't change...", "Limited by..." |
-| **Out of Scope** | "Not including...", "Deferred to...", "Excluded:" |
+| Elemento | Padrões de Extração |
+|----------|---------------------|
+| **Problema** | "Estamos com dificuldade em...", "O problema é...", "Pain point:" |
+| **Usuários** | "Para o time...", "Os clientes querem...", "Os usuários precisam..." |
+| **Goals** | "Precisamos de...", "O goal é...", "Sucesso parece..." |
+| **Critérios de Sucesso** | "Sucesso significa...", "Saberemos quando...", "Medido por..." |
+| **Acceptance Tests** | "Given/When/Then", "Caso de teste:", "Cenário:" |
+| **Restrições** | "Deve funcionar com...", "Não pode mudar...", "Limitado por..." |
+| **Fora do Escopo** | "Não inclui...", "Adiado para...", "Excluído:" |
 
-### Step 4: Calculate Clarity Score
+### Passo 4: Calcular o Clarity Score
 
-Score each element (0-3 points):
+Pontue cada elemento (0-3 pontos):
 
-| Element | Score | Meaning |
-|---------|-------|---------|
-| Problem | 0-3 | Clear, specific, actionable |
-| Users | 0-3 | Identified with pain points |
-| Goals | 0-3 | Measurable outcomes |
-| Success | 0-3 | Testable criteria |
-| Scope | 0-3 | Explicit boundaries |
+| Elemento | Pontuação | Significado |
+|----------|-----------|-------------|
+| Problema | 0-3 | Claro, específico, acionável |
+| Usuários | 0-3 | Identificados com pain points |
+| Goals | 0-3 | Resultados mensuráveis |
+| Sucesso | 0-3 | Critérios testáveis |
+| Escopo | 0-3 | Limites explícitos |
 
-**Scoring Guide:**
-- 0 = Missing entirely
-- 1 = Vague or incomplete
-- 2 = Clear but missing details
-- 3 = Crystal clear, actionable
+**Guia de Pontuação:**
+- 0 = Completamente ausente
+- 1 = Vago ou incompleto
+- 2 = Claro mas faltam detalhes
+- 3 = Crystal clear, acionável
 
-**Minimum to proceed:** 12/15 (80%)
+**Mínimo para prosseguir:** 12/15 (80%)
 
-### Step 5: Fill Gaps (if needed)
+### Passo 5: Preencher Lacunas (se necessário)
 
-If score < 12, use `AskUserQuestion` with specific options:
+Se a pontuação for < 12, faça perguntas específicas:
 
 ```markdown
-Example questions:
-- "Who is the primary user: (a) internal team, (b) customers, (c) both?"
-- "What's the timeline: (a) this sprint, (b) this quarter, (c) no deadline?"
+Exemplos de perguntas:
+- "Quem é o usuário principal: (a) time interno, (b) clientes, (c) ambos?"
+- "Qual é o prazo: (a) este sprint, (b) este trimestre, (c) sem prazo?"
 ```
 
-### Step 6: Generate Document
+### Passo 6: Gerar Documento
 
-Write the structured document following the template, then save:
+Escreva o documento estruturado seguindo o template e salve:
 
 ```markdown
-Write(.claude/sdd/features/DEFINE_{FEATURE_NAME}.md)
+Salvar em: .claude/sdd/features/DEFINE_{FEATURE_NAME}.md
 ```
 
 ---
 
 ## Output
 
-| Artifact | Location |
-|----------|----------|
+| Artefato | Localização |
+|----------|-------------|
 | **DEFINE** | `.claude/sdd/features/DEFINE_{FEATURE_NAME}.md` |
 
-**Next Step:** `/design .claude/sdd/features/DEFINE_{FEATURE_NAME}.md`
+**Próximo Passo:** Design — `DEFINE_{FEATURE_NAME}.md`
 
 ---
 
-## Quality Gate
+## Gate de Qualidade
 
-Before saving, verify:
+Antes de salvar, verifique:
 
 ```text
-[ ] Problem statement is clear and specific
-[ ] At least one user persona identified
-[ ] Success criteria are measurable
-[ ] Acceptance tests are testable
-[ ] Out of scope is explicit
+[ ] Problem statement é claro e específico
+[ ] Pelo menos um user persona identificado
+[ ] Critérios de sucesso são mensuráveis
+[ ] Acceptance tests são testáveis
+[ ] Fora do escopo é explícito
 [ ] Clarity Score >= 12/15
 ```
 
 ---
 
-## Tips
+## Dicas
 
-1. **Be Specific** - "Improve performance" → "Reduce API latency to <200ms"
-2. **Use Numbers** - "Handle many users" → "Support 1000 concurrent users"
-3. **Test Criteria** - If you can't test it, it's not clear enough
-4. **Scope Ruthlessly** - What's OUT is as important as what's IN
+1. **Seja Específico** — "Melhorar performance" → "Reduzir latência da API para <200ms"
+2. **Use Números** — "Suportar muitos usuários" → "Suportar 1000 usuários simultâneos"
+3. **Teste os Critérios** — Se não consegue testar, não está claro o suficiente
+4. **Delimite com Ruthlessness** — O que está FORA é tão importante quanto o que está DENTRO
 
 ---
 
-## References
+## Referências
 
-- Agent: `${CLAUDE_PLUGIN_ROOT}/agents/workflow/define-agent.md`
-- Template: `${CLAUDE_PLUGIN_ROOT}/sdd/templates/DEFINE_TEMPLATE.md`
-- Contracts: `${CLAUDE_PLUGIN_ROOT}/sdd/architecture/WORKFLOW_CONTRACTS.yaml`
-- Previous Phase: `${CLAUDE_PLUGIN_ROOT}/commands/workflow/brainstorm.md` (optional)
-- Next Phase: `${CLAUDE_PLUGIN_ROOT}/commands/workflow/design.md`
+- Agente: `agents/define-agent.md`
+- Template: `templates/DEFINE_TEMPLATE.md`
+- Contratos: `architecture/WORKFLOW_CONTRACTS.yaml`
+- Fase Anterior: `commands/brainstorm.md` (opcional)
+- Próxima Fase: `commands/design.md`

@@ -1,260 +1,245 @@
 ---
 name: create-pr
-description: Create pull request with conventional commits and structured descriptions
+description: Crie pull requests com conventional commits e descrições estruturadas
 ---
 
-# Create PR Command
+# Create PR
 
-> Automate professional pull request creation with conventional commits and structured descriptions
+> Criação profissional de pull requests com conventional commits e descrições estruturadas
 
-## Usage
+## Uso
 
-```bash
-/create-pr                           # Auto-detect changes and create PR
-/create-pr "feat: add user auth"     # Create PR with custom title
-/create-pr --draft                   # Create as draft PR
-/create-pr --review                  # Run dual AI review before PR creation
-/create-pr --review --draft          # Review + create as draft
+```
+create-pr                           # Detectar mudanças automaticamente e criar PR
+create-pr "feat: adicionar auth"    # Criar PR com título customizado
+create-pr --draft                   # Criar como draft PR
+create-pr --review                  # Rodar dual AI review antes de criar o PR
+create-pr --review --draft          # Review + criar como draft
 ```
 
 ---
 
-## Pre-PR Review Option
+## Opção de Review Pré-PR
 
-When using `--review`, the command runs a **dual AI review** (CodeRabbit + Claude) before creating the PR:
+Quando usar `--review`, o comando roda um **dual AI review** antes de criar o PR:
 
 ```text
 ┌─────────────────────────────────────────────────────────────────┐
-│                  /create-pr --review WORKFLOW                    │
+│              WORKFLOW create-pr --review                         │
 ├─────────────────────────────────────────────────────────────────┤
 │                                                                  │
-│   1. Analyze Changes                                             │
+│   1. Analisar Mudanças                                           │
 │          ↓                                                       │
-│   2. Run CodeRabbit CLI (static analysis)                       │
+│   2. Rodar Análise Estática (CodeRabbit)                        │
 │          ↓                                                       │
-│   3. Run Claude Review (architectural)                          │
+│   3. Rodar Review Claude (Arquitetural)                         │
 │          ↓                                                       │
-│   4. Check for Critical Issues                                  │
+│   4. Verificar Problemas Críticos                               │
 │          ↓                                                       │
 │   ┌──────┴──────┐                                               │
 │   │             │                                                │
 │   ▼             ▼                                                │
-│ Critical     No Critical                                         │
-│ Issues       Issues                                              │
+│ Problemas    Sem Problemas                                       │
+│ Críticos     Críticos                                            │
 │   │             │                                                │
 │   ▼             ▼                                                │
-│ STOP &       Continue                                            │
-│ Show         to PR                                               │
-│ Issues       Creation                                            │
+│ PARAR &      Continuar                                           │
+│ Mostrar      para Criação                                        │
+│ Problemas    do PR                                               │
 │                                                                  │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
-### Review Behavior
+### Comportamento do Review
 
-| Review Result | Action |
-|---------------|--------|
-| 🔴 Critical issues found | Stop and show issues, do not create PR |
-| 🟠 Errors found | Warn user, ask to continue or fix |
-| 🟡 Warnings only | Continue to PR, include warnings in description |
-| ✅ Clean | Continue to PR |
-
-### Review Integration
-
-```bash
-# Run CodeRabbit + Claude review
-source ~/.zshrc && coderabbit review --plain 2>&1
-
-# Parse results and check for blockers
-# If critical issues: STOP
-# If errors: ASK user
-# Otherwise: CONTINUE
-```
+| Resultado do Review | Ação |
+|--------------------|------|
+| 🔴 Problemas críticos encontrados | Parar e mostrar problemas, não criar PR |
+| 🟠 Erros encontrados | Avisar usuário, perguntar se continua ou corrige |
+| 🟡 Apenas avisos | Continuar para o PR, incluir avisos na descrição |
+| ✅ Limpo | Continuar para o PR |
 
 ---
 
-## Overview
+## Visão Geral
 
-This command streamlines PR creation by:
+Este processo simplifica a criação de PRs:
 
-1. **Analyzing** all staged/unstaged changes
-2. **Categorizing** changes by type (feat/fix/refactor/docs)
-3. **Generating** conventional commit messages
-4. **Building** structured PR descriptions with test plans
-5. **Creating** the PR via GitHub CLI
+1. **Analisar** — Todas as mudanças staged/unstaged
+2. **Categorizar** — Mudanças por tipo (feat/fix/refactor/docs)
+3. **Gerar** — Mensagens de conventional commits
+4. **Construir** — Descrições estruturadas de PR com test plans
+5. **Criar** — O PR via GitHub CLI
 
 ---
 
-## Process
+## Processo
 
-### Step 1: Analyze Changes
+### Passo 1: Analisar Mudanças
 
 ```bash
-# Run these commands to understand the change scope
+# Rodar estes comandos para entender o escopo da mudança
 git status
 git diff --stat
 git log origin/main..HEAD --oneline
 ```
 
-Categorize files into change types:
+Categorize arquivos em tipos de mudança:
 
 ```text
-CHANGE CATEGORIES
-═════════════════
+CATEGORIAS DE MUDANÇA
+═════════════════════
 
-feat:     New features, capabilities
-fix:      Bug fixes, error corrections
-refactor: Code restructuring, no behavior change
-docs:     Documentation only
-test:     Test additions or corrections
-chore:    Build, CI/CD, dependencies
-style:    Formatting, whitespace
-perf:     Performance improvements
+feat:     Novas features, capacidades
+fix:      Correções de bugs
+refactor: Reestruturação de código, sem mudança de comportamento
+docs:     Somente documentação
+test:     Adições ou correções de testes
+chore:    Build, CI/CD, dependências
+style:    Formatação, espaços em branco
+perf:     Melhorias de performance
 ```
 
-### Step 2: Determine PR Type
+### Passo 2: Determinar Tipo do PR
 
-Based on file analysis, identify the primary change type:
+Com base na análise de arquivos, identifique o tipo principal de mudança:
 
-| Files Changed | Likely Type |
-|---------------|-------------|
-| `src/**/*.py` + new functionality | `feat:` |
-| `src/**/*.py` + bug fix | `fix:` |
-| `src/**/*.py` + restructure | `refactor:` |
+| Arquivos Alterados | Tipo Provável |
+|--------------------|---------------|
+| `src/**/*.py` + nova funcionalidade | `feat:` |
+| `src/**/*.py` + correção de bug | `fix:` |
+| `src/**/*.py` + reestruturação | `refactor:` |
 | `*.md`, `docs/**` | `docs:` |
 | `tests/**`, `*_test.py` | `test:` |
 | `.github/**`, `Makefile`, `pyproject.toml` | `chore:` |
-| `${CLAUDE_PLUGIN_ROOT}/agents/**` | `refactor(agents):` |
-| `${CLAUDE_PLUGIN_ROOT}/kb/**` | `docs(kb):` |
+| `.claude/skills/**` | `refactor(skills):` |
 | `.claude/sdd/**` | `docs(sdd):` |
 
-### Step 3: Generate Commit Message
+### Passo 3: Gerar Mensagem de Commit
 
-Use Conventional Commits format:
+Use o formato de Conventional Commits:
 
 ```text
-<type>(<scope>): <short description>
+<type>(<scope>): <descrição curta>
 
-<body - what changed and why>
+<body - o que mudou e por quê>
 
 Co-Authored-By: Claude <noreply@anthropic.com>
 ```
 
-**Examples:**
+**Exemplos:**
 
 ```text
-feat(auth): add OAuth2 token refresh flow
+feat(auth): adicionar fluxo de refresh OAuth2
 
-- Implement OAuth2 token refresh with PKCE
-- Add backward compatibility for session-based auth
-- Update validation rules for new token format
+- Implementar refresh de token OAuth2 com PKCE
+- Adicionar compatibilidade retroativa com auth baseada em sessão
+- Atualizar regras de validação para novo formato de token
 
 Co-Authored-By: Claude <noreply@anthropic.com>
 ```
 
-### Step 4: Ask Clarifying Questions
+### Passo 4: Fazer Perguntas de Esclarecimento
 
-Use AskUserQuestion to confirm:
+**Pergunta 1: Tipo do PR**
+- Esta categorização está correta?
+- Opções: feat, fix, refactor, docs, test, chore
 
-**Question 1: PR Type**
-- Does this categorization look correct?
-- Options: feat, fix, refactor, docs, test, chore
+**Pergunta 2: Escopo**
+- Qual componente/área isso afeta?
+- Opções: baseado nos caminhos de arquivo detectados
 
-**Question 2: Scope**
-- What component/area does this affect?
-- Options: Based on detected file paths (e.g., parser, agents, kb, api)
+**Pergunta 3: Breaking Changes**
+- Há algum breaking change?
+- Opções: Sim (descreva), Não
 
-**Question 3: Breaking Changes**
-- Are there any breaking changes?
-- Options: Yes (describe), No
+**Pergunta 4: Issues Relacionadas**
+- Link para alguma issue relacionada?
+- (Texto livre — ex., "Closes #123")
 
-**Question 4: Related Issues**
-- Link to any related issues?
-- (Open text - e.g., "Closes #123")
+### Passo 5: Construir Descrição do PR
 
-### Step 5: Build PR Description
-
-Generate structured description following this template:
+Gere a descrição estruturada:
 
 ```markdown
-## Summary
+## Resumo
 
-{2-3 bullet points describing the change}
+{2-3 bullet points descrevendo a mudança}
 
-### Key Changes
-- {Primary change 1}
-- {Primary change 2}
-- {Primary change 3}
+### Principais Mudanças
+- {Mudança principal 1}
+- {Mudança principal 2}
+- {Mudança principal 3}
 
-## What's Changed
+## O que Mudou
 
-### {Category 1}
-{Description of changes in this category}
+### {Categoria 1}
+{Descrição das mudanças nesta categoria}
 
-### {Category 2}
-{Description of changes in this category}
+### {Categoria 2}
+{Descrição das mudanças nesta categoria}
 
-## Files Changed
+## Arquivos Alterados
 
-| Category | Files | Description |
-|----------|-------|-------------|
-| {cat1} | {count} | {brief description} |
-| {cat2} | {count} | {brief description} |
+| Categoria | Arquivos | Descrição |
+|-----------|----------|-----------|
+| {cat1} | {count} | {breve descrição} |
+| {cat2} | {count} | {breve descrição} |
 
 ## Test Plan
 
-- [ ] {Test case 1}
-- [ ] {Test case 2}
-- [ ] {Test case 3}
+- [ ] {Caso de teste 1}
+- [ ] {Caso de teste 2}
+- [ ] {Caso de teste 3}
 
 ## Breaking Changes
 
-{Describe breaking changes or "None"}
+{Descreva breaking changes ou "Nenhum"}
 
-## Related Issues
+## Issues Relacionadas
 
-{Closes #XXX or "None"}
+{Closes #XXX ou "Nenhuma"}
 
 ---
 
-Generated with [Claude Code](https://claude.ai/code)
+Gerado com [Claude Code](https://claude.ai/code)
 ```
 
-### Step 6: Create Branch (if needed)
+### Passo 6: Criar Branch (se necessário)
 
 ```bash
-# If on main, create feature branch
+# Se estiver em main, criar branch de feature
 git checkout -b <type>/<short-description>
 
-# Examples:
-git checkout -b feat/user-authentication
-git checkout -b fix/parser-null-handling
-git checkout -b refactor/agents-standardization
+# Exemplos:
+git checkout -b feat/autenticacao-usuario
+git checkout -b fix/tratamento-null-parser
+git checkout -b refactor/padronizacao-agentes
 ```
 
-### Step 7: Commit and Push
+### Passo 7: Commit e Push
 
 ```bash
-# Stage all changes (or specific files)
-git add -A
+# Stage das mudanças
+git add <arquivos-especificos>
 
-# Commit with conventional message
-git commit -m "<message>"
+# Commit com mensagem conventional
+git commit -m "<mensagem>"
 
-# Push with upstream tracking
-git push -u origin <branch-name>
+# Push com tracking upstream
+git push -u origin <nome-da-branch>
 ```
 
-### Step 8: Create PR
+### Passo 8: Criar PR
 
 ```bash
 gh pr create \
-  --title "<type>(<scope>): <description>" \
-  --body "<generated-body>" \
+  --title "<type>(<scope>): <descrição>" \
+  --body "<body-gerado>" \
   --base main
 ```
 
-For draft PRs:
+Para draft PRs:
 ```bash
 gh pr create --draft ...
 ```
@@ -264,142 +249,64 @@ gh pr create --draft ...
 ## Output
 
 - **Branch:** `<type>/<short-description>`
-- **Commit:** Conventional commit format
-- **PR URL:** Returned from `gh pr create`
+- **Commit:** Formato conventional commit
+- **URL do PR:** Retornado pelo `gh pr create`
 
 ---
 
-## Quality Checklist
+## Checklist de Qualidade
 
-Before creating PR, verify:
+Antes de criar o PR, verifique:
 
 ```text
-COMMIT MESSAGE
-[ ] Uses conventional commits format
-[ ] Type matches the primary change
-[ ] Scope is specific and meaningful
-[ ] Description is concise (< 72 chars)
+MENSAGEM DE COMMIT
+[ ] Usa formato de conventional commits
+[ ] Tipo corresponde à mudança principal
+[ ] Scope é específico e significativo
+[ ] Descrição é concisa (< 72 chars)
 
-PR DESCRIPTION
-[ ] Summary explains WHY not just WHAT
-[ ] Files changed table is accurate
-[ ] Test plan has actionable items
-[ ] Breaking changes documented (if any)
+DESCRIÇÃO DO PR
+[ ] Resumo explica o POR QUÊ e não apenas o O QUÊ
+[ ] Tabela de arquivos alterados é precisa
+[ ] Test plan tem itens acionáveis
+[ ] Breaking changes documentados (se houver)
 
 BRANCH
-[ ] Branch name matches convention
-[ ] Not committing directly to main
-[ ] All changes are staged
+[ ] Nome da branch segue a convenção
+[ ] Não está fazendo commit diretamente na main
+[ ] Todas as mudanças estão staged
 ```
 
 ---
 
-## Conventional Commits Reference
+## Referência de Conventional Commits
 
-| Type | When to Use | Example |
+| Tipo | Quando Usar | Exemplo |
 |------|-------------|---------|
-| `feat` | New feature | `feat(api): add user endpoint` |
-| `fix` | Bug fix | `fix(parser): handle null dates` |
-| `refactor` | Code restructure | `refactor(auth): extract token service` |
-| `docs` | Documentation | `docs(readme): add setup instructions` |
-| `test` | Tests | `test(parser): add edge case coverage` |
-| `chore` | Maintenance | `chore(deps): update dependencies` |
-| `style` | Formatting | `style: apply black formatting` |
-| `perf` | Performance | `perf(query): add index for lookups` |
-| `ci` | CI/CD | `ci: add github actions workflow` |
-| `build` | Build system | `build: update dockerfile` |
-
-**Scopes for this project:**
-
-| Scope | Applies To |
-|-------|------------|
-| `agents` | `${CLAUDE_PLUGIN_ROOT}/agents/**` |
-| `kb` | `${CLAUDE_PLUGIN_ROOT}/kb/**` |
-| `sdd` | `.claude/sdd/**` |
-| `commands` | `${CLAUDE_PLUGIN_ROOT}/commands/**` |
-| `handlers` | `src/handlers/**` |
-| `services` | `src/services/**` |
-| `api` | `src/api/**` |
-| `infra` | `terraform/**`, `infrastructure/**` |
-| `ci` | `.github/**` |
+| `feat` | Nova feature | `feat(api): adicionar endpoint de usuário` |
+| `fix` | Correção de bug | `fix(parser): tratar datas nulas` |
+| `refactor` | Reestruturação de código | `refactor(auth): extrair serviço de token` |
+| `docs` | Documentação | `docs(readme): adicionar instruções de setup` |
+| `test` | Testes | `test(parser): adicionar cobertura de edge cases` |
+| `chore` | Manutenção | `chore(deps): atualizar dependências` |
+| `style` | Formatação | `style: aplicar formatação black` |
+| `perf` | Performance | `perf(query): adicionar index para lookups` |
+| `ci` | CI/CD | `ci: adicionar workflow github actions` |
+| `build` | Build system | `build: atualizar dockerfile` |
 
 ---
 
-## Examples
+## Dicas
 
-### Example 1: Feature PR
-
-```bash
-/create-pr
-
-# Detected: New files in src/handlers/
-# Suggested: feat(auth): add OAuth2 refresh support
-
-→ Created branch: feat/oauth2-refresh
-→ Committed: feat(auth): add OAuth2 token refresh
-→ PR: https://github.com/org/repo/pull/42
-```
-
-### Example 2: Refactor PR
-
-```bash
-/create-pr "refactor(agents): standardize agent definitions"
-
-→ Created branch: refactor/agents-standardization
-→ Committed: refactor(agents): standardize agent definitions
-→ PR: https://github.com/org/repo/pull/43
-```
-
-### Example 3: Documentation PR
-
-```bash
-/create-pr --draft
-
-# Detected: Changes in ${CLAUDE_PLUGIN_ROOT}/kb/
-# Suggested: docs(kb): add redis caching patterns
-
-→ Created branch: docs/kb-redis-patterns
-→ Committed: docs(kb): add redis caching patterns
-→ Draft PR: https://github.com/org/repo/pull/44
-```
-
-### Example 4: PR with Pre-Review
-
-```bash
-/create-pr --review
-
-# Running CodeRabbit analysis...
-# ✅ No critical issues
-# ⚠️ 2 warnings (code style)
-#
-# Running Claude deep review...
-# ✅ Architecture looks good
-# ⚠️ Consider adding type hints to new functions
-#
-# Proceeding to PR creation...
-
-→ Created branch: feat/new-feature
-→ Committed: feat(api): add new endpoint
-→ PR: https://github.com/org/repo/pull/45
-
-# PR description includes review summary
-```
+1. **Mantenha PRs Pequenos** — Mire em < 400 linhas alteradas
+2. **Uma Preocupação por PR** — Não misture features com refactors
+3. **Escreva para os Revisores** — Assuma que eles não conhecem o contexto
+4. **Linke Issues** — Use "Closes #XX" para fechar issues automaticamente
+5. **Test Plan Importa** — Os revisores precisam saber como verificar
 
 ---
 
-## Tips
+## Referências
 
-1. **Keep PRs Small** — Aim for < 400 lines changed
-2. **One Concern Per PR** — Don't mix features with refactors
-3. **Write for Reviewers** — Assume they don't know the context
-4. **Link Issues** — Use "Closes #XX" to auto-close issues
-5. **Test Plan Matters** — Reviewers should know how to verify
-
----
-
-## Related
-
-- Review Command: `${CLAUDE_PLUGIN_ROOT}/commands/review/review.md`
-- Code Reviewer Agent: `${CLAUDE_PLUGIN_ROOT}/agents/python/code-reviewer.md`
-- Workflow: `${CLAUDE_PLUGIN_ROOT}/sdd/_index.md`
-- Agents: `${CLAUDE_PLUGIN_ROOT}/agents/workflow/`
+- Comando de Review: `commands/review.md`
+- Agente Code Reviewer: `agents/code-reviewer.md`

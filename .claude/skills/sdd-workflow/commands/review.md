@@ -1,395 +1,314 @@
 ---
 name: review
-description: Dual AI code review with CodeRabbit + Claude Code for maximum coverage
+description: Dual AI code review com análise estática + arquitetural para cobertura máxima
 ---
 
-# Review Command
+# Review
 
-> Dual AI code review with CodeRabbit + Claude Code for maximum coverage
+> Dual AI code review com análise estática + arquitetural para cobertura máxima
 
-## Usage
+## Uso
 
-```bash
-/review                        # Review all changes vs main
-/review uncommitted            # Review only uncommitted changes
-/review committed              # Review only committed changes
-/review --base develop         # Compare to specific branch
-/review --quick                # CodeRabbit only (faster)
-/review --deep                 # Claude only (no CodeRabbit)
+```
+review                        # Review de todas as mudanças vs main
+review uncommitted            # Review apenas de mudanças não comitadas
+review committed              # Review apenas de mudanças comitadas
+review --base develop         # Comparar com branch específica
+review --quick                # Somente análise estática (mais rápido)
+review --deep                 # Somente Claude (mais profundo)
 ```
 
 ---
 
-## Overview
+## Visão Geral
 
-This command orchestrates a **dual AI review** combining:
+Este comando orquestra um **dual AI review** combinando:
 
-| Reviewer | Strengths |
-|----------|-----------|
-| **CodeRabbit** | Static analysis, security scanning (Gitleaks, Semgrep), linting (Ruff, Pylint), pattern detection |
-| **Claude** | Architectural review, business logic, design patterns, contextual understanding |
+| Revisor | Pontos Fortes |
+|---------|---------------|
+| **Análise Estática** | Análise estática, scanning de segurança (Gitleaks, Semgrep), linting (Ruff, Pylint), detecção de padrões |
+| **Claude** | Review arquitetural, lógica de negócio, design patterns, entendimento contextual |
 
 ```text
 ┌─────────────────────────────────────────────────────────────────┐
-│                    DUAL AI REVIEW PIPELINE                       │
+│                 PIPELINE DE DUAL AI REVIEW                       │
 ├─────────────────────────────────────────────────────────────────┤
 │                                                                  │
 │   ┌───────────────┐          ┌───────────────┐                  │
-│   │  CodeRabbit   │          │    Claude     │                  │
-│   │     CLI       │          │    Code       │                  │
+│   │  Análise      │          │    Claude     │                  │
+│   │  Estática     │          │    Code       │                  │
 │   └───────┬───────┘          └───────┬───────┘                  │
 │           │                          │                           │
 │   ┌───────▼───────┐          ┌───────▼───────┐                  │
-│   │ • Security    │          │ • Architecture│                  │
-│   │ • Linting     │          │ • Logic       │                  │
-│   │ • Patterns    │          │ • Design      │                  │
-│   │ • Style       │          │ • Intent      │                  │
+│   │ • Segurança   │          │ • Arquitetura │                  │
+│   │ • Linting     │          │ • Lógica      │                  │
+│   │ • Padrões     │          │ • Design      │                  │
+│   │ • Estilo      │          │ • Intenção    │                  │
 │   └───────┬───────┘          └───────┬───────┘                  │
 │           │                          │                           │
 │           └────────────┬─────────────┘                          │
 │                        │                                         │
 │                ┌───────▼───────┐                                 │
-│                │   UNIFIED     │                                 │
-│                │   REPORT      │                                 │
+│                │   RELATÓRIO   │                                 │
+│                │   UNIFICADO   │                                 │
 │                └───────────────┘                                 │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## Process
+## Processo
 
-### Step 1: Determine Scope
+### Passo 1: Determinar Escopo
 
 ```bash
-# Check current state
+# Verificar estado atual
 git status
 git diff --stat HEAD
-git log origin/main..HEAD --oneline 2>/dev/null || echo "No commits ahead of main"
+git log origin/main..HEAD --oneline 2>/dev/null || echo "Sem commits à frente de main"
 ```
 
-**Scope Selection:**
+**Seleção de Escopo:**
 
-| User Input | Scope |
-|------------|-------|
-| `/review` | All changes vs main |
-| `/review uncommitted` | Working directory only |
-| `/review committed` | Committed changes only |
-| `/review --base <branch>` | Compare to specific branch |
+| Input do Usuário | Escopo |
+|-----------------|--------|
+| `review` | Todas as mudanças vs main |
+| `review uncommitted` | Apenas diretório de trabalho |
+| `review committed` | Apenas mudanças comitadas |
+| `review --base <branch>` | Comparar com branch específica |
 
-### Step 2: Run CodeRabbit Analysis
+### Passo 2: Rodar Análise Estática (se disponível)
+
+Se CodeRabbit CLI ou ferramenta similar estiver disponível:
 
 ```bash
-# Source shell to ensure CLI is available
-source ~/.zshrc
-
-# Check CLI availability
-coderabbit --version || echo "CodeRabbit CLI not available"
-
-# Run review based on mode
-# For all changes:
+# Para todas as mudanças:
 coderabbit review --plain
 
-# For uncommitted only:
+# Para uncommitted apenas:
 coderabbit review --type uncommitted --plain
-
-# For committed only:
-coderabbit review --type committed --plain
-
-# For specific base branch:
-coderabbit review --base <branch> --plain
 ```
 
-**Note:** Requires CodeRabbit GitHub App installed on the repository.
-
-**Parse CodeRabbit Output:**
+**Mapeamento de Severidade:**
 
 ```text
-SEVERITY MAPPING
-├─ [CRITICAL] → Must fix before merge
-├─ [ERROR]    → Should fix before merge
-├─ [WARNING]  → Recommended to fix
-└─ [INFO]     → Nice to have
+MAPEAMENTO DE SEVERIDADE
+├─ [CRITICAL] → Deve corrigir antes do merge
+├─ [ERROR]    → Deveria corrigir antes do merge
+├─ [WARNING]  → Recomendado corrigir
+└─ [INFO]     → Seria bom ter
 ```
 
-### Step 3: Run Claude Deep Analysis
+### Passo 3: Rodar Análise Profunda Claude
 
-Use the code-reviewer agent capabilities:
+**Áreas de Foco:**
 
-**Focus Areas:**
+| Categoria | Verificar |
+|-----------|-----------|
+| **Arquitetura** | Alinhamento com padrões do projeto, separação de responsabilidades |
+| **Lógica de Negócio** | Implementação correta, edge cases, tratamento de erros |
+| **Design Patterns** | Convenções do projeto, padrões estabelecidos, consistência |
+| **Manutenibilidade** | Código autodocumentado, type hints, princípio DRY |
 
-| Category | Check For |
-|----------|-----------|
-| **Architecture** | Project pattern alignment, separation of concerns |
-| **Business Logic** | Correct implementation, edge cases, error handling |
-| **Design Patterns** | Project conventions, established patterns, consistency |
-| **Maintainability** | Self-documenting code, type hints, DRY principle |
+### Passo 4: Sintetizar Descobertas
 
-### Step 4: Synthesize Findings
+Combine resultados dos dois revisores:
 
-Combine results from both reviewers:
+1. **Desduplicar** — Mesmo problema encontrado pelos dois → manter um, anotar "Ambos"
+2. **Priorizar** — Crítico > Erro > Aviso > Info
+3. **Categorizar** — Segurança, Qualidade, Performance, Estilo
+4. **Ação** — Deve corrigir vs Deveria corrigir vs Seria bom ter
 
-1. **Deduplicate** — Same issue found by both → keep one, note "Both"
-2. **Prioritize** — Critical > Error > Warning > Info
-3. **Categorize** — Security, Quality, Performance, Style
-4. **Action** — Must fix vs Should fix vs Nice to have
-
-### Step 5: Generate Report
+### Passo 5: Gerar Relatório
 
 ---
 
-## Output Format
+## Formato do Output
 
 ```markdown
-## 🔍 Dual AI Review Report
+## 🔍 Relatório de Dual AI Review
 
-**Reviewers:** CodeRabbit + Claude Code
-**Scope:** {scope_description}
-**Files:** {count} files, {lines} lines changed
-**Date:** {timestamp}
+**Revisores:** Análise Estática + Claude Code
+**Escopo:** {descrição do escopo}
+**Arquivos:** {count} arquivos, {linhas} linhas alteradas
+**Data:** {timestamp}
 
 ---
 
-### 📊 Summary
+### 📊 Resumo
 
-| Source | 🔴 Critical | 🟠 Error | 🟡 Warning | 🔵 Info |
-|--------|-------------|----------|------------|---------|
-| CodeRabbit | {n} | {n} | {n} | {n} |
+| Fonte | 🔴 Crítico | 🟠 Erro | 🟡 Aviso | 🔵 Info |
+|-------|-----------|---------|----------|---------|
+| Análise Estática | {n} | {n} | {n} | {n} |
 | Claude | {n} | {n} | {n} | {n} |
 | **Total** | {n} | {n} | {n} | {n} |
 
 ---
 
-### 🔴 Critical Issues
+### 🔴 Problemas Críticos
 
-> Must fix before merge
+> Deve corrigir antes do merge
 
-#### [C1] {Title}
-- **Source:** {CodeRabbit|Claude|Both}
-- **File:** `{path}:{line}`
-- **Issue:** {description}
-- **Fix:**
+#### [C1] {Título}
+- **Fonte:** {Análise Estática|Claude|Ambos}
+- **Arquivo:** `{caminho}:{linha}`
+- **Problema:** {descrição}
+- **Correção:**
 ```{lang}
-{code}
+{código}
 ```
 
 ---
 
-### 🟠 Errors
+### 🟠 Erros
 
-> Should fix before merge
+> Deveria corrigir antes do merge
 
-#### [E1] {Title}
-- **Source:** {source}
-- **File:** `{path}:{line}`
-- **Issue:** {description}
-
----
-
-### 🟡 Warnings
-
-> Recommended to fix
-
-- [{source}] `{file}`: {description}
+#### [E1] {Título}
+- **Fonte:** {fonte}
+- **Arquivo:** `{caminho}:{linha}`
+- **Problema:** {descrição}
 
 ---
 
-### 🔵 Suggestions
+### 🟡 Avisos
 
-- {suggestion 1}
-- {suggestion 2}
+> Recomendado corrigir
 
----
-
-### ✅ Positive Observations
-
-- {good practice 1}
-- {good practice 2}
+- [{fonte}] `{arquivo}`: {descrição}
 
 ---
 
-### 📋 Action Checklist
+### 🔵 Sugestões
 
-- [ ] Fix: {critical 1}
-- [ ] Fix: {critical 2}
-- [ ] Consider: {warning 1}
+- {sugestão 1}
+- {sugestão 2}
 
 ---
 
-**Merge Status:** {✅ Ready | ⚠️ Fix warnings first | 🚫 Fix critical issues}
+### ✅ Observações Positivas
+
+- {boa prática 1}
+- {boa prática 2}
+
+---
+
+### 📋 Checklist de Ações
+
+- [ ] Corrigir: {crítico 1}
+- [ ] Corrigir: {crítico 2}
+- [ ] Considerar: {aviso 1}
+
+---
+
+**Status de Merge:** {✅ Pronto | ⚠️ Corrigir avisos primeiro | 🚫 Corrigir problemas críticos}
 ```
 
 ---
 
-## Error Handling
+## Tratamento de Erros
 
-### CodeRabbit CLI Not Available
+### Ferramenta de Análise Estática Não Disponível
 
 ```text
-IF coderabbit command not found:
-  1. Attempt: source ~/.zshrc && coderabbit --version
-  2. If still fails: Proceed with Claude-only review
-  3. Note in report: "CodeRabbit unavailable"
+Se ferramenta não encontrada:
+  1. Prosseguir com review somente Claude
+  2. Notar no relatório: "Análise estática indisponível"
 ```
 
-### CodeRabbit Not Authenticated
+### Changeset Grande
 
 ```text
-IF authentication error:
-  1. Inform user: "Run 'coderabbit auth login' to authenticate"
-  2. Proceed with Claude-only review
-  3. Note in report: "CodeRabbit not authenticated"
-```
-
-### Large Changeset
-
-```text
-IF > 50 files changed:
-  1. Suggest: "Large changeset detected. Use '/review uncommitted' for faster feedback"
-  2. Proceed with review but note potential timeout
+Se > 50 arquivos alterados:
+  1. Sugerir: "Changeset grande detectado. Use 'review uncommitted' para feedback mais rápido"
+  2. Prosseguir com review mas notar potencial de timeout
 ```
 
 ---
 
-## Quick Mode (`--quick`)
+## Modo Rápido (`--quick`)
 
-CodeRabbit only — for fast feedback:
+Análise estática somente — para feedback rápido:
 
-```bash
-/review --quick
+```
+review --quick
 ```
 
-**Process:**
-1. Run `coderabbit review --plain`
-2. Parse and format results
-3. Skip Claude analysis
-4. Return immediately
+**Processo:**
+1. Rodar análise estática
+2. Parsear e formatar resultados
+3. Pular análise Claude
+4. Retornar imediatamente
 
-**Use When:**
-- Quick sanity check
-- Pre-commit validation
-- CI/CD integration
+**Use Quando:**
+- Verificação rápida de sanidade
+- Validação pré-commit
+- Integração com CI/CD
 
 ---
 
-## Deep Mode (`--deep`)
+## Modo Profundo (`--deep`)
 
-Claude only — for thorough analysis:
+Somente Claude — para análise detalhada:
 
-```bash
-/review --deep
+```
+review --deep
 ```
 
-**Process:**
-1. Skip CodeRabbit
-2. Full Claude analysis with all capabilities
-3. Detailed architectural review
-4. Extended recommendations
+**Processo:**
+1. Pular análise estática
+2. Análise completa Claude com todas as capacidades
+3. Review arquitetural detalhado
+4. Recomendações estendidas
 
-**Use When:**
-- CodeRabbit unavailable
-- Need deeper contextual analysis
-- Reviewing design decisions
+**Use Quando:**
+- Análise estática indisponível
+- Precisa de análise contextual mais profunda
+- Revisando decisões de design
 
 ---
 
-## Integration
+## Integração
 
-### Before PR Creation
+### Antes de Criar PR
 
-```bash
-# Review first, then create PR
-/review
-# If all good:
-/create-pr
+```
+# Review primeiro, depois criar PR
+review
+# Se tudo ok:
+create-pr
 ```
 
-### With create-pr Command
+### Com create-pr
 
-```bash
-# Automatically runs review before PR
-/create-pr --review
+```
+# Roda review automaticamente antes do PR
+create-pr --review
 ```
 
-### In Development Loop
+### No Loop de Desenvolvimento
 
-```bash
-# Quick feedback on work in progress
-/review uncommitted
-
-# Full review before commit
-git add .
-/review committed
 ```
+# Feedback rápido em trabalho em progresso
+review uncommitted
 
----
-
-## Configuration
-
-Optionally respects `.coderabbit.yaml` settings (create this file if needed):
-
-| Setting | Effect |
-|---------|--------|
-| `reviews.path_instructions` | Custom rules per path |
-| `reviews.tools` | Which linters are enabled |
-| `reviews.pre_merge_checks` | Quality gates |
-
----
-
-## Examples
-
-### Example 1: Standard Review
-
-```bash
-/review
-
-# Output:
-## 🔍 Dual AI Review Report
-...
-🔴 Critical: 0
-🟠 Error: 2
-🟡 Warning: 5
-
-Merge Status: ⚠️ Fix errors first
-```
-
-### Example 2: Quick Check
-
-```bash
-/review --quick uncommitted
-
-# Output:
-## CodeRabbit Quick Review
-...
-✅ No critical issues
-⚠️ 3 warnings to consider
-```
-
-### Example 3: Branch Comparison
-
-```bash
-/review --base develop
-
-# Output:
-## 🔍 Dual AI Review Report
-Comparing: HEAD vs develop
-...
+# Review completo antes do commit
+review committed
 ```
 
 ---
 
-## Tips
+## Dicas
 
-1. **Review Early** — Run `/review uncommitted` frequently during development
-2. **Fix Critical First** — Always address critical and error issues before PR
-3. **Learn from Feedback** — Both AIs provide educational explanations
-4. **Use Quick Mode** — For rapid iteration, `/review --quick` is your friend
-5. **Pre-PR Habit** — Always `/review` before `/create-pr`
+1. **Revise Cedo** — Rode `review uncommitted` frequentemente durante o desenvolvimento
+2. **Corrija Críticos Primeiro** — Sempre resolva problemas críticos e erros antes do PR
+3. **Aprenda com o Feedback** — Ambos os AIs fornecem explicações educativas
+4. **Use Modo Rápido** — Para iteração rápida, `review --quick` é seu amigo
+5. **Hábito Pré-PR** — Sempre faça `review` antes de `create-pr`
 
 ---
 
-## Related
+## Referências
 
-- Agent: `${CLAUDE_PLUGIN_ROOT}/agents/python/code-reviewer.md`
-- Config: `.coderabbit.yaml` (optional, create if needed)
-- Create PR: `${CLAUDE_PLUGIN_ROOT}/commands/workflow/create-pr.md`
+- Agente: `agents/code-reviewer.md`
+- Criar PR: `commands/create-pr.md`
