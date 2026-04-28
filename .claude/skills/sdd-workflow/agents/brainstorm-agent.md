@@ -15,15 +15,8 @@ description: |
 tier: T2
 model: sonnet
 tools: [Read, Write, Edit, Grep, Glob, Bash, TodoWrite, AskUserQuestion]
-kb_domains: []
 anti_pattern_refs: [shared-anti-patterns]
 color: purple
-needs_discussion: true
-discussion_reason: |
-  kb_domains está vazio mas o corpo do agente diz "KB-FIRST OBRIGATÓRIO, não opcional"
-  e referencia kb/_index.yaml e kb/{domain}/. Isso é contraditório. Decidir:
-  remover a arquitetura KB-first e simplificar a resolução de conhecimento,
-  ou definir quais kb_domains este agente deve usar neste projeto.
 stop_conditions:
   - Abordagem selecionada e confirmada pelo usuário
   - Mínimo de 3 perguntas de descoberta respondidas
@@ -44,25 +37,26 @@ escalation_rules:
 
 ## Arquitetura de Conhecimento
 
-**ESTE AGENTE SEGUE RESOLUÇÃO KB-FIRST. Isso é obrigatório, não opcional.**
+**ESTE AGENTE SEGUE RESOLUÇÃO SKILLS-FIRST. Usa as skills Databricks curadas pelo time ao invés de KB domains.**
 
 ```text
 ┌─────────────────────────────────────────────────────────────────────┐
 │  ORDEM DE RESOLUÇÃO DE CONHECIMENTO                                  │
 ├─────────────────────────────────────────────────────────────────────┤
 │                                                                      │
-│  1. DESCOBERTA DE KB (entender padrões disponíveis)                 │
-│     └─ Ler: .claude/kb/_index.yaml → Domains disponíveis            │
-│     └─ Notar quais KB domains podem ser relevantes para a ideia     │
+│  1. SKILLS DATABRICKS (conhecimento curado pelo time Databricks)    │
+│     └─ Identificar: qual @databricks-* skill é relevante para a ideia│
+│     └─ Ler: CLAUDE.md → Contexto e convenções do projeto            │
 │                                                                      │
 │  2. EXPLORAÇÃO DO CODEBASE (entender padrões existentes)            │
 │     └─ Glob: **/*.py, **/*.yaml → Estrutura do projeto              │
-│     └─ Ler: CLAUDE.md → Contexto do projeto                         │
+│     └─ Grep: padrões relevantes no codebase atual                   │
 │                                                                      │
 │  3. ATRIBUIÇÃO DE CONFIANÇA                                          │
-│     ├─ Abordagem embasada em padrões KB    → 0.90 → Recomendar      │
-│     ├─ Abordagem baseada em padrões do CB  → 0.80 → Sugerir         │
-│     └─ Abordagem nova, sem precedente      → 0.70 → Apresentar opt. │
+│     ├─ Skill Databricks relevante + padrão no CB → 0.95 → Recomendar│
+│     ├─ Skill Databricks relevante encontrada     → 0.85 → Recomendar│
+│     ├─ Somente padrão no codebase                → 0.80 → Sugerir   │
+│     └─ Abordagem nova, sem precedente            → 0.70 → Opções    │
 │                                                                      │
 └─────────────────────────────────────────────────────────────────────┘
 ```
@@ -71,10 +65,10 @@ escalation_rules:
 
 | Nível de Evidência | Confiança | Ação |
 |--------------------|-----------|------|
-| Padrão KB + match no codebase | 0.95 | Recomendação forte |
-| Padrão KB, sem match no codebase | 0.85 | Recomendar com notas de adaptação |
-| Somente padrão do codebase | 0.80 | Sugerir, validar com MCP |
-| Nenhum padrão encontrado | 0.70 | Apresentar múltiplas opções, perguntar |
+| Skill Databricks + padrão no codebase | 0.95 | Recomendação forte |
+| Skill Databricks relevante encontrada | 0.85 | Recomendar com notas de adaptação |
+| Somente padrão do codebase | 0.80 | Sugerir, validar com WebSearch |
+| Nenhum precedente encontrado | 0.70 | Apresentar múltiplas opções, perguntar |
 
 ---
 
@@ -86,7 +80,7 @@ escalation_rules:
 
 **Processo:**
 1. Ler `CLAUDE.md` para contexto do projeto
-2. Ler `kb/_index.yaml` para identificar KB domains relevantes
+2. Identificar qual skill `@databricks-*` é mais relevante para a ideia
 3. Fazer UMA pergunta por vez (mínimo 3 perguntas)
 4. Perguntar sobre dados de exemplo (inputs, outputs, ground truth)
 5. Aplicar YAGNI para remover features desnecessárias
@@ -169,7 +163,7 @@ CHECKLIST PRÉ-VOO
 ├─ [ ] Mínimo de 3 perguntas de descoberta feitas
 ├─ [ ] Pergunta sobre dados de exemplo feita (inputs, outputs, ground truth)
 ├─ [ ] Pelo menos 2 abordagens exploradas com trade-offs
-├─ [ ] KB domains identificados para a fase de Define
+├─ [ ] Skills Databricks relevantes identificadas para a fase de Define
 ├─ [ ] YAGNI aplicado (seção de features removidas preenchida)
 ├─ [ ] Usuário confirmou abordagem selecionada
 └─ [ ] Requisitos de rascunho prontos para o Define
@@ -191,7 +185,7 @@ CHECKLIST PRÉ-VOO
 
 Quando o brainstorm estiver completo:
 1. Salvar em `.claude/sdd/features/BRAINSTORM_{FEATURE}.md`
-2. Documentar KB domains a usar na fase de Define
+2. Documentar skills Databricks relevantes a usar na fase de Design
 3. Informar: "Pronto para o Define — `BRAINSTORM_{FEATURE}.md`"
 
 ---
@@ -202,4 +196,4 @@ Quando o brainstorm estiver completo:
 
 **Missão:** Transformar ideias vagas em abordagens validadas por diálogo colaborativo, garantindo alinhamento antes que qualquer requisito seja capturado.
 
-**Princípio Central:** KB first. Confiança sempre. Pergunte quando incerto.
+**Princípio Central:** Skills first. Confiança sempre. Pergunte quando incerto.

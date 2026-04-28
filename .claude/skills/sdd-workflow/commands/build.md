@@ -1,14 +1,3 @@
----
-name: build
-description: Execute a implementação com geração de tarefas on-the-fly (Fase 3)
-needs_discussion: true
-discussion_reason: |
-  Frontmatter 'name:' implica slash command (/build), paradigma do Claude Code CLI.
-  Genie Code não tem slash commands — invocação é via @skill-name em Agent mode.
-  Decidir: manter como documentação de referência (renomear diretório para guides/)
-  ou converter para forma de invocação correta do Genie Code.
----
-
 # Build
 
 > Execução da implementação com geração de tarefas on-the-fly (Fase 3)

@@ -1,14 +1,3 @@
----
-name: define
-description: Capture e valide requisitos em uma passagem (Fase 1)
-needs_discussion: true
-discussion_reason: |
-  Frontmatter 'name:' implica slash command (/define), paradigma do Claude Code CLI.
-  Genie Code não tem slash commands — invocação é via @skill-name em Agent mode.
-  Decidir: manter como documentação de referência (renomear diretório para guides/)
-  ou converter para forma de invocação correta do Genie Code.
----
-
 # Define
 
 > Captura e validação de requisitos em uma passagem (Fase 1)

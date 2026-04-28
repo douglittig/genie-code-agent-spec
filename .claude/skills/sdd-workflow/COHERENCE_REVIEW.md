@@ -1,7 +1,7 @@
 # Revisão de Coerência — sdd-workflow
 
-Revisão realizada em 2026-04-27 para verificar coerência de todos os arquivos da skill
-`sdd-workflow` com o projeto `genie-code-agent-spec` e com o paradigma do Genie Code.
+Revisão realizada em 2026-04-27. Decisões tomadas e implementadas em 2026-04-27.
+Todos os `needs_discussion` foram resolvidos — este documento é histórico.
 
 ---
 
@@ -60,33 +60,48 @@ detalhada está em `discussion_reason:` dentro de cada arquivo.
 
 ---
 
-## Temas para Discussão
+## Decisões Tomadas
 
-Três decisões de design que resolvem a maioria dos problemas:
+### 1. Arquitetura KB-first → Skills-first ✅
 
-### 1. Arquitetura KB-first
+**Decisão:** Substituir KB-first por Skills-first usando as skills Databricks curadas pelo time.
 
-**Situação:** Agentes (brainstorm, define, design, build) têm arquitetura "KB-FIRST OBRIGATÓRIO" mas o projeto não tem diretório `kb/`. Os `kb_domains` estão vazios na maioria dos agentes.
+**Implementado:**
+- Todos os 6 agentes (brainstorm, define, design, build, code-reviewer, test-generator): bloco "KB-FIRST OBRIGATÓRIO" substituído por "SKILLS-FIRST"
+- `kb_domains` removido do frontmatter de todos os agentes
+- Referências a `kb/_index.yaml` e `kb/{domain}/` removidas
+- Princípio Central atualizado para "Skills first" em todos os agentes
 
-**Opções:**
-- (a) Remover a arquitetura KB-first dos agentes — simplificar para detecção de padrões no codebase existente do usuário
-- (b) Criar estrutura `kb/` no projeto com domínios relevantes para Databricks (dbt, spark, sql-patterns, data-quality)
-- (c) Tornar o KB-first opcional/condicional — só aplicar se `kb_domains` estiver preenchido
+### 2. Agentes especializados → Skills Databricks existentes ✅
 
-### 2. Agentes especializados inexistentes
+**Decisão:** Mapear para as skills Databricks existentes no projeto.
 
-**Situação:** `SKILL.md`, `design-agent` e `build-agent` referenciam agentes (`@dbt-specialist`, `@spark-engineer`, `@lakeflow-pipeline-builder`, etc.) que não existem como skills no projeto. O projeto tem skills Databricks que cobrem essas especialidades.
+**Mapeamento aplicado:**
 
-**Opções:**
-- (a) Remover o mapa de delegação especializada — build-agent constrói tudo diretamente
-- (b) Mapear para skills Databricks existentes: `@databricks-spark-declarative-pipelines` em vez de `@lakeflow-pipeline-builder`, `@databricks-python-sdk` em vez de `@python-developer`, etc.
-- (c) Criar as skills especializadas faltantes como novos arquivos em `agents/`
+| Agente agentspec (removido) | Skill Databricks (mapeado) |
+|----------------------------|---------------------------|
+| `@lakeflow-pipeline-builder` | `@databricks-spark-declarative-pipelines` |
+| `@spark-engineer` | `@databricks-spark-declarative-pipelines` |
+| `@spark-streaming-architect` | `@databricks-spark-structured-streaming` |
+| `@sql-optimizer` | `@databricks-dbsql` |
+| `@medallion-architect` | `@databricks-spark-declarative-pipelines` |
+| `@data-quality-analyst` | `@databricks-spark-declarative-pipelines` + `@databricks-mlflow-evaluation` |
+| `@python-developer` | `@python-dev` |
+| `@pipeline-architect` | `@databricks-bundles` + `@databricks-jobs` |
+| `@schema-designer` / `@data-contracts-engineer` | `@databricks-unity-catalog` |
 
-### 3. Diretório `commands/`
+**Implementado:**
+- `SKILL.md`: tabela do File Manifest atualizada com skills Databricks
+- `design-agent.md`: tabela de delegação e referências de capacidades atualizadas
+- `build-agent.md`: mapa DE atualizado para skills Databricks; ferramenta `Task` removida
 
-**Situação:** Os 8 arquivos em `commands/` têm frontmatter com `name:` sugerindo slash commands (`/brainstorm`, `/define`, etc.). Genie Code não tem slash commands — usa `@skill-name`. Claude Code CLI suporta slash commands mas o projeto foca em Genie Code.
+**Nota:** Os agentes especializados originais existem em `assets/repos/agentspec-main/plugin/agents/data-engineering/` para referência.
 
-**Opções:**
-- (a) Renomear para `guides/` e remover o frontmatter `name:` — manter como documentação de referência
-- (b) Manter como está — esses arquivos funcionam no Claude Code CLI mesmo que não no Genie Code
-- (c) Converter para o formato correto do Genie Code (documentar como `@sdd-workflow` + fase)
+### 3. `commands/` → guias sem frontmatter (Genie Code first) ✅
+
+**Decisão:** Converter os 8 arquivos para guias de referência sem frontmatter de slash command.
+
+**Implementado:**
+- Frontmatter YAML (`name:`, `description:`, `needs_discussion:`, `discussion_reason:`) removido de todos os 8 arquivos em `commands/`
+- Arquivos mantidos como guias de referência para o SKILL.md (que já gerencia o roteamento)
+- Paradigma Genie Code: invocar via `@sdd-workflow` em Agent mode — o SKILL.md roteia para o agente correto

@@ -1,17 +1,8 @@
 # SDD Workflow — Contratos do Workflow
-# Workflow de Desenvolvimento em 5 Fases com Matching e Delegação de Agentes
-# Version: 3.0.0
-# Date: 2026-04-14
-#
-# ⚠️ PENDENTE DISCUSSÃO
-# needs_discussion: true
-# discussion_reason: |
-#   1. Seção workflow.phases usa command: "/brainstorm", "/define", etc. — Genie Code
-#      não tem slash commands; invocação é via @skill-name em Agent mode.
-#   2. Tool lists em brainstorm (linha ~93), design (linha ~331) e build (linha ~415)
-#      divergem dos frontmatters nos arquivos de agente correspondentes.
-#   3. Seção data_engineering_delegation referencia agentes que não existem no projeto.
-#   Decidir: atualizar referências de comando para @agent-name e sincronizar tool lists.
+# Workflow de Desenvolvimento em 5 Fases com Skills-First e Genie Code First
+# Version: 3.1.0
+# Date: 2026-04-27
+# Paradigma: Genie Code first — invocação via @sdd-workflow em Agent mode
 
 version: "3.0.0"
 name: "AgentSpec"
@@ -459,19 +450,21 @@ build:
     - self_documenting_names
     - config_over_hardcode
 
-  data_engineering_delegation:
-    description: "Quando o DESIGN contém arquitetura de pipeline, o Build delega para agentes DE"
-    agent_map:
-      dbt_models: "dbt-specialist"
-      airflow_dags: "pipeline-architect"
-      spark_jobs: "spark-engineer"
-      data_contracts: "data-contracts-engineer"
-      quality_checks: "data-quality-analyst"
-      schema_design: "schema-designer"
+  databricks_skills_map:
+    description: "Quando o DESIGN contém arquitetura Databricks, o Build usa as skills curadas"
+    skill_map:
+      sdp_pipelines: "@databricks-spark-declarative-pipelines"
+      structured_streaming: "@databricks-spark-structured-streaming"
+      sql_warehouses: "@databricks-dbsql"
+      unity_catalog: "@databricks-unity-catalog"
+      model_serving: "@databricks-model-serving"
+      bundles_dabs: "@databricks-bundles"
+      jobs_scheduling: "@databricks-jobs"
+      python_general: "@python-dev"
     de_verification:
-      - "dbt build --select {model}"
-      - "sqlfluff lint {file} --dialect {dialect}"
-      - "great_expectations suite run {suite}"
+      - "ruff check {arquivo}"
+      - "mypy {arquivo}"
+      - "pytest {arquivo_de_teste} -v"
 
   anti_patterns:
     - improvising: "Criar arquivos que não estão no manifest"

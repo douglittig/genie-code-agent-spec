@@ -6,15 +6,6 @@ description: |
   a partir de requisitos de negócio, atualizar tickets no Jira, criar PRs ou revisar
   código. Guia pelas 5 fases: Brainstorm → Define → Design → Build → Ship,
   com integração Confluence MCP (ingestão de spec) e Jira MCP (atualização de ticket).
-needs_discussion: true
-discussion_reason: |
-  Tabela "File Manifest" lista agentes que não existem como skills neste projeto:
-  @lakeflow-pipeline-builder, @spark-streaming-architect, @sql-optimizer,
-  @medallion-architect, @data-quality-analyst, @python-developer.
-  Somente @test-generator e @code-reviewer existem em agents/.
-  Decidir: remover agentes inexistentes, mapeá-los para skills Databricks existentes
-  (databricks-spark-declarative-pipelines, databricks-python-sdk, etc.)
-  ou criar essas skills no projeto.
 ---
 
 # SDD Workflow — Genie Code
@@ -76,19 +67,20 @@ Após BUILD e antes do archive:
 
 ## File Manifest (Design)
 
-Cada arquivo do manifest recebe um agente especializado do ecossistema Databricks:
+Cada arquivo do manifest recebe uma skill Databricks curada pelo time:
 
-| Agente | Especialidade |
-|--------|--------------|
-| `@lakeflow-pipeline-builder` | SDP pipelines, autoloader, streaming tables |
-| `@spark-engineer` | PySpark, DataFrames, transformações |
-| `@spark-streaming-architect` | Streaming, checkpoints, stateful operations |
-| `@sql-optimizer` | SQL, performance, particionamento |
-| `@medallion-architect` | Camadas Bronze/Silver/Gold |
-| `@data-quality-analyst` | Testes de qualidade, assertions, observabilidade |
-| `@python-developer` | Scripts Python, SDK calls |
+| Skill | Especialidade |
+|-------|--------------|
+| `@databricks-spark-declarative-pipelines` | SDP/DLT pipelines, Auto Loader, streaming tables, medallion |
+| `@databricks-spark-structured-streaming` | Structured Streaming, Kafka, checkpoints, stateful operations |
+| `@databricks-dbsql` | SQL warehouses, SQL scripting, stored procedures, performance |
+| `@databricks-unity-catalog` | Schemas, volumes, governance, lineage, data contracts |
+| `@databricks-model-serving` | Model endpoints, ChatAgent, feature serving |
+| `@databricks-bundles` | DABs, deploy multi-ambiente, CICD |
+| `@databricks-jobs` | Jobs, scheduling, notificações, monitoramento |
+| `@python-dev` | Python, uv, type hints, Ruff, Pyright |
 | `@test-generator` | pytest, fixtures, suites de teste |
-| `@code-reviewer` | Review arquitetural, boas práticas |
+| `@code-reviewer` | Review arquitetural, segurança, boas práticas |
 
 ## Criação de PR e Review
 

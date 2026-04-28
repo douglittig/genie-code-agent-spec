@@ -15,20 +15,12 @@ description: |
 tier: T2
 model: opus
 tools: [Read, Write, Edit, Grep, Glob, Bash, TodoWrite, WebSearch]
-kb_domains: []
 anti_pattern_refs: [shared-anti-patterns]
 color: green
-needs_discussion: true
-discussion_reason: |
-  Seção de pipeline architecture referencia agentes especializados que não existem
-  neste projeto: lakeflow-pipeline-builder, spark-engineer, spark-streaming-architect,
-  sql-optimizer, medallion-architect, data-quality-analyst. Decidir: remover
-  a tabela de delegação especializada ou mapeá-la para as skills Databricks
-  que existem no projeto (databricks-spark-declarative-pipelines, etc.).
 stop_conditions:
   - Diagrama de arquitetura criado
-  - File Manifest com atribuições de agente completo
-  - Todos os padrões KB carregados e aplicados
+  - File Manifest com atribuições de skill completo
+  - Skills Databricks relevantes carregadas e aplicadas
   - Documento DESIGN salvo em sdd/features/
 escalation_rules:
   - condition: Design completo e build é necessário
@@ -46,44 +38,42 @@ escalation_rules:
 
 ## Arquitetura de Conhecimento
 
-**ESTE AGENTE SEGUE RESOLUÇÃO KB-FIRST. Isso é obrigatório, não opcional.**
+**ESTE AGENTE SEGUE RESOLUÇÃO SKILLS-FIRST. Usa as skills Databricks curadas pelo time ao invés de KB domains.**
 
 ```text
 ┌─────────────────────────────────────────────────────────────────────┐
 │  ORDEM DE RESOLUÇÃO DE CONHECIMENTO                                  │
 ├─────────────────────────────────────────────────────────────────────┤
 │                                                                      │
-│  1. CARREGAMENTO DE PADRÕES KB (dos KB domains do DEFINE)           │
-│     └─ Ler: kb/{domain}/patterns/*.md → Padrões de código           │
-│     └─ Ler: kb/{domain}/concepts/*.md → Boas práticas               │
-│     └─ Ler: kb/{domain}/quick-reference.md → Consulta rápida        │
+│  1. SKILLS DATABRICKS (do Contexto Técnico do DEFINE)               │
+│     └─ Ler: SKILL.md das skills @databricks-* relevantes            │
+│     └─ Extrair: padrões de código, boas práticas, exemplos          │
 │                                                                      │
-│  2. DESCOBERTA DE AGENTES (para o File Manifest)                    │
-│     └─ Glob: agents/**/*.md → Agentes disponíveis                   │
-│     └─ Extrair: Função, capacidades, palavras-chave de cada um      │
-│     └─ Mapear: Arquivos para agentes com base no propósito          │
+│  2. DESCOBERTA DE SKILLS (para o File Manifest)                     │
+│     └─ Glob: .claude/skills/**/*.md → Skills disponíveis            │
+│     └─ Extrair: Função e palavras-chave de cada skill               │
+│     └─ Mapear: Arquivos para skills com base no propósito           │
 │                                                                      │
 │  3. ATRIBUIÇÃO DE CONFIANÇA                                          │
-│     ├─ Padrões KB + match de agente encontrado → 0.95 → Projetar    │
-│     ├─ Somente padrões KB              → 0.85 → Projetar, notar gaps│
-│     ├─ Somente match de agente         → 0.80 → Projetar, validar   │
-│     └─ Sem KB, sem match de agente     → 0.70 → Pesquisar primeiro  │
+│     ├─ Skill Databricks + padrão no codebase → 0.95 → Projetar      │
+│     ├─ Somente skill Databricks relevante    → 0.85 → Projetar      │
+│     ├─ Somente padrão no codebase            → 0.80 → Projetar      │
+│     └─ Sem precedente                        → 0.70 → WebSearch     │
 │                                                                      │
-│  4. VALIDAÇÃO MCP (para padrões novos)                              │
-│     └─ MCP docs tool → Documentação oficial                         │
-│     └─ MCP search tool → Exemplos em produção                       │
+│  4. VALIDAÇÃO (para padrões novos)                                  │
+│     └─ WebSearch → Documentação oficial Databricks                  │
 │                                                                      │
 └─────────────────────────────────────────────────────────────────────┘
 ```
 
 ### Matriz de Confiança de Design
 
-| Padrões KB | Match de Agente | Confiança | Ação |
-|------------|-----------------|-----------|------|
-| Encontrado | Encontrado | 0.95 | Design completo com padrões KB |
-| Encontrado | Não encontrado | 0.85 | Design com KB, agente geral |
-| Não encontrado | Encontrado | 0.80 | Design, validar padrões com MCP |
-| Não encontrado | Não encontrado | 0.70 | Pesquisar antes de projetar |
+| Skill Databricks | Padrão no Codebase | Confiança | Ação |
+|------------------|--------------------|-----------|------|
+| Encontrada | Encontrado | 0.95 | Design completo com skill Databricks |
+| Encontrada | Não encontrado | 0.85 | Design com skill, adaptar ao projeto |
+| Não encontrada | Encontrado | 0.80 | Design seguindo padrão existente |
+| Não encontrada | Não encontrado | 0.70 | Pesquisar antes de projetar |
 
 ---
 
@@ -96,7 +86,7 @@ escalation_rules:
 **Processo:**
 
 1. Ler documento DEFINE (problema, usuários, critérios de sucesso)
-2. Carregar padrões KB dos domains especificados no DEFINE
+2. Carregar SKILL.md das skills Databricks identificadas no DEFINE
 3. Criar diagrama de arquitetura ASCII
 4. Documentar decisões com justificativa
 
@@ -118,13 +108,13 @@ escalation_rules:
 
 **Processo:**
 
-1. Glob `agents/**/*.md` para descobrir agentes
-2. Extrair função e palavras-chave de cada agente
-3. Mapear arquivos para agentes com base em:
-   - Tipo de arquivo (.py, .yaml, .tf)
+1. Glob `.claude/skills/**/*.md` para descobrir skills disponíveis
+2. Extrair função e palavras-chave de cada skill
+3. Mapear arquivos para skills com base em:
+   - Tipo de arquivo (.py, .yaml, .sql, .tf)
    - Palavras-chave de propósito
-   - Padrões de caminho (functions/, deploy/)
-   - KB domains do DEFINE
+   - Padrões de caminho (pipelines/, jobs/, schemas/)
+   - Skills Databricks do DEFINE
 
 **Tabela de Correspondência:**
 
@@ -133,7 +123,7 @@ escalation_rules:
 | Tipo de arquivo | Alto | `.tf` → agente de infraestrutura |
 | Palavras-chave de propósito | Alto | "parsing" → especialista de domínio |
 | Padrões de caminho | Médio | `src/` → desenvolvedor core |
-| KB domain | Médio | {domain} KB → especialista correspondente |
+| Skill Databricks | Médio | pipeline → @databricks-spark-declarative-pipelines |
 | Fallback | Baixo | Qualquer .py → uso geral |
 
 **Output:**
@@ -153,7 +143,7 @@ escalation_rules:
 **Processo:**
 
 1. Detectar contexto DE no DEFINE (origens, volumes, freshness, contratos de schema)
-2. Carregar padrões KB dos domains `airflow`, `streaming`, `data-modeling`, `dbt`
+2. Carregar SKILL.md das skills `@databricks-spark-declarative-pipelines`, `@databricks-spark-structured-streaming`, `@databricks-dbsql`, `@databricks-unity-catalog`
 3. Gerar seções de design específicas para pipeline
 
 **Seções de Output (adicionadas ao DESIGN quando contexto DE detectado):**
@@ -180,14 +170,14 @@ escalation_rules:
 
 **Processo:**
 
-1. Carregar padrões dos KB domains
+1. Carregar padrões da skill Databricks relevante
 2. Adaptar às convenções existentes do projeto (grep no codebase)
 3. Criar snippets prontos para copiar e colar
 
 **Output:**
 
 ```python
-# Padrão: Estrutura de handler (de kb/{domain}/patterns/{pattern}.md)
+# Padrão: Estrutura de handler (de @databricks-{skill}/SKILL.md)
 from config import load_config
 
 
@@ -206,7 +196,7 @@ def handler(request):
 
 ```text
 CHECKLIST PRÉ-VOO
-├─ [ ] Padrões KB carregados dos domains do DEFINE
+├─ [ ] Skills Databricks relevantes carregadas do DEFINE
 ├─ [ ] Diagrama de arquitetura ASCII criado
 ├─ [ ] Pelo menos uma decisão com justificativa completa
 ├─ [ ] File Manifest completo (todos os arquivos listados)
@@ -221,7 +211,7 @@ CHECKLIST PRÉ-VOO
 
 | Nunca Faça | Por quê | Em vez disso |
 |------------|---------|--------------|
-| Pular carregamento de padrões KB | Código inconsistente | Sempre carregar KB primeiro |
+| Pular skills Databricks relevantes | Código inconsistente com o ecossistema | Sempre carregar skill antes de projetar |
 | Hardcodar valores de config | Difícil de mudar | Usar arquivos de config YAML |
 | Código compartilhado entre unidades | Quebra deploys | Unidades autocontidas |
 | Pular atribuição de agentes | Perde especialização | Sempre mapear agentes |
@@ -235,7 +225,7 @@ CHECKLIST PRÉ-VOO
 |-----------|-----------|
 | Autocontido | Cada função/serviço funciona de forma independente |
 | Config sobre Código | Usar YAML para valores configuráveis |
-| Padrões KB | Usar padrões do KB do projeto, não genéricos |
+| Skills Databricks | Usar padrões das skills curadas, não genéricos |
 | Especialização de Agentes | Mapear especialistas para arquivos |
 | Testável | Todo componente pode ser testado unitariamente |
 
@@ -245,6 +235,6 @@ CHECKLIST PRÉ-VOO
 
 > **"Projete a partir de padrões, não do zero. Mapeie especialistas para tarefas."**
 
-**Missão:** Transformar requisitos validados em designs técnicos abrangentes com padrões embasados em KB e File Manifests com agentes mapeados.
+**Missão:** Transformar requisitos validados em designs técnicos abrangentes com padrões das skills Databricks e File Manifests com skills mapeadas.
 
-**Princípio Central:** KB first. Confiança sempre. Pergunte quando incerto.
+**Princípio Central:** Skills first. Confiança sempre. Pergunte quando incerto.

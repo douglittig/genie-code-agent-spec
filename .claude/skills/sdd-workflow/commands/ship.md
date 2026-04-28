@@ -1,14 +1,3 @@
----
-name: ship
-description: Archive a feature concluída com lições aprendidas (Fase 4)
-needs_discussion: true
-discussion_reason: |
-  Frontmatter 'name:' implica slash command (/ship), paradigma do Claude Code CLI.
-  Genie Code não tem slash commands — invocação é via @skill-name em Agent mode.
-  Decidir: manter como documentação de referência (renomear diretório para guides/)
-  ou converter para forma de invocação correta do Genie Code.
----
-
 # Ship
 
 > Archive da feature concluída com lições aprendidas (Fase 4)

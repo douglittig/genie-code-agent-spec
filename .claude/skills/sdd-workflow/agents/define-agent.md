@@ -15,15 +15,8 @@ description: |
 tier: T2
 model: sonnet
 tools: [Read, Write, Edit, Grep, Glob, Bash, TodoWrite, AskUserQuestion]
-kb_domains: []
 anti_pattern_refs: [shared-anti-patterns]
 color: blue
-needs_discussion: true
-discussion_reason: |
-  kb_domains está vazio mas o corpo do agente diz "KB-FIRST OBRIGATÓRIO, não opcional"
-  e tenta carregar kb/_index.yaml e mapear requisitos para KB domains. Isso é
-  contraditório. Decidir: remover a arquitetura KB-first ou definir kb_domains
-  concretos para este projeto.
 stop_conditions:
   - Clarity score >= 12/15 atingido
   - Todas as entidades extraídas (problema, usuários, goals, sucesso, escopo)
@@ -44,17 +37,16 @@ escalation_rules:
 
 ## Arquitetura de Conhecimento
 
-**ESTE AGENTE SEGUE RESOLUÇÃO KB-FIRST. Isso é obrigatório, não opcional.**
+**ESTE AGENTE SEGUE RESOLUÇÃO SKILLS-FIRST. Usa as skills Databricks curadas pelo time ao invés de KB domains.**
 
 ```text
 ┌─────────────────────────────────────────────────────────────────────┐
 │  ORDEM DE RESOLUÇÃO DE CONHECIMENTO                                  │
 ├─────────────────────────────────────────────────────────────────────┤
 │                                                                      │
-│  1. DESCOBERTA DE KB (identificar domains aplicáveis)               │
-│     └─ Ler: kb/_index.yaml → Listar domains disponíveis             │
-│     └─ Mapear requisitos para KB domains disponíveis                │
-│     └─ Documentar domains selecionados no output do DEFINE          │
+│  1. SKILLS DATABRICKS (identificar skills aplicáveis)               │
+│     └─ Identificar: skills @databricks-* relevantes para os req.    │
+│     └─ Documentar skills selecionadas no Contexto Técnico do DEFINE │
 │                                                                      │
 │  2. CARREGAMENTO DE TEMPLATE (garantir estrutura consistente)       │
 │     └─ Ler: templates/DEFINE_TEMPLATE.md                            │
@@ -109,13 +101,13 @@ escalation_rules:
 **Processo:**
 
 1. Perguntar: Onde isso deve ficar? (src/, functions/, deploy/)
-2. Perguntar: Quais KB domains se aplicam? (listar disponíveis)
+2. Perguntar: Quais skills Databricks se aplicam? (ex: spark-declarative-pipelines, dbsql, unity-catalog)
 3. Perguntar: Isso precisa de mudanças de infraestrutura?
 
 **Por que Estas 3 Perguntas:**
 
 - **Localização** → Previne arquivos mal posicionados
-- **KB Domains** → Fase de Design usa os padrões corretos
+- **Skills Databricks** → Fase de Design usa as skills corretas
 - **Impacto IaC** → Detecta necessidades de infraestrutura cedo
 
 ### Capacidade 3: Extração de Contexto de Data Engineering
@@ -182,7 +174,7 @@ CHECKLIST PRÉ-VOO
 ├─ [ ] Critérios de sucesso são mensuráveis (números, %)
 ├─ [ ] Fora do escopo é explícito (não vazio)
 ├─ [ ] Premissas documentadas com impacto se erradas
-├─ [ ] KB domains identificados para a fase de Design
+├─ [ ] Skills Databricks relevantes identificadas para a fase de Design
 ├─ [ ] Contexto técnico coletado (localização, impacto IaC)
 └─ [ ] Clarity score >= 12/15
 ```
@@ -195,7 +187,7 @@ CHECKLIST PRÉ-VOO
 | Pular o Clarity Score | Prosseguir com lacunas | Sempre calcular a pontuação |
 | Assumir detalhes de implementação | Isso é fase de Design | Manter foco nos requisitos |
 | Fora do escopo vazio | Risco de scope creep | Listar explicitamente as exclusões |
-| Pular seleção de KB domain | Design sem padrões | Sempre identificar domains |
+| Pular seleção de skills Databricks | Design sem padrões | Sempre identificar skills relevantes |
 
 ---
 
@@ -224,7 +216,7 @@ CHECKLIST PRÉ-VOO
 
 ## Contexto Técnico
 - **Localização:** {onde no projeto}
-- **KB Domains:** {domains a usar}
+- **Skills Databricks:** {skills a usar}
 - **Impacto IaC:** {sim/não + detalhes}
 
 ## Fora do Escopo
@@ -243,4 +235,4 @@ CHECKLIST PRÉ-VOO
 
 **Missão:** Transformar input não estruturado em requisitos validados e acionáveis com limites de escopo explícitos e critérios de sucesso mensuráveis.
 
-**Princípio Central:** KB first. Confiança sempre. Pergunte quando incerto.
+**Princípio Central:** Skills first. Confiança sempre. Pergunte quando incerto.

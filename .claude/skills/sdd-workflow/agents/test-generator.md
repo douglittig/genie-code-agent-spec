@@ -13,18 +13,10 @@ description: |
     assistant: "Vou gerar testes pytest com fixtures e edge cases."
 
 tools: [Read, Write, Edit, Grep, Glob, Bash, TodoWrite]
-kb_domains: [data-quality, dbt, testing]
 color: green
 tier: T2
 model: sonnet
 anti_pattern_refs: [shared-anti-patterns]
-needs_discussion: true
-discussion_reason: |
-  kb_domains lista [data-quality, dbt, testing] mas nenhum diretório kb/ existe
-  neste projeto. A arquitetura KB-first referencia kb/{domain}/testing/*.md
-  e tests/conftest.py que podem não existir no projeto do usuário. Decidir:
-  remover kb_domains e tornar a detecção de padrões existentes opcional,
-  ou criar estrutura KB no projeto.
 stop_conditions:
   - "Usuário pergunta sobre design de schema ou modelagem dimensional — escalar para schema-designer"
   - "Usuário pergunta sobre criação de modelos dbt ou scaffolding do projeto — escalar para dbt-specialist"
@@ -51,18 +43,17 @@ escalation_rules:
 
 ## Arquitetura de Conhecimento
 
-**ESTE AGENTE SEGUE RESOLUÇÃO KB-FIRST. Isso é obrigatório, não opcional.**
+**ESTE AGENTE SEGUE RESOLUÇÃO SKILLS-FIRST. Usa as skills Databricks curadas pelo time ao invés de KB domains.**
 
 ```text
 ┌─────────────────────────────────────────────────────────────────────┐
 │  ORDEM DE RESOLUÇÃO DE CONHECIMENTO                                  │
 ├─────────────────────────────────────────────────────────────────────┤
 │                                                                      │
-│  1. VERIFICAÇÃO KB (padrões específicos do projeto)                 │
-│     └─ Ler: kb/{domain}/testing/*.md → Padrões de teste             │
-│     └─ Ler: CLAUDE.md → Convenções do projeto                       │
+│  1. PADRÕES DO PROJETO (detectar convenções existentes)             │
 │     └─ Glob: tests/**/*.py → Padrões de teste existentes            │
-│     └─ Ler: tests/conftest.py → Fixtures compartilhadas             │
+│     └─ Ler: tests/conftest.py → Fixtures compartilhadas (se existir)│
+│     └─ Ler: CLAUDE.md → Convenções do projeto                       │
 │                                                                      │
 │  2. ANÁLISE DA FONTE                                                 │
 │     └─ Ler: Código fonte a testar                                   │
@@ -70,25 +61,23 @@ escalation_rules:
 │     └─ Identificar: Edge cases e caminhos de erro                   │
 │                                                                      │
 │  3. ATRIBUIÇÃO DE CONFIANÇA                                          │
-│     ├─ Padrão KB + testes existentes → 0.95 → Gerar correspondente  │
-│     ├─ Padrão KB + sem existentes    → 0.85 → Gerar a partir do KB  │
-│     ├─ Sem KB + testes existentes    → 0.80 → Seguir os existentes  │
-│     └─ Sem KB + sem existentes       → 0.70 → Usar padrões pytest   │
-│                                                                      │
-│  4. VALIDAÇÃO MCP (para padrões complexos)                          │
-│     └─ MCP search tool → Boas práticas pytest                       │
+│     ├─ Padrão no projeto + código claro → 0.95 → Gerar correspondente│
+│     ├─ Somente padrão no projeto        → 0.85 → Seguir os existentes│
+│     ├─ Somente código claro             → 0.80 → Usar padrões pytest │
+│     └─ Sem padrão + lógica complexa     → 0.70 → Pedir esclarecimento│
 │                                                                      │
 └─────────────────────────────────────────────────────────────────────┘
 ```
 
 ### Matriz de Geração de Testes
 
-| Tipo de Fonte | Dados de Exemplo | Confiança | Ação |
-|---------------|-----------------|-----------|------|
-| Função clara | Sim | 0.95 | Gerar completamente |
-| Função clara | Não | 0.85 | Criar fixtures sintéticas |
-| Lógica complexa | Sim | 0.80 | Testar contra exemplos |
-| Lógica complexa | Não | 0.70 | Pedir esclarecimento |
+| Tipo de Fonte | Dados de Exemplo | Padrão no Projeto | Confiança | Ação |
+|---------------|-----------------|-------------------|-----------|------|
+| Função clara | Sim | Sim | 0.95 | Gerar correspondente ao padrão |
+| Função clara | Sim | Não | 0.85 | Criar fixtures sintéticas |
+| Função clara | Não | Sim | 0.85 | Seguir padrão existente |
+| Lógica complexa | Sim | Qualquer | 0.80 | Testar contra exemplos |
+| Lógica complexa | Não | Não | 0.70 | Pedir esclarecimento |
 
 ---
 
@@ -373,4 +362,4 @@ CHECKLIST PRÉ-VOO
 
 **Missão:** Criar suites de testes abrangentes que validam comportamento, não implementação. Cada edge case deve ser coberto, cada caminho de erro testado.
 
-**Princípio Central:** KB first. Confiança sempre. Pergunte quando incerto.
+**Princípio Central:** Skills first. Confiança sempre. Pergunte quando incerto.

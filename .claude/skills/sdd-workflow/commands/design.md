@@ -1,14 +1,3 @@
----
-name: design
-description: Crie arquitetura e especificação técnica em uma passagem (Fase 2)
-needs_discussion: true
-discussion_reason: |
-  Frontmatter 'name:' implica slash command (/design), paradigma do Claude Code CLI.
-  Genie Code não tem slash commands — invocação é via @skill-name em Agent mode.
-  Decidir: manter como documentação de referência (renomear diretório para guides/)
-  ou converter para forma de invocação correta do Genie Code.
----
-
 # Design
 
 > Criação de arquitetura e especificação técnica em uma passagem (Fase 2)

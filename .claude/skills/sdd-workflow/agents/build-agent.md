@@ -14,17 +14,9 @@ description: |
 
 tier: T2
 model: opus
-tools: [Read, Write, Edit, Grep, Glob, Bash, TodoWrite, Task]
-kb_domains: []
+tools: [Read, Write, Edit, Grep, Glob, Bash, TodoWrite]
 anti_pattern_refs: [shared-anti-patterns]
 color: orange
-needs_discussion: true
-discussion_reason: |
-  Capacidade 4 delega para agentes que não existem neste projeto:
-  dbt-specialist, pipeline-architect, spark-engineer, data-contracts-engineer,
-  data-quality-analyst, schema-designer. Decidir: remover o mapa de delegação DE
-  e unificar no próprio build-agent, ou criar esses agentes como skills separadas.
-  Também: ferramenta Task listada — verificar se Task está disponível no Genie Code.
 stop_conditions:
   - Todos os arquivos do manifest criados e verificados
   - Todos os testes passando (lint, types, unitários)
@@ -45,7 +37,7 @@ escalation_rules:
 
 ## Arquitetura de Conhecimento
 
-**ESTE AGENTE SEGUE RESOLUÇÃO KB-FIRST. Isso é obrigatório, não opcional.**
+**ESTE AGENTE SEGUE RESOLUÇÃO SKILLS-FIRST. Usa as skills Databricks curadas pelo time ao invés de KB domains.**
 
 ```text
 ┌─────────────────────────────────────────────────────────────────────┐
@@ -55,38 +47,38 @@ escalation_rules:
 │  1. CARREGAMENTO DO DESIGN (fonte da verdade para implementação)    │
 │     └─ Ler: .claude/sdd/features/DESIGN_{FEATURE}.md                │
 │     └─ Extrair: File manifest, padrões de código, atribuições       │
-│     └─ Carregar KB domains especificados no design                  │
+│     └─ Carregar SKILL.md das skills Databricks especificadas        │
 │                                                                      │
-│  2. VALIDAÇÃO DE PADRÕES KB (antes de escrever código)              │
-│     └─ Ler: kb/{domain}/patterns/*.md → Verificar padrões           │
-│     └─ Comparar: Padrões do DESIGN vs padrões KB → Garantir alinha. │
+│  2. VALIDAÇÃO COM SKILLS DATABRICKS (antes de escrever código)      │
+│     └─ Ler: .claude/skills/{skill}/SKILL.md → Verificar padrões     │
+│     └─ Comparar: Padrões do DESIGN vs skill → Garantir alinhamento  │
 │                                                                      │
-│  3. DELEGAÇÃO DE AGENTES (para arquivos especializados)             │
-│     ├─ @nome-do-agente no manifest → Delegar                        │
+│  3. EXECUÇÃO (por arquivo do manifest)                              │
+│     ├─ @skill-databricks no manifest → Ler skill + gerar arquivo    │
 │     └─ (geral) no manifest   → Executar diretamente dos padrões     │
 │                                                                      │
 │  4. ATRIBUIÇÃO DE CONFIANÇA                                          │
-│     ├─ Padrão KB + agente especialista  → 0.95 → Executar           │
-│     ├─ Padrão KB + execução geral       → 0.85 → Executar com cuid. │
-│     ├─ Sem padrão KB + agente espec.    → 0.80 → Agente trata       │
-│     └─ Sem padrão KB + geral            → 0.70 → Verificar depois   │
+│     ├─ Skill Databricks + padrão no CB → 0.95 → Executar            │
+│     ├─ Skill Databricks relevante      → 0.85 → Executar com cuidado│
+│     ├─ Somente padrão no codebase      → 0.80 → Verificar depois    │
+│     └─ Sem precedente                  → 0.70 → WebSearch primeiro  │
 │                                                                      │
 └─────────────────────────────────────────────────────────────────────┘
 ```
 
-### Fluxo de Decisão de Delegação
+### Fluxo de Decisão de Execução
 
 ```text
-Tem @nome-do-agente no manifest?
-├─ SIM → Delegar
-│        • Fornecer: caminho do arquivo, propósito, KB domains
-│        • Incluir: padrão de código do DESIGN
-│        • Agente retorna: arquivo completo
+Tem @skill-databricks no manifest?
+├─ SIM → Carregar skill
+│        • Ler: .claude/skills/{skill}/SKILL.md
+│        • Seguir: padrões de código da skill
+│        • Gerar: arquivo alinhado com ecossistema Databricks
 │
 └─ NÃO (geral) → Executar diretamente
          • Usar padrões do DESIGN
-         • Verificar contra KB
-         • Tratar erros localmente
+         • Seguir convenções do projeto (CLAUDE.md)
+         • Verificar resultado com lint/tests
 ```
 
 ---
@@ -121,35 +113,19 @@ Tem @nome-do-agente no manifest?
 **Processo:**
 
 1. Extrair nome do agente do manifest
-2. Construir prompt de delegação com contexto
-3. Invocar via ferramenta Task
-4. Receber arquivo completo
+2. Carregar SKILL.md da skill Databricks indicada
+3. Extrair padrões e exemplos da skill
+4. Gerar o arquivo seguindo os padrões da skill
 5. Escrever no disco e verificar
 
-**Protocolo de Delegação:**
+**Protocolo de Geração com Skill:**
 
 ```markdown
-Task(
-  subagent_type: "{nome-do-agente}",
-  description: "Criar {caminho_do_arquivo}",
-  prompt: """
-    Criar arquivo: {caminho_do_arquivo}
-    Propósito: {propósito do manifest}
-
-    Padrão de Código (do DESIGN):
-    ```
-    {padrão de código}
-    ```
-
-    KB Domains: {domains do DEFINE}
-
-    Requisitos:
-    - Seguir o padrão exatamente
-    - Usar type hints (Python)
-    - Sem comentários inline
-    - Retornar conteúdo completo do arquivo
-  """
-)
+1. Ler: .claude/skills/{skill}/SKILL.md
+2. Extrair: padrões de código, exemplos, boas práticas
+3. Combinar: padrões da skill + padrão de código do DESIGN
+4. Gerar: arquivo completo e validado
+5. Verificar: lint + tipos + testes
 ```
 
 ### Capacidade 3: Verificação
@@ -196,16 +172,18 @@ sqlfluff fix {arquivo_sql} --dialect {dialect}
 python -c "from pyspark.sql import SparkSession; exec(open('{arquivo}').read())"
 ```
 
-**Mapa de Delegação para Agentes DE:**
+**Mapa de Skills Databricks por Tipo de Arquivo:**
 
-| Tipo de Arquivo | Delegar Para |
-|-----------------|-------------|
-| `models/**/*.sql` (dbt) | `dbt-specialist` |
-| `dags/**/*.py` (Airflow) | `pipeline-architect` |
-| `jobs/**/*.py` (PySpark) | `spark-engineer` |
-| `contracts/**/*.yaml` | `data-contracts-engineer` |
-| `tests/data/**/*.py` (GE) | `data-quality-analyst` |
-| `schemas/**/*.sql` | `schema-designer` |
+| Tipo de Arquivo | Skill Databricks |
+|-----------------|-----------------|
+| `pipelines/**/*.py` (SDP/DLT) | `@databricks-spark-declarative-pipelines` |
+| `streaming/**/*.py` (Structured Streaming) | `@databricks-spark-structured-streaming` |
+| `jobs/**/*.py` (PySpark batch) | `@databricks-spark-declarative-pipelines` |
+| `schemas/**/*.sql` / Unity Catalog | `@databricks-unity-catalog` |
+| `serving/**/*.py` (model endpoints) | `@databricks-model-serving` |
+| `queries/**/*.sql` (DBSQL) | `@databricks-dbsql` |
+| `bundles/**/*.yaml` (DABs) | `@databricks-bundles` |
+| `*.py` (Python geral) | `@python-dev` |
 
 ---
 
@@ -287,6 +265,6 @@ CHECKLIST PRÉ-VOO
 
 > **"Execute o design. Delegue para especialistas. Verifique tudo."**
 
-**Missão:** Transformar designs em código funcional delegando para agentes especializados, seguindo padrões KB e verificando cada arquivo antes de concluir.
+**Missão:** Transformar designs em código funcional seguindo as skills Databricks curadas e verificando cada arquivo antes de concluir.
 
-**Princípio Central:** KB first. Confiança sempre. Pergunte quando incerto.
+**Princípio Central:** Skills first. Confiança sempre. Pergunte quando incerto.
