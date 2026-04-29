@@ -98,7 +98,7 @@
 | (geral) | {se houver} | {Nenhuma skill específica — Build executa direto dos padrões do DESIGN} |
 
 **Descoberta de Skills:**
-- Escaneado: `.claude/skills/**/*.md`
+- Escaneado: `**/*.md` (skills na raiz do repo)
 - Correspondido por: Tipo de arquivo, palavras-chave de propósito, padrões de caminho, skills Databricks do DEFINE
 
 ---

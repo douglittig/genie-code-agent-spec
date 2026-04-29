@@ -1,6 +1,9 @@
 # Local assets (source repos — not committed)
 assets/repos/
 
+# Claude Code CLI — local development only, not for Genie Code
+.claude/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]

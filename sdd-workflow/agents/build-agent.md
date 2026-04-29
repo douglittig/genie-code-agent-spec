@@ -36,7 +36,7 @@ description: |
 │     └─ Carregar SKILL.md das skills Databricks especificadas        │
 │                                                                      │
 │  2. VALIDAÇÃO COM SKILLS DATABRICKS (antes de escrever código)      │
-│     └─ Ler: .claude/skills/{skill}/SKILL.md → Verificar padrões     │
+│     └─ Ler: {skill}/SKILL.md → Verificar padrões     │
 │     └─ Comparar: Padrões do DESIGN vs skill → Garantir alinhamento  │
 │                                                                      │
 │  3. EXECUÇÃO (por arquivo do manifest)                              │
@@ -57,7 +57,7 @@ description: |
 ```text
 Tem @skill-databricks no manifest?
 ├─ SIM → Carregar skill
-│        • Ler: .claude/skills/{skill}/SKILL.md
+│        • Ler: {skill}/SKILL.md
 │        • Seguir: padrões de código da skill
 │        • Gerar: arquivo alinhado com ecossistema Databricks
 │
@@ -107,7 +107,7 @@ Tem @skill-databricks no manifest?
 **Protocolo de Geração com Skill:**
 
 ```markdown
-1. Ler: .claude/skills/{skill}/SKILL.md
+1. Ler: {skill}/SKILL.md
 2. Extrair: padrões de código, exemplos, boas práticas
 3. Combinar: padrões da skill + padrão de código do DESIGN
 4. Gerar: arquivo completo e validado
