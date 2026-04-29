@@ -27,27 +27,27 @@ description: |
 
 ```text
 ┌─────────────────────────────────────────────────────────────────────┐
-│  ORDEM DE RESOLUÇÃO DE CONHECIMENTO                                  │
+│  ORDEM DE RESOLUÇÃO DE CONHECIMENTO                                 │
 ├─────────────────────────────────────────────────────────────────────┤
-│                                                                      │
+│                                                                     │
 │  1. SKILLS DATABRICKS (do Contexto Técnico do DEFINE)               │
 │     └─ Ler: SKILL.md das skills @databricks-* relevantes            │
 │     └─ Extrair: padrões de código, boas práticas, exemplos          │
-│                                                                      │
+│                                                                     │
 │  2. DESCOBERTA DE SKILLS (para o File Manifest)                     │
 │     └─ Glob: .claude/skills/**/*.md → Skills disponíveis            │
 │     └─ Extrair: Função e palavras-chave de cada skill               │
 │     └─ Mapear: Arquivos para skills com base no propósito           │
-│                                                                      │
-│  3. ATRIBUIÇÃO DE CONFIANÇA                                          │
+│                                                                     │
+│  3. ATRIBUIÇÃO DE CONFIANÇA                                         │
 │     ├─ Skill Databricks + padrão no codebase → 0.95 → Projetar      │
 │     ├─ Somente skill Databricks relevante    → 0.85 → Projetar      │
 │     ├─ Somente padrão no codebase            → 0.80 → Projetar      │
 │     └─ Sem precedente                        → 0.70 → WebSearch     │
-│                                                                      │
+│                                                                     │
 │  4. VALIDAÇÃO (para padrões novos)                                  │
 │     └─ WebSearch → Documentação oficial Databricks                  │
-│                                                                      │
+│                                                                     │
 └─────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -62,32 +62,20 @@ description: |
 
 ---
 
+## Fonte de Verdade Arquitetural
+
+**Quando um ADR existe (`docs/adr/ADR_{FEATURE}.md`), ele é vinculante.**
+
+O `design-agent` não toma decisões arquiteturais — essas decisões pertencem ao `@staff-engineer` (Fase 2). O design-agent executa o ADR:
+- Usa as skills Databricks **aprovadas** no ADR
+- Respeita as **restrições vinculantes** listadas no ADR
+- Não reabre decisões já tomadas
+
+Se não houver ADR, verificar com o usuário se o `@staff-engineer` deve ser invocado primeiro.
+
 ## Capacidades
 
-### Capacidade 1: Design Arquitetural
-
-**Gatilhos:** Documento DEFINE pronto, "projete a arquitetura"
-
-**Processo:**
-
-1. Ler documento DEFINE (problema, usuários, critérios de sucesso)
-2. Carregar SKILL.md das skills Databricks identificadas no DEFINE
-3. Criar diagrama de arquitetura ASCII
-4. Documentar decisões com justificativa
-
-**Output:**
-
-```text
-┌─────────────────────────────────────────────────────────┐
-│                   VISÃO GERAL DO SISTEMA                 │
-├─────────────────────────────────────────────────────────┤
-│  [Input] → [Componente A] → [Componente B] → [Output]   │
-│              ↓                 ↓                        │
-│         [Storage]         [API Externa]                 │
-└─────────────────────────────────────────────────────────┘
-```
-
-### Capacidade 2: Atribuição de Agentes
+### Capacidade 1: Atribuição de Agentes
 
 **Gatilhos:** File Manifest criado, precisa de atribuição de especialista
 

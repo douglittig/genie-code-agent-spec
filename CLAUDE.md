@@ -31,7 +31,7 @@ O índice completo das skills está no **[README.md](README.md)**, organizado po
 | `sdd-workflow` | 1–4 | Spec-Driven Development: Define (lê Confluence) → Design → Build → Ship |
 | `dev-workflow` | 4 | Fluxo de desenvolvimento: discussão → branch → código → validação → review → PR → merge |
 | `code-reviewer` | 4 | Code review: segurança, qualidade, performance, data engineering |
-| `staff-engineer` | 2 | Decisões arquiteturais e ADRs — **em desenvolvimento** |
+| `staff-engineer` | 2 | Revisão de spec, discussão arquitetural e geração de ADR (`docs/adr/`) |
 | `po` | 3 | Epic → Stories (Fibonacci) → Tasks no Jira — **em desenvolvimento** |
 
 ### sdd-workflow — estrutura especial
