@@ -21,20 +21,34 @@ Repositório de skills, custom instructions e integrações MCP para Databricks 
 
 ### Passo 1 — Carregar o repositório no workspace
 
-As skills precisam estar em `Workspace/.assistant/skills/` para o Genie Code detectá-las automaticamente. A forma correta é montar este repo **diretamente** nesse caminho via Git Folder.
+O Genie Code detecta skills em `Workspace/.assistant/skills/<skill-name>/SKILL.md` — **um nível** abaixo de `skills/`. Por isso o repo precisa ser montado **como** a pasta `skills/`, não dentro dela.
+
+**Estrutura esperada:**
+```
+Workspace/
+└── .assistant/
+    └── skills/          ← este repo é montado AQUI
+        ├── sdd-workflow/
+        │   └── SKILL.md
+        ├── staff-engineer/
+        │   └── SKILL.md
+        └── databricks-*/
+            └── SKILL.md
+```
 
 **No Databricks:**
 
 1. Acesse o painel lateral → **Workspace**
 2. Navegue até `Workspace/` (raiz do workspace)
 3. Crie a pasta `.assistant/` se não existir — clique com botão direito → **Create folder**
-4. Dentro de `.assistant/`, crie a pasta `skills/`
-5. Clique com botão direito em `skills/` → **Add Git Folder**
+4. Entre na pasta `.assistant/` — **não crie `skills/` manualmente**
+5. Clique com botão direito dentro de `.assistant/` → **Add Git Folder**
 6. Cole a URL deste repositório: `https://github.com/<org>/genie-code-agent-spec`
 7. Escolha a branch `main`
-8. Confirme — o Git Folder será criado em `Workspace/.assistant/skills/genie-code-agent-spec/`
+8. **Renomeie o Git Folder para `skills`** (o padrão seria o nome do repo)
+9. Confirme — o Git Folder será criado em `Workspace/.assistant/skills/`
 
-> **Por que funciona:** As skills ficam na raiz deste repo. Depois do clone, cada skill estará em `Workspace/.assistant/skills/genie-code-agent-spec/<skill-name>/SKILL.md` — caminho que o Genie Code rastreia automaticamente.
+> **Por que o nome importa:** O Genie Code procura skills em `Workspace/.assistant/skills/<skill-name>/SKILL.md`. Se o folder for nomeado diferente de `skills`, o caminho quebra. As skills estão na raiz deste repo — com o nome correto, cada skill fica exatamente onde o Genie Code espera.
 
 ---
 
