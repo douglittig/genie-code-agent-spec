@@ -53,6 +53,34 @@ Confluence (SPEC) → DEFINE → @staff-engineer → @po → DESIGN → BUILD �
 **Gate:** Clarity Score ≥ 12/15. Se menor, pedir esclarecimentos antes de avançar.
 **Próximo passo natural:** `@staff-engineer` — revisão da spec e decisão arquitetural (ADR) antes do Design.
 
+### Como funciona
+
+Ao chamar `@sdd-workflow define <url-confluence>`, este SKILL.md carrega:
+
+| O que carrega | Arquivo | Papel |
+|---------------|---------|-------|
+| Agente | `agents/define-agent.md` | Executa as 4 capacidades abaixo |
+| Template | `templates/DEFINE_TEMPLATE.md` | Estrutura do documento de saída |
+
+O **define-agent** executa nesta ordem:
+
+1. Lê `AGENTS.md` — contexto do projeto
+2. Lê a página do Confluence via MCP — input principal
+3. **Capacidade 1 — Extração de Requisitos:** extrai Problema, Usuários, Goals (MoSCoW), Critérios de Sucesso, Restrições, Fora do Escopo
+4. **Capacidade 2 — Contexto Técnico:** faz 3 perguntas (localização no projeto, quais `@databricks-*` skills se aplicam, impacto de infraestrutura)
+5. **Capacidade 3 — Contexto DE** *(se detectar keywords: pipeline, ETL, warehouse, schema):* extrai origens, volumes, SLAs de freshness, contratos de schema
+6. **Capacidade 4 — Clarity Score:** pontua 5 elementos (0–3 cada) → total 0–15
+
+**Gate iterativo — o agente não avança até a spec estar validada:**
+
+| Score | Ação |
+|-------|------|
+| ≥ 12/15 | Gera `DEFINE_{FEATURE}.md` → sugere `@staff-engineer` |
+| 9–11/15 | Faz perguntas direcionadas → re-pontua |
+| < 9/15  | Bloqueia — exige esclarecimento antes de continuar |
+
+> **Nota:** As skills `@databricks-*` não são invocadas nesta fase — são apenas *identificadas* no Contexto Técnico para uso nas fases de Design e Build.
+
 > **Para executar esta fase:** ler `agents/define-agent.md` e usar `templates/DEFINE_TEMPLATE.md`
 
 ---
