@@ -2,6 +2,8 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+> **Status:** Fases 1 e 2 prontas para uso (`@sdd-workflow` Define + `@staff-engineer`). Fases 3 e 4 em desenvolvimento — não usar `@po`, `@dev-workflow` nem as fases Design/Build/Ship do `@sdd-workflow` em ambiente real ainda.
+
 ## Project
 
 `genie-code-agent-spec` — repositório de skills, custom instructions e integrações MCP para Databricks Genie Code e Claude Code. **Genie Code first**: todas as decisões de design priorizam o paradigma do Genie Code (Agent mode + `@skill-name`), não o paradigma de slash commands do Claude Code CLI.
@@ -24,15 +26,16 @@ Cada subpasta é uma skill autocontida seguindo o padrão open Agent Skills:
 
 O índice completo das skills está no **[README.md](README.md)**, organizado por categoria (IA & ML, Dados & SQL, Plataforma Databricks, Aplicações, Desenvolvimento & Workflow).
 
-### Skills de Workflow (essenciais para todo desenvolvimento)
+### Skills de Workflow
 
-| Skill | Fase | Propósito |
-|-------|------|---------|
-| `sdd-workflow` | 1 e 4 | Fase 1: Brainstorm + Define via MCP Confluence. Fase 4: Design + Build + Ship (dentro do @dev-workflow) |
-| `dev-workflow` | 4 | Fluxo de desenvolvimento: discussão → branch → código → validação → review → PR → merge |
-| `code-reviewer` | 4 | Code review: segurança, qualidade, performance, data engineering |
-| `staff-engineer` | 2 | Revisão de spec, discussão arquitetural e geração de ADR (`docs/adr/`) |
-| `po` | 3 | Epic → Stories (Fibonacci) → Tasks no Jira — **em desenvolvimento** |
+| Skill | Fase | Status | Propósito |
+|-------|------|--------|-----------|
+| `sdd-workflow` | 1 | **PRONTO** | Brainstorm + Define via MCP Confluence → `docs/specs/DEFINE_*.md` |
+| `staff-engineer` | 2 | **PRONTO** | Revisão de spec, decisão arquitetural → `docs/adr/ADR_*.md` |
+| `po` | 3 | EM DESENVOLVIMENTO | Epic → Stories (Fibonacci) → Tasks no Jira |
+| `sdd-workflow` (Design→Ship) | 4 | EM DESENVOLVIMENTO | Design + Build + Ship a partir do DEFINE aprovado |
+| `dev-workflow` | 4 | EM DESENVOLVIMENTO | Branch → código → validação → PR → merge |
+| `code-reviewer` | 4 | EM DESENVOLVIMENTO | Code review: segurança, qualidade, performance |
 
 ### sdd-workflow — estrutura especial
 
