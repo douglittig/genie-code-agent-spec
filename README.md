@@ -6,6 +6,106 @@ Repositório de skills, custom instructions e integrações MCP para Databricks 
 
 ---
 
+## Instalação e Uso
+
+### Pré-requisitos
+
+| Requisito | Detalhes |
+|-----------|---------|
+| Databricks workspace | Genie Code habilitado (Agent mode disponível) |
+| Acesso de admin | Permissão para criar Git Folders em `Workspace/` |
+| Git provider configurado | GitHub, GitLab ou Bitbucket conectado ao workspace |
+| MCP por fase | Confluence (Fase 1), Jira (Fase 3/6), Bitbucket (Fase 4) |
+
+---
+
+### Passo 1 — Carregar o repositório no workspace
+
+As skills precisam estar em `Workspace/.assistant/skills/` para o Genie Code detectá-las automaticamente. A forma correta é montar este repo **diretamente** nesse caminho via Git Folder.
+
+**No Databricks:**
+
+1. Acesse o painel lateral → **Workspace**
+2. Navegue até `Workspace/` (raiz do workspace)
+3. Crie a pasta `.assistant/` se não existir — clique com botão direito → **Create folder**
+4. Dentro de `.assistant/`, crie a pasta `skills/`
+5. Clique com botão direito em `skills/` → **Add Git Folder**
+6. Cole a URL deste repositório: `https://github.com/<org>/genie-code-agent-spec`
+7. Escolha a branch `main`
+8. Confirme — o Git Folder será criado em `Workspace/.assistant/skills/genie-code-agent-spec/`
+
+> **Por que funciona:** As skills ficam na raiz deste repo. Depois do clone, cada skill estará em `Workspace/.assistant/skills/genie-code-agent-spec/<skill-name>/SKILL.md` — caminho que o Genie Code rastreia automaticamente.
+
+---
+
+### Passo 2 — Verificar a instalação
+
+Abra o **Genie Code** → mude para **Agent mode** → digite:
+
+```
+@sdd-workflow
+```
+
+Se a skill aparecer como sugestão no autocomplete, a instalação está correta.
+
+Para verificar todas as skills disponíveis:
+
+```
+Quais skills você tem disponíveis?
+```
+
+O agente listará as skills carregadas do `Workspace/.assistant/skills/`.
+
+---
+
+### Passo 3 — Configurar MCP por fase
+
+Cada fase usa um conjunto diferente de MCPs. Configure os servidores MCP no Genie Code conforme a fase que vai executar:
+
+| Fase | MCP necessário | Como ativar |
+|------|---------------|-------------|
+| **Fase 1 — Spec** | Confluence | Settings → MCP → adicionar servidor Confluence |
+| **Fase 2 — Arquitetura** | Nenhum | Desativar todos os MCPs opcionais |
+| **Fase 3 — Planejamento** | Jira | Settings → MCP → adicionar servidor Jira |
+| **Fase 4 — Desenvolvimento** | Jira + Bitbucket | Ativar ambos |
+
+> **Limite:** Genie Code suporta no máximo **20 ferramentas MCP** simultâneas. Ative apenas o MCP da fase atual para não estourar o limite.
+
+---
+
+### Primeiro uso — Fase 1 (Spec via Confluence)
+
+Com o MCP do Confluence ativo e Agent mode ligado:
+
+```
+@sdd-workflow define https://seu-confluence.atlassian.net/wiki/spaces/PROJ/pages/12345
+```
+
+O agente irá:
+1. Ler a página do Confluence via MCP
+2. Extrair requisitos, usuários, goals (MoSCoW) e restrições
+3. Fazer até 3 perguntas de contexto técnico
+4. Calcular o Clarity Score (0–15)
+5. Gerar `docs/specs/DEFINE_{FEATURE}.md` no repositório do projeto
+
+Quando o Clarity Score atingir ≥ 12/15, o agente sugere o próximo passo:
+
+```
+@staff-engineer  ← Fase 2: revisão arquitetural e geração do ADR
+```
+
+---
+
+### Atualizar as skills
+
+Para puxar atualizações deste repositório:
+
+1. No workspace, navegue até `Workspace/.assistant/skills/genie-code-agent-spec/`
+2. Clique em **Pull** (ícone de atualização do Git Folder)
+3. As skills são recarregadas automaticamente na próxima sessão do Genie Code
+
+---
+
 ## Fluxo de Desenvolvimento
 
 O desenvolvimento de features segue 4 fases com configurações MCP distintas por fase. Cada fase produz um artefato que alimenta a próxima — sem dependência de contexto online entre fases.
