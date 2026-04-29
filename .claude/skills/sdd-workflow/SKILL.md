@@ -57,7 +57,7 @@ Confluence (SPEC) → DEFINE → @staff-engineer → @po → DESIGN → BUILD �
 
 ---
 
-## Fase 2 — Design
+## Fase 2 — Design  ⚠️ EM DESENVOLVIMENTO
 
 **Quando usar:** DEFINE pronto com Clarity Score ≥ 12/15.
 **ADR:** se `docs/adr/ADR_{FEATURE}.md` existir (gerado pelo `@staff-engineer`), ele é vinculante — o design-agent executa o ADR, não reabre decisões.
@@ -69,7 +69,7 @@ Confluence (SPEC) → DEFINE → @staff-engineer → @po → DESIGN → BUILD �
 
 ---
 
-## Fase 3 — Build
+## Fase 3 — Build  ⚠️ EM DESENVOLVIMENTO
 
 **Quando usar:** DESIGN pronto com File Manifest completo.
 **Processo:** executar o File Manifest arquivo por arquivo, delegando para a skill Databricks indicada.
@@ -81,7 +81,7 @@ Confluence (SPEC) → DEFINE → @staff-engineer → @po → DESIGN → BUILD �
 
 ---
 
-## Fase 4 — Ship
+## Fase 4 — Ship  ⚠️ EM DESENVOLVIMENTO
 
 **Quando usar:** Build completo e validado.
 **Integração Jira:** mover ticket para "In Review" → adicionar link do PR → após merge: mover para "Done".
