@@ -16,18 +16,19 @@ Spec-Driven Development transforma requisitos em código rastreável. Cada arqui
 ## Fluxo Completo
 
 ```
-Confluence (SPEC) → DEFINE → DESIGN → BUILD → Jira (update) → PR → Review
-      ↑                                              ↓
-  (via MCP)                                      (via MCP)
+Confluence (SPEC) → DEFINE → @staff-engineer → @po → DESIGN → BUILD → PR/Review → SHIP
+      ↑                           (ADR)        (Jira)                       ↓
+  (via MCP)                                                           (via MCP Jira)
 ```
 
 ## Regras do Fluxo
 
 1. **Brainstorm** é opcional — pular para Define se a SPEC já está clara
 2. **Define** exige Clarity Score ≥ 12/15 antes de avançar
-3. **Design** deve ter File Manifest completo — nenhum arquivo sem agente atribuído
-4. **Build** delega cada arquivo ao agente especializado
-5. **Ship** arquiva todos os artefatos e atualiza o Jira antes de fechar
+3. **Após Define** — acionar `@staff-engineer` para gerar o ADR antes do Design
+4. **Design** usa o ADR como fonte de verdade vinculante; deve ter File Manifest completo
+5. **Build** delega cada arquivo à skill Databricks indicada no manifest
+6. **Ship** arquiva todos os artefatos e atualiza o Jira antes de fechar
 
 ---
 
@@ -50,6 +51,7 @@ Confluence (SPEC) → DEFINE → DESIGN → BUILD → Jira (update) → PR → R
 
 **Output:** `docs/specs/DEFINE_{FEATURE}.md`
 **Gate:** Clarity Score ≥ 12/15. Se menor, pedir esclarecimentos antes de avançar.
+**Próximo passo natural:** `@staff-engineer` — revisão da spec e decisão arquitetural (ADR) antes do Design.
 
 > **Para executar esta fase:** ler `agents/define-agent.md` e usar `templates/DEFINE_TEMPLATE.md`
 

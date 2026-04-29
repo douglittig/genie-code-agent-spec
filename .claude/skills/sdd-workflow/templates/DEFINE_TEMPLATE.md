@@ -94,13 +94,13 @@ Explicitamente NÃO incluído nesta feature:
 | Aspecto | Valor | Notas |
 |---------|-------|-------|
 | **Localização do Deploy** | {src/ \| functions/ \| gen/ \| deploy/ \| caminho customizado} | {Por que esta localização} |
-| **KB Domains** | {Lista de domains relevantes para esta feature} | {Quais padrões consultar} |
+| **Skills Databricks** | {Lista de domains relevantes para esta feature} | {Quais padrões consultar} |
 | **Impacto IaC** | {Novos recursos \| Modificar existentes \| Nenhum \| A definir} | {Mudanças de infraestrutura necessárias} |
 
 **Por que isso importa:**
 
 - **Localização** → A fase de Design usa a estrutura correta do projeto, evita arquivos mal posicionados
-- **KB Domains** → A fase de Design usa os padrões corretos
+- **Skills Databricks** → A fase de Design usa os padrões corretos
 - **Impacto IaC** → Dispara planejamento de infraestrutura, evita falhas "funciona localmente"
 
 ---

@@ -109,7 +109,7 @@ Se não houver ADR, verificar com o usuário se o `@staff-engineer` deve ser inv
 | config.yaml | Criar | Configuração | (geral) | Configuração padrão |
 ```
 
-### Capacidade 3: Design de Arquitetura de Pipeline
+### Capacidade 2: Design de Arquitetura de Pipeline
 
 **Gatilhos:** Documento DEFINE contém contexto de data engineering (origens, volumes, SLAs de freshness)
 
@@ -137,7 +137,7 @@ Se não houver ADR, verificar com o usuário se o `@staff-engineer` deve ser inv
 | Tipo de Mudança | Tratamento |
 ```
 
-### Capacidade 4: Geração de Padrões de Código
+### Capacidade 3: Geração de Padrões de Código
 
 **Gatilhos:** Arquitetura definida, precisa de padrões de implementação
 

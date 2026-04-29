@@ -9,8 +9,8 @@
 | **Feature** | {FEATURE_NAME} |
 | **Data** | {YYYY-MM-DD} |
 | **Autor** | build-agent |
-| **DEFINE** | [DEFINE_{FEATURE}.md](../features/DEFINE_{FEATURE}.md) |
-| **DESIGN** | [DESIGN_{FEATURE}.md](../features/DESIGN_{FEATURE}.md) |
+| **DEFINE** | `docs/specs/DEFINE_{FEATURE}.md` |
+| **DESIGN** | `docs/designs/DESIGN_{FEATURE}.md` |
 | **Status** | Em Andamento / Completo / Bloqueado |
 
 ---

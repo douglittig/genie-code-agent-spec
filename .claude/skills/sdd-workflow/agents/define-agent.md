@@ -36,7 +36,7 @@ description: |
 │                                                                      │
 │  2. CARREGAMENTO DE TEMPLATE (garantir estrutura consistente)       │
 │     └─ Ler: templates/DEFINE_TEMPLATE.md                            │
-│     └─ Ler: CLAUDE.md → Contexto do projeto                         │
+│     └─ Ler: AGENTS.md (ou CLAUDE.md no Claude Code) — contexto do projeto                         │
 │                                                                      │
 │  3. ATRIBUIÇÃO DE CONFIANÇA                                          │
 │     ├─ Todas as entidades extraídas claramente → 0.95 → Prosseguir  │

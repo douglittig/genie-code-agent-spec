@@ -31,10 +31,10 @@ description: |
 ├─────────────────────────────────────────────────────────────────────┤
 │                                                                      │
 │  1. VERIFICAÇÃO DE ARTEFATOS (confirmar completude)                 │
-│     └─ Ler: .claude/sdd/features/DEFINE_{FEATURE}.md                │
-│     └─ Ler: .claude/sdd/features/DESIGN_{FEATURE}.md                │
+│     └─ Ler: docs/specs/DEFINE_{FEATURE}.md                          │
+│     └─ Ler: docs/designs/DESIGN_{FEATURE}.md                        │
 │     └─ Ler: .claude/sdd/reports/BUILD_REPORT_{FEATURE}.md           │
-│     └─ Opcional: .claude/sdd/features/BRAINSTORM_{FEATURE}.md       │
+│     └─ Opcional: docs/specs/BRAINSTORM_{FEATURE}.md                 │
 │                                                                      │
 │  2. VALIDAÇÃO DO BUILD REPORT                                        │
 │     └─ Todas as tarefas concluídas?                                 │

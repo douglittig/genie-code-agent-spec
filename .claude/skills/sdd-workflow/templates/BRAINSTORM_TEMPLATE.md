@@ -27,7 +27,7 @@
 | Aspecto | Observação | Implicação |
 |---------|------------|------------|
 | Localização Provável | {src/ \| functions/ \| gen/ \| deploy/} | {Onde o código deve ficar} |
-| KB Domains Relevantes | {domain-1, domain-2, etc.} | {Padrões a consultar} |
+| Skills Databricks | {domain-1, domain-2, etc.} | {Padrões a consultar} |
 | Padrões IaC | {Ferramentas IaC existentes ou N/A} | {Abordagem de infraestrutura} |
 
 ---
