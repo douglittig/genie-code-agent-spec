@@ -177,7 +177,7 @@ git push -u origin <nome-da-branch>
 
 Usar o template em [`pr-template.md`](pr-template.md) desta skill.
 
-Para o processo detalhado de criação de PR (conventional commits, categorização de mudanças, uso do `gh` CLI), referenciar `@sdd-workflow` comando `create-pr`.
+Criar o PR via `gh pr create` usando o template [`pr-template.md`](pr-template.md) desta skill como base para a descrição.
 
 **Checklist antes de criar o PR:**
 
@@ -200,7 +200,7 @@ Para o processo detalhado de criação de PR (conventional commits, categorizaç
 Por padrão, aplicar:
 
 - Revisão por pelo menos 1 desenvolvedor do time
-- Dual AI review: análise estática + `@code-reviewer` arquitetural (via `@sdd-workflow` comando `review`)
+- Dual AI review: análise estática + `@code-reviewer` arquitetural
 
 ### Bloqueadores que impedem merge
 
@@ -218,9 +218,7 @@ Por padrão, aplicar:
 | Arquivo | Conteúdo |
 |---------|---------|
 | [`pr-template.md`](pr-template.md) | Template base de PR (placeholder corporativo) |
-| `@sdd-workflow` → `commands/brainstorm.md` | Fase de Brainstorm (Passo 0) |
-| `@sdd-workflow` → `commands/create-pr.md` | Criação detalhada de PR (Passo 6) |
-| `@sdd-workflow` → `commands/review.md` | Dual AI review (Passo 7) |
+| `@sdd-workflow` | Fase de Brainstorm para ideias vagas (Passo 0) |
 | `@code-reviewer` | Auto-review antes de PR (Passo 4) |
 
 ## Integração MCP (opcional)

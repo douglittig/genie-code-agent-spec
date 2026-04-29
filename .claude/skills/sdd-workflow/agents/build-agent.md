@@ -31,7 +31,7 @@ description: |
 ├─────────────────────────────────────────────────────────────────────┤
 │                                                                      │
 │  1. CARREGAMENTO DO DESIGN (fonte da verdade para implementação)    │
-│     └─ Ler: .claude/sdd/features/DESIGN_{FEATURE}.md                │
+│     └─ Ler: docs/designs/DESIGN_{FEATURE}.md                        │
 │     └─ Extrair: File manifest, padrões de código, atribuições       │
 │     └─ Carregar SKILL.md das skills Databricks especificadas        │
 │                                                                      │

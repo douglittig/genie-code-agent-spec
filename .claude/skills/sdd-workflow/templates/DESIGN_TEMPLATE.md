@@ -88,18 +88,18 @@
 
 ## Justificativa de Atribuição de Agente
 
-> Agentes disponíveis no diretório `agents/` desta skill — a fase de Build invoca os especialistas correspondentes.
+> A fase de Build invoca as skills `@databricks-*` mapeadas abaixo para gerar cada arquivo.
 
-| Agente | Arquivos Atribuídos | Por que Este Agente |
-|--------|--------------------|--------------------|
-| @{agente-1} | 1, 3 | {Match de especialização: ex., "padrões de roteamento de API"} |
-| @{agente-2} | 2 | {Match de especialização: ex., "modelos de validação de dados"} |
-| @{agente-3} | 4 | {Match de especialização: ex., "fixtures de teste"} |
-| (geral) | {se houver} | {Nenhum especialista encontrado — Build trata diretamente} |
+| Skill Databricks | Arquivos Atribuídos | Por que Esta Skill |
+|-----------------|--------------------|--------------------|
+| @{databricks-skill-1} | 1, 3 | {Match de especialização: ex., "padrões de pipeline DLT"} |
+| @{databricks-skill-2} | 2 | {Match de especialização: ex., "governança Unity Catalog"} |
+| @{databricks-skill-3} | 4 | {Match de especialização: ex., "testes pytest"} |
+| (geral) | {se houver} | {Nenhuma skill específica — Build executa direto dos padrões do DESIGN} |
 
-**Descoberta de Agentes:**
-- Escaneado: `agents/**/*.md`
-- Correspondido por: Tipo de arquivo, palavras-chave de propósito, padrões de caminho, KB domains
+**Descoberta de Skills:**
+- Escaneado: `.claude/skills/**/*.md`
+- Correspondido por: Tipo de arquivo, palavras-chave de propósito, padrões de caminho, skills Databricks do DEFINE
 
 ---
 

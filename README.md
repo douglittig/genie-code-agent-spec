@@ -2,6 +2,8 @@
 
 Repositório de skills, custom instructions e integrações MCP para Databricks Genie Code e Claude Code.
 
+> **Status:** Fases 1 e 2 prontas para uso. Fases 3 e 4 em desenvolvimento — não testar em ambiente real ainda.
+
 ---
 
 ## Fluxo de Desenvolvimento
@@ -26,18 +28,19 @@ O desenvolvimento de features segue 4 fases com configurações MCP distintas po
 └────────────────────────────┬────────────────────────────────────┘
                              │
 ┌────────────────────────────▼────────────────────────────────────┐
-│ FASE 3 — Planejamento            MCP: Jira (14 slots)           │
-│                                                                 │
+│ FASE 3 — Planejamento  [EM DESENVOLVIMENTO]                     │
+│                                  MCP: Jira (14 slots)           │
 │  Quem: Product Owner / Tech lead                                │
-│  Skill: @po  [em desenvolvimento]                               │
+│  Skill: @po                                                     │
 │  Output: Epic + Stories (Fibonacci) + Tasks no Jira             │
 └────────────────────────────┬────────────────────────────────────┘
                              │
 ┌────────────────────────────▼────────────────────────────────────┐
-│ FASE 4 — Desenvolvimento    MCP: Bitbucket (~6) + Jira (14)     │
-│                                                                 │
+│ FASE 4 — Desenvolvimento  [EM DESENVOLVIMENTO]                  │
+│                             MCP: Bitbucket (~6) + Jira (14)     │
 │  Quem: Desenvolvedor                                            │
-│  Skill: @dev-workflow                                           │
+│  Skills: @sdd-workflow (Design → Build → Ship)                  │
+│          @dev-workflow  (branch → commit → PR → merge)          │
 │  Output: branch → código → PR → ticket Jira atualizado          │
 └─────────────────────────────────────────────────────────────────┘
 ```
@@ -81,6 +84,114 @@ projeto/
 | 4 — Desenvolvimento | Bitbucket + Jira | Confluence |
 
 > Guia de configuração do Bitbucket MCP: [`docs/bitbucket-mcp-guide.md`](docs/bitbucket-mcp-guide.md)
+
+---
+
+## Mapa de Interação Detalhado
+
+Mostra todos os pontos de entrada, o que cada nó chama, para onde vai, o que é fixo e o que é opcional.
+
+### Diagrama
+
+```text
+╔══════════════════════════════════════════════════════════════════════════════╗
+║  ITERATE — cross-cutting (disponível em qualquer fase)                       ║
+║  @sdd-workflow / iterate-agent  →  atualiza artefato da fase + cascata       ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+ENTRADAS                                 NÓS
+────────                                 ────────────────────────────────────────
+
+(A) Ideia vaga ──────────────────────→   ┌── [0] BRAINSTORM ──────────────────┐
+(B) Notas / docs brutos ─────────────→   │  skill:  @sdd-workflow             │ OPCIONAL
+                                         │  mcp:    —                         │
+                                         │  output: docs/specs/BRAINSTORM_*.md│
+                                         │  gate:   usuário confirmou abord.  │
+                                         └───────────────────┬────────────────┘
+                                                            │
+(C) DEFINE_*.md já existe ──────────────────────────────────┼─────────────────┐
+(D) URL Confluence ─────────────────────────────────────────┼─────────────────┤
+                                                            ▼                 ▼
+                                         ┌── [1] DEFINE ───────────────────────┐
+                                         │  skill:  @sdd-workflow              │ OBRIGATÓRIO
+                                         │  mcp:    Confluence (12 slots)      │
+                                         │  output: docs/specs/DEFINE_*.md     │
+                                         │  gate:   Clarity Score ≥ 12/15      │
+                                         └───────────────────┬─────────────────┘
+                                                             │
+                                                             ▼
+                                         ┌─ ─[2] ARQUITETURA ──────────────────┐
+                                         │  skill:  @staff-engineer            │ OBRIGATÓRIO
+                                         │  mcp:    —                          │
+                                         │  output: docs/adr/ADR_*.md          │
+                                         └──────────────────┬──────────────────┘
+                                                            │
+                                              ┌─────────────┴─────────────┐
+                                              ▼                           │
+                          ┌── [3] PLANEJAMENTO ────────────┐ OPCIONAL     │
+                          │  skill:  @po  [em desenv.]     │              │
+                          │  mcp:    Jira (14 slots)       │              │
+                          │  output: Epic + Stories + Tasks│              │
+                          └──────────────────┬─────────────┘              │
+                                             └─────────────────────────▶  │
+                                                            ▼
+                                         ┌── [4] DESIGN ───────────────────────┐
+                                         │  skill:  @sdd-workflow              │ OBRIGATÓRIO
+                                         │  mcp:    —                          │
+                                         │  input:  ADR_*.md (vinculante)      │
+                                         │  output: docs/designs/DESIGN_*.md   │
+                                         │  gate:   File Manifest completo     │
+                                         └───────────────────┬─────────────────┘
+                                                             │
+                              ┌──────────────────────────────┤ paralelo
+                              ▼                              ▼
+                 @dev-workflow (criar branch)  ┌── [5] BUILD ───────────────────┐
+                                               │  skill:   @sdd-workflow        │ OBRIGATÓRIO
+                                               │  mcp:     —                    │
+                                               │  delega:  @databricks-* skills │
+                                               │  output:  código gerado        │
+                                               │           BUILD_REPORT_*.md    │
+                                               │  gate:    lint + testes ok,    │
+                                               │           sem credenciais      │
+                                               └──────────────────┬─────────────┘
+                              ┌─────────────────────────────┤ paralelo
+                              ▼                             ▼
+                 @dev-workflow (commit + PR)   ┌── [6] SHIP ────────────────────┐
+                                               │  skill:   @sdd-workflow        │ OBRIGATÓRIO
+                                               │  mcp:     Jira (14 slots)      │
+                                               │  delega:  @dev-workflow (PR)   │
+                                               │  delega:  @code-reviewer ★     │
+                                               │  output:  SHIPPED_*.md         │
+                                               │           Jira ticket fechado  │
+                                               │  gate:    acceptance tests ok  │
+                                               └────────────────────────────────┘
+
+★ RECOMENDADO
+```
+
+### Nós — Referência Rápida
+
+| Nó | Skill | MCP ativo | Output | Gate para avançar | Status |
+|----|-------|-----------|--------|-------------------|--------|
+| [0] Brainstorm | @sdd-workflow | — | `docs/specs/BRAINSTORM_*.md` | Usuário confirmou abordagem | OPCIONAL |
+| [1] Define | @sdd-workflow | Confluence | `docs/specs/DEFINE_*.md` | Clarity Score ≥ 12/15 | PRONTO |
+| [2] Arquitetura | @staff-engineer | — | `docs/adr/ADR_*.md` | ADR revisado e aceito | PRONTO |
+| [3] Planejamento | @po | Jira | Epic + Stories + Tasks | — | EM DESENVOLVIMENTO |
+| [4] Design | @sdd-workflow | — | `docs/designs/DESIGN_*.md` | File Manifest completo | EM DESENVOLVIMENTO |
+| [5] Build | @sdd-workflow | — | código + `BUILD_REPORT_*.md` | Lint + testes ok, sem credenciais | EM DESENVOLVIMENTO |
+| [6] Ship | @sdd-workflow | Jira | `SHIPPED_*.md` + Jira fechado | Acceptance tests ok | EM DESENVOLVIMENTO |
+| Iterate | @sdd-workflow | — | Artefato da fase atualizado | — | CROSS-CUTTING |
+
+### Delegações em Fase 4
+
+Durante os nós [4] a [6], o @sdd-workflow coordena com outras skills:
+
+| Ação | Delegado para | Quando |
+|------|--------------|--------|
+| Criar branch git | @dev-workflow | Início do Design [4] |
+| Implementar cada arquivo | @databricks-* (mapeado no File Manifest) | Build [5] |
+| Commit + PR | @dev-workflow | Ship [6] |
+| Code review | @code-reviewer | Ship [6] — recomendado |
 
 ---
 
@@ -138,19 +249,13 @@ Skills ficam em `.claude/skills/`. Cada skill é uma pasta com `SKILL.md` (front
 
 | Skill | Fase | Descrição |
 |-------|------|-----------|
-| [`sdd-workflow`](.claude/skills/sdd-workflow/) | 1–4 | Workflow Spec-Driven Development em 5 fases (Brainstorm → Define → Design → Build → Ship) com integração Confluence e Jira via MCP |
+| [`sdd-workflow`](.claude/skills/sdd-workflow/) | 1 e 4 | Workflow Spec-Driven Development em 5 fases (Brainstorm → Define → Design → Build → Ship). Fase 1: Brainstorm + Define via MCP Confluence. Fase 4: Design + Build + Ship (dentro do @dev-workflow) |
 | [`dev-workflow`](.claude/skills/dev-workflow/) | 4 | Fluxo de desenvolvimento seguro: discussão → branch → código → validação → auto-review → PR → merge |
 | [`code-reviewer`](.claude/skills/code-reviewer/) | 4 | Review de segurança, qualidade de código, performance e boas práticas para projetos Databricks e Python |
 | [`python-dev`](.claude/skills/python-dev/) | 4 | Padrões de desenvolvimento Python: uv, type hints, Ruff, Pyright e pytest |
 | [`test-generator`](.claude/skills/test-generator/) | 4 | Geração de testes unitários pytest, testes de integração e fixtures para código Python e data engineering |
 | [`staff-engineer`](.claude/skills/staff-engineer/) | 2 | Revisão de spec, discussão arquitetural e geração de ADR (`docs/adr/`) |
 | `po` | 3 | Quebra de Epic em Stories (Fibonacci) e Tasks no Jira — **em desenvolvimento** |
-
----
-
-## Revisão de Coerência — sdd-workflow
-
-A skill `sdd-workflow` passou por uma revisão de coerência. Três decisões de design foram identificadas e implementadas — ver [`.claude/skills/sdd-workflow/COHERENCE_REVIEW.md`](.claude/skills/sdd-workflow/COHERENCE_REVIEW.md) para o histórico completo.
 
 ---
 

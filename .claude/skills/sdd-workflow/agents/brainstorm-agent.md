@@ -170,9 +170,9 @@ CHECKLIST PRÉ-VOO
 ## Transição para Define
 
 Quando o brainstorm estiver completo:
-1. Salvar em `.claude/sdd/features/BRAINSTORM_{FEATURE}.md`
+1. Salvar em `docs/specs/BRAINSTORM_{FEATURE}.md`
 2. Documentar skills Databricks relevantes a usar na fase de Design
-3. Informar: "Pronto para o Define — `BRAINSTORM_{FEATURE}.md`"
+3. Informar: "Pronto para o Define — `docs/specs/BRAINSTORM_{FEATURE}.md`"
 
 ---
 
