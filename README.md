@@ -103,13 +103,14 @@ ENTRADAS                                 NÓS
 ────────                                 ────────────────────────────────────────
 
 (A) Ideia vaga ──────────────────────→   ┌── [0] BRAINSTORM ──────────────────┐
-(B) Notas / docs brutos ─────────────→   │  skill:  @sdd-workflow             │ OPCIONAL
+                                         │  skill:  @sdd-workflow             │ OPCIONAL
                                          │  mcp:    —                         │
                                          │  output: docs/specs/BRAINSTORM_*.md│
                                          │  gate:   usuário confirmou abord.  │
                                          └───────────────────┬────────────────┘
                                                             │
-(C) DEFINE_*.md já existe ──────────────────────────────────┼─────────────────┐
+(B) Notas / docs brutos ────────────────────────────────────┼─────────────────┐
+(C) DEFINE_*.md já existe ──────────────────────────────────┼─────────────────┤
 (D) URL Confluence ─────────────────────────────────────────┼─────────────────┤
                                                             ▼                 ▼
                                          ┌── [1] DEFINE ───────────────────────┐
@@ -173,7 +174,7 @@ ENTRADAS                                 NÓS
 
 | Nó | Skill | MCP ativo | Output | Gate para avançar | Status |
 |----|-------|-----------|--------|-------------------|--------|
-| [0] Brainstorm | @sdd-workflow | — | `docs/specs/BRAINSTORM_*.md` | Usuário confirmou abordagem | OPCIONAL |
+| [0] Brainstorm | @sdd-workflow | — | `docs/specs/BRAINSTORM_*.md` | Usuário confirmou abordagem → vai para [1] | OPCIONAL |
 | [1] Define | @sdd-workflow | Confluence | `docs/specs/DEFINE_*.md` | Clarity Score ≥ 12/15 | PRONTO |
 | [2] Arquitetura | @staff-engineer | — | `docs/adr/ADR_*.md` | ADR revisado e aceito | PRONTO |
 | [3] Planejamento | @po | Jira | Epic + Stories + Tasks | — | EM DESENVOLVIMENTO |
