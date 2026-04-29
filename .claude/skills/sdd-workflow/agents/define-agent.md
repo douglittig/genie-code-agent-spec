@@ -26,24 +26,24 @@ description: |
 **ESTE AGENTE SEGUE RESOLUÇÃO SKILLS-FIRST. Usa as skills Databricks curadas pelo time ao invés de KB domains.**
 
 ```text
-┌─────────────────────────────────────────────────────────────────────┐
-│  ORDEM DE RESOLUÇÃO DE CONHECIMENTO                                  │
-├─────────────────────────────────────────────────────────────────────┤
-│                                                                      │
-│  1. SKILLS DATABRICKS (identificar skills aplicáveis)               │
-│     └─ Identificar: skills @databricks-* relevantes para os req.    │
-│     └─ Documentar skills selecionadas no Contexto Técnico do DEFINE │
-│                                                                      │
-│  2. CARREGAMENTO DE TEMPLATE (garantir estrutura consistente)       │
-│     └─ Ler: templates/DEFINE_TEMPLATE.md                            │
-│     └─ Ler: AGENTS.md (ou CLAUDE.md no Claude Code) — contexto do projeto                         │
-│                                                                      │
-│  3. ATRIBUIÇÃO DE CONFIANÇA                                          │
-│     ├─ Todas as entidades extraídas claramente → 0.95 → Prosseguir  │
-│     ├─ Algumas lacunas, esclarecimento necessário → 0.80 → Perguntar│
-│     └─ Ambiguidade maior, escopo não claro → 0.60 → Bloquear, clar.│
-│                                                                      │
-└─────────────────────────────────────────────────────────────────────┘
+┌───────────────────────────────────────────────────────────────────────────┐
+│  ORDEM DE RESOLUÇÃO DE CONHECIMENTO                                       │
+├───────────────────────────────────────────────────────────────────────────┤
+│                                                                           │
+│  1. SKILLS DATABRICKS (identificar skills aplicáveis)                     │
+│     └─ Identificar: skills @databricks-* relevantes para os req.          │
+│     └─ Documentar skills selecionadas no Contexto Técnico do DEFINE       │
+│                                                                           │
+│  2. CARREGAMENTO DE TEMPLATE (garantir estrutura consistente)             │
+│     └─ Ler: templates/DEFINE_TEMPLATE.md                                  │
+│     └─ Ler: AGENTS.md (ou CLAUDE.md no Claude Code) — contexto do projeto │
+│                                                                           │
+│  3. ATRIBUIÇÃO DE CONFIANÇA                                               │
+│     ├─ Todas as entidades extraídas claramente → 0.95 → Prosseguir        │
+│     ├─ Algumas lacunas, esclarecimento necessário → 0.80 → Perguntar.     │
+│     └─ Ambiguidade maior, escopo não claro → 0.60 → Bloquear, clar.       │
+│                                                                           │
+└───────────────────────────────────────────────────────────────────────────┘
 ```
 
 ### Thresholds do Clarity Score

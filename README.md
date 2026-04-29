@@ -85,6 +85,114 @@ projeto/
 
 ---
 
+## Mapa de Interação Detalhado
+
+Mostra todos os pontos de entrada, o que cada nó chama, para onde vai, o que é fixo e o que é opcional.
+
+### Diagrama
+
+```text
+╔══════════════════════════════════════════════════════════════════════════════╗
+║  ITERATE — cross-cutting (disponível em qualquer fase)                       ║
+║  @sdd-workflow / iterate-agent  →  atualiza artefato da fase + cascata       ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+ENTRADAS                                 NÓS
+────────                                 ────────────────────────────────────────
+
+(A) Ideia vaga ──────────────────────→  ┌─ [0] BRAINSTORM ──────────────────┐
+(B) Notas / docs brutos ─────────────→  │  skill:  @sdd-workflow             │ OPCIONAL
+                                         │  mcp:    —                         │
+                                         │  output: docs/specs/BRAINSTORM_*.md│
+                                         │  gate:   usuário confirmou abord.  │
+                                         └──────────────────┬────────────────┘
+                                                            │
+(C) DEFINE_*.md já existe ──────────────────────────────────┼─────────────────┐
+(D) URL Confluence ──────────────────────────────────────────┼─────────────────┤
+                                                            ▼                 ▼
+                                         ┌─ [1] DEFINE ───────────────────────┐
+                                         │  skill:  @sdd-workflow              │ OBRIGATÓRIO
+                                         │  mcp:    Confluence (12 slots)      │
+                                         │  output: docs/specs/DEFINE_*.md     │
+                                         │  gate:   Clarity Score ≥ 12/15      │
+                                         └──────────────────┬─────────────────┘
+                                                            │
+                                                            ▼
+                                         ┌─ [2] ARQUITETURA ──────────────────┐
+                                         │  skill:  @staff-engineer            │ OBRIGATÓRIO
+                                         │  mcp:    —                          │
+                                         │  output: docs/adr/ADR_*.md          │
+                                         └─────────────────┬──────────────────┘
+                                                           │
+                                              ┌────────────┴────────────┐
+                                              ▼                         │
+                          ┌─ [3] PLANEJAMENTO ────────────┐ OPCIONAL    │
+                          │  skill:  @po  [em desenv.]     │             │
+                          │  mcp:    Jira (14 slots)        │             │
+                          │  output: Epic + Stories + Tasks │             │
+                          └──────────────────┬─────────────┘             │
+                                             └─────────────────────────▶ │
+                                                            ▼
+                                         ┌─ [4] DESIGN ───────────────────────┐
+                                         │  skill:  @sdd-workflow              │ OBRIGATÓRIO
+                                         │  mcp:    —                          │
+                                         │  input:  ADR_*.md (vinculante)      │
+                                         │  output: docs/designs/DESIGN_*.md   │
+                                         │  gate:   File Manifest completo     │
+                                         └──────────────────┬─────────────────┘
+                                                            │
+                              ┌─────────────────────────────┤ paralelo
+                              ▼                             ▼
+                 @dev-workflow (criar branch)  ┌─ [5] BUILD ───────────────────┐
+                                               │  skill:   @sdd-workflow        │ OBRIGATÓRIO
+                                               │  mcp:     —                    │
+                                               │  delega:  @databricks-* skills │
+                                               │  output:  código gerado        │
+                                               │           BUILD_REPORT_*.md    │
+                                               │  gate:    lint + testes ok,    │
+                                               │           sem credenciais       │
+                                               └──────────────────┬─────────────┘
+                              ┌─────────────────────────────┤ paralelo
+                              ▼                             ▼
+                 @dev-workflow (commit + PR)   ┌─ [6] SHIP ────────────────────┐
+                                               │  skill:   @sdd-workflow        │ OBRIGATÓRIO
+                                               │  mcp:     Jira (14 slots)      │
+                                               │  delega:  @dev-workflow (PR)   │
+                                               │  delega:  @code-reviewer ★     │
+                                               │  output:  SHIPPED_*.md         │
+                                               │           Jira ticket fechado  │
+                                               │  gate:    acceptance tests ok  │
+                                               └───────────────────────────────┘
+
+★ RECOMENDADO
+```
+
+### Nós — Referência Rápida
+
+| Nó | Skill | MCP ativo | Output | Gate para avançar | Tipo |
+|----|-------|-----------|--------|-------------------|------|
+| [0] Brainstorm | @sdd-workflow | — | `docs/specs/BRAINSTORM_*.md` | Usuário confirmou abordagem | OPCIONAL |
+| [1] Define | @sdd-workflow | Confluence | `docs/specs/DEFINE_*.md` | Clarity Score ≥ 12/15 | OBRIGATÓRIO |
+| [2] Arquitetura | @staff-engineer | — | `docs/adr/ADR_*.md` | ADR revisado e aceito | OBRIGATÓRIO |
+| [3] Planejamento | @po | Jira | Epic + Stories + Tasks | — | OPCIONAL |
+| [4] Design | @sdd-workflow | — | `docs/designs/DESIGN_*.md` | File Manifest completo | OBRIGATÓRIO |
+| [5] Build | @sdd-workflow | — | código + `BUILD_REPORT_*.md` | Lint + testes ok, sem credenciais | OBRIGATÓRIO |
+| [6] Ship | @sdd-workflow | Jira | `SHIPPED_*.md` + Jira fechado | Acceptance tests ok | OBRIGATÓRIO |
+| Iterate | @sdd-workflow | — | Artefato da fase atualizado | — | CROSS-CUTTING |
+
+### Delegações em Fase 4
+
+Durante os nós [4] a [6], o @sdd-workflow coordena com outras skills:
+
+| Ação | Delegado para | Quando |
+|------|--------------|--------|
+| Criar branch git | @dev-workflow | Início do Design [4] |
+| Implementar cada arquivo | @databricks-* (mapeado no File Manifest) | Build [5] |
+| Commit + PR | @dev-workflow | Ship [6] |
+| Code review | @code-reviewer | Ship [6] — recomendado |
+
+---
+
 ## Índice de Skills
 
 Skills ficam em `.claude/skills/`. Cada skill é uma pasta com `SKILL.md` (frontmatter + instruções) e arquivos de referência opcionais. No Genie Code, são invocadas via `@skill-name` em Agent mode; no Claude Code CLI, são carregadas automaticamente.
