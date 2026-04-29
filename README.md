@@ -37,7 +37,8 @@ O desenvolvimento de features segue 4 fases com configurações MCP distintas po
 │ FASE 4 — Desenvolvimento    MCP: Bitbucket (~6) + Jira (14)     │
 │                                                                 │
 │  Quem: Desenvolvedor                                            │
-│  Skill: @dev-workflow                                           │
+│  Skills: @sdd-workflow (Design → Build → Ship)                  │
+│          @dev-workflow  (branch → commit → PR → merge)          │
 │  Output: branch → código → PR → ticket Jira atualizado          │
 └─────────────────────────────────────────────────────────────────┘
 ```
@@ -138,7 +139,7 @@ Skills ficam em `.claude/skills/`. Cada skill é uma pasta com `SKILL.md` (front
 
 | Skill | Fase | Descrição |
 |-------|------|-----------|
-| [`sdd-workflow`](.claude/skills/sdd-workflow/) | 1–4 | Workflow Spec-Driven Development em 5 fases (Brainstorm → Define → Design → Build → Ship) com integração Confluence e Jira via MCP |
+| [`sdd-workflow`](.claude/skills/sdd-workflow/) | 1 e 4 | Workflow Spec-Driven Development em 5 fases (Brainstorm → Define → Design → Build → Ship). Fase 1: Brainstorm + Define via MCP Confluence. Fase 4: Design + Build + Ship (dentro do @dev-workflow) |
 | [`dev-workflow`](.claude/skills/dev-workflow/) | 4 | Fluxo de desenvolvimento seguro: discussão → branch → código → validação → auto-review → PR → merge |
 | [`code-reviewer`](.claude/skills/code-reviewer/) | 4 | Review de segurança, qualidade de código, performance e boas práticas para projetos Databricks e Python |
 | [`python-dev`](.claude/skills/python-dev/) | 4 | Padrões de desenvolvimento Python: uv, type hints, Ruff, Pyright e pytest |

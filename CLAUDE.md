@@ -28,7 +28,7 @@ O índice completo das skills está no **[README.md](README.md)**, organizado po
 
 | Skill | Fase | Propósito |
 |-------|------|---------|
-| `sdd-workflow` | 1–4 | Spec-Driven Development: Define (lê Confluence) → Design → Build → Ship |
+| `sdd-workflow` | 1 e 4 | Fase 1: Brainstorm + Define via MCP Confluence. Fase 4: Design + Build + Ship (dentro do @dev-workflow) |
 | `dev-workflow` | 4 | Fluxo de desenvolvimento: discussão → branch → código → validação → review → PR → merge |
 | `code-reviewer` | 4 | Code review: segurança, qualidade, performance, data engineering |
 | `staff-engineer` | 2 | Revisão de spec, discussão arquitetural e geração de ADR (`docs/adr/`) |
