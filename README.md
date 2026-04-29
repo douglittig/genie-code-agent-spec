@@ -11,7 +11,7 @@ O desenvolvimento de features segue 4 fases com configurações MCP distintas po
 ```
 ┌─────────────────────────────────────────────────────────────────┐
 │ FASE 1 — Spec                    MCP: Confluence (12 slots)     │
-│                                                                  │
+│                                                                 │
 │  Quem: Chapter leader / Tech lead                               │
 │  Skill: @sdd-workflow → define <url-confluence>                 │
 │  Output: docs/specs/DEFINE_{FEATURE}.md                         │
@@ -19,26 +19,26 @@ O desenvolvimento de features segue 4 fases com configurações MCP distintas po
                              │
 ┌────────────────────────────▼────────────────────────────────────┐
 │ FASE 2 — Arquitetura             MCP: nenhum                    │
-│                                                                  │
+│                                                                 │
 │  Quem: Staff Engineer / Tech lead                               │
-│  Skill: @staff-engineer  [em desenvolvimento]                   │
+│  Skill: @staff-engineer                                         │
 │  Output: docs/adr/ADR_{FEATURE}.md                              │
 └────────────────────────────┬────────────────────────────────────┘
                              │
 ┌────────────────────────────▼────────────────────────────────────┐
 │ FASE 3 — Planejamento            MCP: Jira (14 slots)           │
-│                                                                  │
+│                                                                 │
 │  Quem: Product Owner / Tech lead                                │
 │  Skill: @po  [em desenvolvimento]                               │
 │  Output: Epic + Stories (Fibonacci) + Tasks no Jira             │
 └────────────────────────────┬────────────────────────────────────┘
                              │
 ┌────────────────────────────▼────────────────────────────────────┐
-│ FASE 4 — Desenvolvimento    MCP: Bitbucket (~6) + Jira (14)    │
-│                                                                  │
+│ FASE 4 — Desenvolvimento    MCP: Bitbucket (~6) + Jira (14)     │
+│                                                                 │
 │  Quem: Desenvolvedor                                            │
 │  Skill: @dev-workflow                                           │
-│  Output: branch → código → PR → ticket Jira atualizado         │
+│  Output: branch → código → PR → ticket Jira atualizado          │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
@@ -143,7 +143,7 @@ Skills ficam em `.claude/skills/`. Cada skill é uma pasta com `SKILL.md` (front
 | [`code-reviewer`](.claude/skills/code-reviewer/) | 4 | Review de segurança, qualidade de código, performance e boas práticas para projetos Databricks e Python |
 | [`python-dev`](.claude/skills/python-dev/) | 4 | Padrões de desenvolvimento Python: uv, type hints, Ruff, Pyright e pytest |
 | [`test-generator`](.claude/skills/test-generator/) | 4 | Geração de testes unitários pytest, testes de integração e fixtures para código Python e data engineering |
-| `staff-engineer` | 2 | Discussão arquitetural e geração de ADRs — **em desenvolvimento** |
+| [`staff-engineer`](.claude/skills/staff-engineer/) | 2 | Revisão de spec, discussão arquitetural e geração de ADR (`docs/adr/`) |
 | `po` | 3 | Quebra de Epic em Stories (Fibonacci) e Tasks no Jira — **em desenvolvimento** |
 
 ---
