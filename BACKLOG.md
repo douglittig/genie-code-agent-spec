@@ -8,7 +8,7 @@ Usar como base para próximas sessões de trabalho.
 ## Em Aberto
 
 ### 1. PR Template Corporativo
-**Contexto:** O arquivo `.claude/skills/dev-workflow/pr-template.md` é um placeholder genérico.
+**Contexto:** O arquivo `dev-workflow/pr-template.md` é um placeholder genérico.
 **O que falta:** Definir campos obrigatórios conforme regras da empresa (ex: campo de ticket, aprovadores, checklist de segurança específico).
 **Origem:** Sessão de criação da skill `dev-workflow`.
 

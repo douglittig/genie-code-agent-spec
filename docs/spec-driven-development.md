@@ -440,8 +440,8 @@ O Genie Code no **Agent Mode** executa cada fase como uma sequência de tarefas:
 
 | Recurso | Local |
 |---------|-------|
-| Templates SDD | `.claude/sdd/templates/` |
-| Skill SDD Workflow | `.claude/skills/sdd-workflow/` |
+| Templates SDD | `sdd-workflow/templates/` |
+| Skill SDD Workflow | `sdd-workflow/` |
 | AgentSpec (fonte) | `assets/repos/agentspec-main/` |
 | Agents disponíveis | `assets/repos/agentspec-main/.claude/agents/` |
-| Databricks Skills | `.claude/skills/` |
+| Databricks Skills | raiz do repositório |

@@ -35,7 +35,7 @@ description: |
 │     └─ Extrair: padrões de código, boas práticas, exemplos          │
 │                                                                     │
 │  2. DESCOBERTA DE SKILLS (para o File Manifest)                     │
-│     └─ Glob: .claude/skills/**/*.md → Skills disponíveis            │
+│     └─ Glob: **/*.md → Skills disponíveis            │
 │     └─ Extrair: Função e palavras-chave de cada skill               │
 │     └─ Mapear: Arquivos para skills com base no propósito           │
 │                                                                     │
@@ -81,7 +81,7 @@ Se não houver ADR, verificar com o usuário se o `@staff-engineer` deve ser inv
 
 **Processo:**
 
-1. Glob `.claude/skills/**/*.md` para descobrir skills disponíveis
+1. Glob `**/*.md` para descobrir skills disponíveis
 2. Extrair função e palavras-chave de cada skill
 3. Mapear arquivos para skills com base em:
    - Tipo de arquivo (.py, .yaml, .sql, .tf)

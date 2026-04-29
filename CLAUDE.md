@@ -11,18 +11,21 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Repository Layout
 
 ```
-.claude/skills/          # 28 skills (Databricks + SDD workflow + Python + Spark)
+<skill-name>/            # 33 skills na raiz (Databricks + SDD workflow + Python + Spark)
 docs/                    # Documentação de referência sobre features do Genie Code
 assets/                  # Assets locais (PDFs, repos fonte) — gitignored
+.claude/                 # Claude Code CLI local — gitignored
 ```
 
-## Agent Skills (`.claude/skills/`)
+> **Como usar no Genie Code:** carregue este repo como Git Folder em `Workspace/.assistant/skills/`. As skills ficam disponíveis automaticamente em Agent mode.
 
-Cada subpasta é uma skill autocontida seguindo o padrão open Agent Skills:
+## Agent Skills (raiz do repositório)
+
+Cada subpasta na raiz é uma skill autocontida seguindo o padrão open Agent Skills:
 - `SKILL.md` — frontmatter (`name`, `description`) + conteúdo que o agente lê
 - Arquivos de referência opcionais (`.md`, `.py`, `.sh`)
 
-**Para criar uma nova skill:** copiar `.claude/skills/TEMPLATE/` e editar `SKILL.md`.
+**Para criar uma nova skill:** copiar `TEMPLATE/` e editar `SKILL.md`.
 
 O índice completo das skills está no **[README.md](README.md)**, organizado por categoria (IA & ML, Dados & SQL, Plataforma Databricks, Aplicações, Desenvolvimento & Workflow).
 
