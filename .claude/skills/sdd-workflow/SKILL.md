@@ -37,7 +37,7 @@ Confluence (SPEC) → DEFINE → DESIGN → BUILD → Jira (update) → PR → R
 - "Tenho a SPEC no Confluence" → Ler via MCP e gerar Define
 - Tem DEFINE pronto → Sugerir Design
 - Tem DESIGN pronto → Executar Build
-- Build completo → Atualizar Jira, criar PR, fazer review, executar Ship
+- Build completo → Atualizar Jira, criar PR (`@dev-workflow`), fazer review (`@code-reviewer`), executar Ship
 
 ## Regras do Fluxo
 
@@ -55,7 +55,7 @@ Quando o usuário fornecer uma URL ou page-id do Confluence:
 2. Extrair: objetivo, usuários, critérios de aceite, restrições, integrações
 3. Mapear para o template DEFINE (ver `templates/DEFINE_TEMPLATE.md`)
 4. Calcular Clarity Score — pedir esclarecimentos se < 12/15
-5. Salvar em `.claude/sdd/features/DEFINE_{FEATURE}.md`
+5. Salvar em `docs/specs/DEFINE_{FEATURE}.md`
 
 ## Integração Jira → Ship
 
@@ -80,15 +80,15 @@ Cada arquivo do manifest recebe uma skill Databricks curada pelo time:
 | `@databricks-jobs` | Jobs, scheduling, notificações, monitoramento |
 | `@python-dev` | Python, uv, type hints, Ruff, Pyright |
 | `@test-generator` | pytest, fixtures, suites de teste |
-| `@code-reviewer` | Review arquitetural, segurança, boas práticas |
 
-## Criação de PR e Review
+## PR e Review (pós-Build)
 
-Após BUILD completo:
+Após BUILD completo, delegar para as skills especializadas:
 
-1. Rodar review antes do PR: verificar acceptance tests do DEFINE, segurança, qualidade de código
-2. Criar PR com conventional commits (`feat:`, `fix:`, `refactor:`, `test:`, `chore:`)
-3. Bloqueadores que impedem merge: falha em acceptance test, credencial exposta, breaking change sem deprecation period
+- **Review de código:** `@code-reviewer` — verificar acceptance tests do DEFINE, segurança, qualidade
+- **Criar PR:** `@dev-workflow` — branch → commit → PR com conventional commits
+
+Bloqueadores que impedem merge: falha em acceptance test, credencial exposta, breaking change sem deprecation period.
 
 ## Iterate — Mudanças Mid-Stream
 
@@ -99,13 +99,21 @@ Quando requisitos mudarem durante qualquer fase, propagar a mudança pelo pipeli
 
 ## Localização dos Artefatos
 
-Todos os documentos SDD ficam no workspace do projeto:
+Todos os documentos SDD ficam no repositório do projeto:
+
+```
+docs/
+├── specs/      BRAINSTORM_*.md, DEFINE_*.md
+├── adr/        ADR_*.md  (gerado pelo @staff-engineer)
+└── designs/    DESIGN_*.md
+```
+
+Relatórios e archives ficam em `.claude/sdd/` no workspace do projeto:
 
 ```
 .claude/sdd/
-├── features/       BRAINSTORM_*.md, DEFINE_*.md, DESIGN_*.md
-├── reports/        BUILD_REPORT_*.md
-└── archive/        {FEATURE}/ com todos os docs + SHIPPED_*.md
+├── reports/    BUILD_REPORT_*.md
+└── archive/    {FEATURE}/ com todos os docs + SHIPPED_*.md
 ```
 
 ## Reference Files desta Skill
@@ -117,19 +125,9 @@ Todos os documentos SDD ficam no workspace do projeto:
 | `templates/DESIGN_TEMPLATE.md` | Template da fase 2 (com File Manifest) |
 | `templates/BUILD_REPORT_TEMPLATE.md` | Template da fase 3 |
 | `templates/SHIPPED_TEMPLATE.md` | Template da fase 4 |
-| `architecture/WORKFLOW_CONTRACTS.yaml` | Regras de transição entre fases |
-| `architecture/ARCHITECTURE.md` | Arquitetura completa do framework |
-| `commands/brainstorm.md` | Instrução detalhada da fase Brainstorm |
-| `commands/define.md` | Instrução detalhada da fase Define |
-| `commands/design.md` | Instrução detalhada da fase Design |
-| `commands/build.md` | Instrução detalhada da fase Build |
-| `commands/ship.md` | Instrução detalhada da fase Ship |
-| `commands/iterate.md` | Instrução detalhada da fase Iterate |
-| `commands/create-pr.md` | Criação de PR com conventional commits |
-| `commands/review.md` | Dual AI review (análise estática + arquitetural) |
-| `agents/brainstorm-agent.md` | Capacidades do agente de Brainstorm |
-| `agents/define-agent.md` | Capacidades do agente de Define |
-| `agents/design-agent.md` | Capacidades do agente de Design |
-| `agents/build-agent.md` | Capacidades do agente de Build |
-| `agents/ship-agent.md` | Capacidades do agente de Ship |
-| `agents/iterate-agent.md` | Capacidades do agente de Iterate |
+| `agents/brainstorm-agent.md` | Processo e capacidades da fase Brainstorm |
+| `agents/define-agent.md` | Processo e capacidades da fase Define |
+| `agents/design-agent.md` | Processo e capacidades da fase Design |
+| `agents/build-agent.md` | Processo e capacidades da fase Build |
+| `agents/ship-agent.md` | Processo e capacidades da fase Ship |
+| `agents/iterate-agent.md` | Processo e capacidades da fase Iterate |
