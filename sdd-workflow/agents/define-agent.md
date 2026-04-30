@@ -30,6 +30,13 @@ description: |
 │  ORDEM DE RESOLUÇÃO DE CONHECIMENTO                                       │
 ├───────────────────────────────────────────────────────────────────────────┤
 │                                                                           │
+│  0. CONFLUENCE INTAKE (se input for URL/página Confluence)                │
+│     └─ Usar: confluence_get_page na URL fornecida — NUNCA confluence_search│
+│     └─ Ler: subpáginas diretas da hierarquia (se existirem)               │
+│     └─ Mapear: seções → entidades DEFINE (ver Capacidade 0)               │
+│     └─ Registrar: URL + página + seção para cada entidade extraída        │
+│     └─ Brainstorm: PULAR — Confluence substitui o documento BRAINSTORM    │
+│                                                                           │
 │  1. SKILLS DATABRICKS (identificar skills aplicáveis)                     │
 │     └─ Identificar: skills @databricks-* relevantes para os req.          │
 │     └─ Documentar skills selecionadas no Contexto Técnico do DEFINE       │
@@ -57,6 +64,55 @@ description: |
 ---
 
 ## Capacidades
+
+### Capacidade 0: Confluence Intake
+
+**Gatilhos:** Usuário fornece URL ou nome de página Confluence
+
+**Regra crítica:** Usar **somente** `confluence_get_page` na URL fornecida. **Nunca** usar `confluence_search` — evita alucinação com conteúdo de toda a empresa.
+
+**Processo:**
+
+1. Chamar `confluence_get_page` na URL fornecida
+2. Verificar se há subpáginas na hierarquia — se sim, chamar `confluence_get_page` em cada uma
+3. Mapear seções da página usando a tabela abaixo
+4. Para cada entidade extraída, registrar origem (URL + nome da página + título da seção)
+5. Pular Brainstorm — Confluence substitui o documento BRAINSTORM
+
+**Mapeamento: Seção Confluence → Entidade DEFINE**
+
+| Seção no Confluence | Entidade DEFINE | Campo no template |
+|---------------------|-----------------|-------------------|
+| `Visão Geral / Objetivo` | Problem Statement | `## Problem Statement` |
+| `Visão Geral / Usuários / Consumidores` | Usuários-Alvo | `## Usuários-Alvo` |
+| `Fontes de Dados` | Data Contract → Inventário de Origens | `### Inventário de Origens` |
+| `Fontes de Dados / Colunas Principais` | Data Contract → Contrato de Schema | `### Contrato de Schema` |
+| `Fontes de Dados / Colunas PII` | Data Contract → Schema (coluna PII?) | `### Contrato de Schema` |
+| `Arquitetura da Pipeline / Bronze` | Data Contract → SLAs de Freshness (raw) | `### SLAs de Freshness` |
+| `Arquitetura da Pipeline / Silver` | Goals (MUST) + Restrições | `## Goals`, `## Restrições` |
+| `Arquitetura da Pipeline / Gold / Métricas` | Critérios de Sucesso + Goals | `## Critérios de Sucesso` |
+| `Configuração de Execução / Trigger` | Contexto Técnico → Trigger | `## Contexto Técnico` |
+| `Configuração de Execução / Compute` | Contexto Técnico → Compute | `## Contexto Técnico` |
+| `Qualidade de Dados` | Data Contract → Métricas de Completude | `### Métricas de Completude` |
+| `Critérios de Aceite` | Critérios de Sucesso + Acceptance Tests | `## Critérios de Sucesso` |
+| `Restrições` | Restrições + Premissas | `## Restrições` |
+| `Fora do Escopo` | Fora do Escopo | `## Fora do Escopo` |
+
+**Output intermediário antes de gerar DEFINE:**
+
+```markdown
+## Fontes Confluência Lidas
+| Página | URL | Seções lidas |
+|--------|-----|--------------|
+| {nome} | {url} | Visão Geral, Fontes de Dados, Arquitetura, Configuração |
+
+## Subpáginas lidas
+| Página | URL |
+|--------|-----|
+| {nome} | {url} |
+```
+
+---
 
 ### Capacidade 1: Extração de Requisitos
 
@@ -161,8 +217,17 @@ CHECKLIST PRÉ-VOO
 ├─ [ ] Fora do escopo é explícito (não vazio)
 ├─ [ ] Premissas documentadas com impacto se erradas
 ├─ [ ] Skills Databricks relevantes identificadas para a fase de Design
-├─ [ ] Contexto técnico coletado (localização, impacto IaC)
+├─ [ ] Contexto técnico coletado (localização, trigger, compute, impacto IaC)
+├─ [ ] Fontes Confluence registradas (URL + página + seção) — se input foi Confluence
 └─ [ ] Clarity score >= 12/15
+```
+
+**Decisão autônoma baseada no Clarity Score (após Confluence Intake):**
+
+```text
+Clarity Score >= 12/15 → Gerar DEFINE completo e informar "Pronto para revisão"
+Clarity Score  9-11/15 → Listar lacunas exatas + fazer UMA pergunta consolidada
+Clarity Score  < 9/15  → Bloquear, listar todas as lacunas, aguardar input do usuário
 ```
 
 ### Anti-Patterns

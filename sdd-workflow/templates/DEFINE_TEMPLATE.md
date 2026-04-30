@@ -14,6 +14,22 @@
 
 ---
 
+## Fontes
+
+> Rastreabilidade: páginas Confluence lidas para gerar este documento.
+
+| Página | URL | Seções Utilizadas |
+|--------|-----|-------------------|
+| {nome da página principal} | {url} | Visão Geral, Fontes de Dados, Arquitetura, Configuração |
+
+**Subpáginas lidas:**
+
+| Página | URL |
+|--------|-----|
+| {nome da subpágina} | {url} |
+
+---
+
 ## Problem Statement
 
 {1-2 frases descrevendo o problema que estamos resolvendo. Seja específico sobre quem tem o problema e qual é o impacto.}
@@ -94,13 +110,33 @@ Explicitamente NÃO incluído nesta feature:
 | Aspecto | Valor | Notas |
 |---------|-------|-------|
 | **Localização do Deploy** | {src/ \| functions/ \| gen/ \| deploy/ \| caminho customizado} | {Por que esta localização} |
-| **Skills Databricks** | {Lista de domains relevantes para esta feature} | {Quais padrões consultar} |
+| **Skills Databricks** | {Lista de skills @databricks-* relevantes para esta feature} | {Quais padrões consultar} |
 | **Impacto IaC** | {Novos recursos \| Modificar existentes \| Nenhum \| A definir} | {Mudanças de infraestrutura necessárias} |
+
+**Estratégia de Trigger:**
+
+| Campo | Valor |
+|-------|-------|
+| **Tipo** | {`batch_scheduled` \| `continuous` \| `streaming_triggered` \| `one_time`} |
+| **Schedule / Intervalo** | {ex: `"0 3 * * *"` (cron) \| `15 min` \| `n/a`} |
+| **SLA de Disponibilidade** | {ex: `Gold disponível até 07h UTC`} |
+| **Tolerância a Atraso** | {ex: `30 min aceitáveis`} |
+
+**Compute:**
+
+| Campo | Valor |
+|-------|-------|
+| **Tipo** | {`serverless` \| `job_cluster` \| `classic_dlt`} |
+| **Instância** | {ex: `i3.xlarge` \| `n/a para serverless`} |
+| **Workers** | {ex: `min: 2, max: 8 (autoscaling)` \| `n/a para serverless`} |
+| **Região / Cloud** | {ex: `AWS us-east-1`} |
 
 **Por que isso importa:**
 
 - **Localização** → A fase de Design usa a estrutura correta do projeto, evita arquivos mal posicionados
 - **Skills Databricks** → A fase de Design usa os padrões corretos
+- **Trigger** → O build-agent configura o pipeline com o modo de execução correto sem perguntar
+- **Compute** → O build-agent define o cluster/serverless sem perguntar
 - **Impacto IaC** → Dispara planejamento de infraestrutura, evita falhas "funciona localmente"
 
 ---
