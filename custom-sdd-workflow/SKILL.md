@@ -1,5 +1,5 @@
 ---
-name: sdd-workflow
+name: custom-sdd-workflow
 description: |
   Workflow de Spec-Driven Development (SDD) para o Genie Code. Use de forma PROATIVA
   quando o usuário falar em construir features, ler specs do Confluence, gerar código
@@ -16,7 +16,7 @@ Spec-Driven Development transforma requisitos em código rastreável. Cada arqui
 ## Fluxo Completo
 
 ```
-Confluence (SPEC) → DEFINE → @staff-engineer → @po → DESIGN → BUILD → PR/Review → SHIP
+Confluence (SPEC) → DEFINE → @custom-staff-engineer → @po → DESIGN → BUILD → PR/Review → SHIP
       ↑                           (ADR)        (Jira)                       ↓
   (via MCP)                                                           (via MCP Jira)
 ```
@@ -25,7 +25,7 @@ Confluence (SPEC) → DEFINE → @staff-engineer → @po → DESIGN → BUILD �
 
 1. **Brainstorm** é opcional — pular para Define se a SPEC já está clara
 2. **Define** exige Clarity Score ≥ 12/15 antes de avançar
-3. **Após Define** — acionar `@staff-engineer` para gerar o ADR antes do Design
+3. **Após Define** — acionar `@custom-staff-engineer` para gerar o ADR antes do Design
 4. **Design** usa o ADR como fonte de verdade vinculante; deve ter File Manifest completo
 5. **Build** delega cada arquivo à skill Databricks indicada no manifest
 6. **Ship** arquiva todos os artefatos e atualiza o Jira antes de fechar
@@ -51,11 +51,11 @@ Confluence (SPEC) → DEFINE → @staff-engineer → @po → DESIGN → BUILD �
 
 **Output:** `docs/specs/DEFINE_{FEATURE}.md`
 **Gate:** Clarity Score ≥ 12/15. Se menor, pedir esclarecimentos antes de avançar.
-**Próximo passo natural:** `@staff-engineer` — revisão da spec e decisão arquitetural (ADR) antes do Design.
+**Próximo passo natural:** `@custom-staff-engineer` — revisão da spec e decisão arquitetural (ADR) antes do Design.
 
 ### Como funciona
 
-Ao chamar `@sdd-workflow define <url-confluence>`, este SKILL.md carrega:
+Ao chamar `@custom-sdd-workflow define <url-confluence>`, este SKILL.md carrega:
 
 | O que carrega | Arquivo | Papel |
 |---------------|---------|-------|
@@ -75,7 +75,7 @@ O **define-agent** executa nesta ordem:
 
 | Score | Ação |
 |-------|------|
-| ≥ 12/15 | Gera `DEFINE_{FEATURE}.md` → sugere `@staff-engineer` |
+| ≥ 12/15 | Gera `DEFINE_{FEATURE}.md` → sugere `@custom-staff-engineer` |
 | 9–11/15 | Faz perguntas direcionadas → re-pontua |
 | < 9/15  | Bloqueia — exige esclarecimento antes de continuar |
 
@@ -88,7 +88,7 @@ O **define-agent** executa nesta ordem:
 ## Fase 2 — Design  ⚠️ EM DESENVOLVIMENTO
 
 **Quando usar:** DEFINE pronto com Clarity Score ≥ 12/15.
-**ADR:** se `docs/adr/ADR_{FEATURE}.md` existir (gerado pelo `@staff-engineer`), ele é vinculante — o design-agent executa o ADR, não reabre decisões.
+**ADR:** se `docs/adr/ADR_{FEATURE}.md` existir (gerado pelo `@custom-staff-engineer`), ele é vinculante — o design-agent executa o ADR, não reabre decisões.
 
 **Output:** `docs/designs/DESIGN_{FEATURE}.md`
 **Gate:** File Manifest completo — todos os arquivos com agente Databricks atribuído.
@@ -113,7 +113,7 @@ O **define-agent** executa nesta ordem:
 
 **Quando usar:** Build completo e validado.
 **Integração Jira:** mover ticket para "In Review" → adicionar link do PR → após merge: mover para "Done".
-**PR e Review:** delegar para `@dev-workflow` (branch → commit → PR) e `@code-reviewer` (review de segurança e qualidade).
+**PR e Review:** delegar para `@custom-dev-workflow` (branch → commit → PR) e `@custom-code-reviewer` (review de segurança e qualidade).
 
 **Bloqueadores de merge:** falha em acceptance test, credencial exposta, breaking change sem deprecation period.
 
@@ -140,7 +140,7 @@ Quando requisitos mudarem durante qualquer fase:
 ```
 docs/
 ├── specs/      BRAINSTORM_*.md, DEFINE_*.md
-├── adr/        ADR_*.md  (gerado pelo @staff-engineer)
+├── adr/        ADR_*.md  (gerado pelo @custom-staff-engineer)
 └── designs/    DESIGN_*.md
 
 .claude/sdd/

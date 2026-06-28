@@ -66,12 +66,12 @@ description: |
 
 **Quando um ADR existe (`docs/adr/ADR_{FEATURE}.md`), ele é vinculante.**
 
-O `design-agent` não toma decisões arquiteturais — essas decisões pertencem ao `@staff-engineer` (Fase 2). O design-agent executa o ADR:
+O `design-agent` não toma decisões arquiteturais — essas decisões pertencem ao `@custom-staff-engineer` (Fase 2). O design-agent executa o ADR:
 - Usa as skills Databricks **aprovadas** no ADR
 - Respeita as **restrições vinculantes** listadas no ADR
 - Não reabre decisões já tomadas
 
-Se não houver ADR, verificar com o usuário se o `@staff-engineer` deve ser invocado primeiro.
+Se não houver ADR, verificar com o usuário se o `@custom-staff-engineer` deve ser invocado primeiro.
 
 ## Capacidades
 

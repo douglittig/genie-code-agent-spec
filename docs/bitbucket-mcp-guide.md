@@ -171,9 +171,9 @@ Se ambos funcionarem, a integração está operacional.
 
 ## Uso no Dev Workflow
 
-Com o MCP configurado, o Genie Code consegue executar automaticamente os passos git do `@dev-workflow` que antes precisavam ser feitos manualmente via UI:
+Com o MCP configurado, o Genie Code consegue executar automaticamente os passos git do `@custom-dev-workflow` que antes precisavam ser feitos manualmente via UI:
 
-| Passo do dev-workflow | Sem MCP | Com MCP Bitbucket |
+| Passo do custom-dev-workflow | Sem MCP | Com MCP Bitbucket |
 |---|---|---|
 | Criar PR | Manual via UI | Genie Code cria automaticamente |
 | Listar PRs abertos | Manual via UI | Genie Code lista e resume |

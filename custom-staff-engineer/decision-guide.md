@@ -2,11 +2,11 @@
 
 > **Este arquivo é de propriedade do time de engenharia.**
 > É aqui que o time documenta suas decisões arquiteturais padronizadas, restrições
-> corporativas, políticas de PII e orientações técnicas que o `@staff-engineer`
+> corporativas, políticas de PII e orientações técnicas que o `@custom-staff-engineer`
 > deve seguir em TODA discussão arquitetural.
 >
-> **Preencha este arquivo antes de usar a skill `@staff-engineer` em produção.**
-> Quanto mais completo este guia, menos perguntas o staff-engineer precisará fazer
+> **Preencha este arquivo antes de usar a skill `@custom-staff-engineer` em produção.**
+> Quanto mais completo este guia, menos perguntas o custom-staff-engineer precisará fazer
 > e mais consistentes serão os ADRs gerados.
 >
 > Seções marcadas com `[PREENCHER]` são obrigatórias.
@@ -61,7 +61,7 @@
 ## 3. Políticas de PII e Dados Sensíveis [PREENCHER]
 
 > **Esta seção é crítica.** Documente as políticas de PII do time/empresa.
-> O `@staff-engineer` usará isto para classificar campos e definir controles.
+> O `@custom-staff-engineer` usará isto para classificar campos e definir controles.
 
 ### Classificação de dados
 | Categoria | Definição | Exemplos de campos |

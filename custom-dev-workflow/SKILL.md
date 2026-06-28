@@ -1,5 +1,5 @@
 ---
-name: dev-workflow
+name: custom-dev-workflow
 description: |
   Fluxo de desenvolvimento seguro: discussão → branch → código → validação → review → PR → merge.
   Use de forma PROATIVA sempre que o usuário quiser modificar código, criar uma feature,
@@ -11,7 +11,7 @@ description: |
 
   Exemplo 2 — Usuário acabou de alinhar a abordagem:
   user: "Ok, vamos implementar dessa forma"
-  assistant: "Vou criar a feature branch e seguir o dev-workflow."
+  assistant: "Vou criar a feature branch e seguir o custom-dev-workflow."
 ---
 
 # Dev Workflow
@@ -50,7 +50,7 @@ Discussão → Branch → Desenvolvimento → Validação Local → Auto-review 
 
 | Situação | Rota |
 |----------|------|
-| Ideia vaga ou requisito impreciso | Usar `@sdd-workflow` fase Brainstorm |
+| Ideia vaga ou requisito impreciso | Usar `@custom-sdd-workflow` fase Brainstorm |
 | Múltiplas abordagens possíveis | Apresentar opções com trade-offs, aguardar decisão |
 | Mudança simples e clara | Descrever o que será feito e aguardar aprovação inline |
 
@@ -143,12 +143,12 @@ pytest
 
 ---
 
-## Passo 4 — Auto-review com `@code-reviewer`
+## Passo 4 — Auto-review com `@custom-code-reviewer`
 
-Antes de solicitar revisão humana, rodar o `@code-reviewer` nas mudanças:
+Antes de solicitar revisão humana, rodar o `@custom-code-reviewer` nas mudanças:
 
 ```
-@code-reviewer revise as mudanças na branch atual
+@custom-code-reviewer revise as mudanças na branch atual
 ```
 
 | Resultado | Ação |
@@ -184,7 +184,7 @@ Criar o PR via `gh pr create` usando o template [`pr-template.md`](pr-template.m
 ```text
 [ ] Branch está atualizada com main (git rebase origin/main)
 [ ] Validação local passou (linting, testes)
-[ ] Auto-review com @code-reviewer concluído
+[ ] Auto-review com @custom-code-reviewer concluído
 [ ] Nenhum segredo ou credencial no código
 [ ] Título segue conventional commits
 [ ] Descrição tem Resumo, Test Plan e Breaking Changes
@@ -200,7 +200,7 @@ Criar o PR via `gh pr create` usando o template [`pr-template.md`](pr-template.m
 Por padrão, aplicar:
 
 - Revisão por pelo menos 1 desenvolvedor do time
-- Dual AI review: análise estática + `@code-reviewer` arquitetural
+- Dual AI review: análise estática + `@custom-code-reviewer` arquitetural
 
 ### Bloqueadores que impedem merge
 
@@ -218,8 +218,8 @@ Por padrão, aplicar:
 | Arquivo | Conteúdo |
 |---------|---------|
 | [`pr-template.md`](pr-template.md) | Template base de PR (placeholder corporativo) |
-| `@sdd-workflow` | Fase de Brainstorm para ideias vagas (Passo 0) |
-| `@code-reviewer` | Auto-review antes de PR (Passo 4) |
+| `@custom-sdd-workflow` | Fase de Brainstorm para ideias vagas (Passo 0) |
+| `@custom-code-reviewer` | Auto-review antes de PR (Passo 4) |
 
 ## Integração MCP (opcional)
 
