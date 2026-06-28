@@ -19,15 +19,29 @@ assets/                  # Assets locais (PDFs, repos fonte) — gitignored
 
 > **Como usar no Genie Code:** carregue este repo como Git Folder em `Workspace/.assistant/skills/`. As skills ficam disponíveis automaticamente em Agent mode.
 
+> **Sem build/lint/test:** este é um repositório de conteúdo (Markdown + arquivos de referência), não uma aplicação. Não há `package.json`, `pyproject.toml` nem pipeline de CI — a "compilação" é o Genie Code/Claude Code lendo os `SKILL.md`. Validar uma mudança = revisar o Markdown e confirmar que o frontmatter está correto.
+
+> **Arquivos de instrução paralelos:** [`CLAUDE.md`](CLAUDE.md) (Claude Code) e [`AGENTS.md`](AGENTS.md) (Genie Code) cobrem o mesmo conteúdo para dois agentes. Ao editar um, **atualizar o outro** para mantê-los em sincronia. [`BACKLOG.md`](BACKLOG.md) rastreia trabalho adiado (placeholders corporativos, skills futuras) — consultar antes de começar trabalho novo em `dev-workflow`/`code-reviewer`.
+
 ## Agent Skills (raiz do repositório)
 
 Cada subpasta na raiz é uma skill autocontida seguindo o padrão open Agent Skills:
 - `SKILL.md` — frontmatter (`name`, `description`) + conteúdo que o agente lê
 - Arquivos de referência opcionais (`.md`, `.py`, `.sh`)
 
+**O campo `description` do frontmatter dispara o auto-load.** O agente decide carregar uma skill comparando o pedido do usuário com a `description` — por isso as skills `databricks-*` escrevem descrições em inglês, ricas em gatilhos ("Use when building..., querying..., migrating..."). Ao criar/editar uma skill, otimizar a `description` para casar com como o usuário descreveria a tarefa, não para resumir o conteúdo.
+
 **Para criar uma nova skill:** copiar `TEMPLATE/` e editar `SKILL.md`.
 
 O índice completo das skills está no **[README.md](README.md)**, organizado por categoria (IA & ML, Dados & SQL, Plataforma Databricks, Aplicações, Desenvolvimento & Workflow).
+
+### Proveniência: skills upstream vs. skills próprias
+
+⚠️ **As skills `databricks-*`, `spark-python-data-source` e `TEMPLATE` vêm do upstream [`databricks-solutions/ai-dev-kit`](https://github.com/databricks-solutions/ai-dev-kit) (`databricks-skills/`). NÃO editar à mão** — o sync sobrescreve. Para mudar uma delas, contribuir no upstream.
+
+- **Sincronização:** [`.github/workflows/sync-databricks-skills.yml`](.github/workflows/sync-databricks-skills.yml) faz sparse checkout efêmero do upstream, copia as pastas para a raiz e abre um PR. O upstream **nunca** é commitado aqui (sem submodule/subtree). Roda semanalmente + `workflow_dispatch`.
+- **Versão fixada:** última tag semver do upstream, registrada em `databricks-skills.lock` (gerado pelo workflow).
+- **Skills NOSSAS, editáveis** (não existem no upstream): `sdd-workflow`, `staff-engineer`, `dev-workflow`, `code-reviewer`, `po`, `python-dev`, `test-generator`. O workflow tem uma salvaguarda (`OWN_SKILLS`) que nunca as sobrescreve.
 
 ### Skills de Workflow
 

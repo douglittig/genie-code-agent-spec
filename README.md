@@ -355,7 +355,7 @@ Skills ficam na **raiz do repositório** — cada skill é uma pasta com `SKILL.
 
 | Skill | Descrição |
 |-------|-----------|
-| [`databricks-app-python`](databricks-app-python/) | Aplicações Python no Databricks (Dash, Streamlit, Gradio, Flask, FastAPI, Reflex) com OAuth, SQL warehouse e model serving |
+| [`databricks-apps-python`](databricks-apps-python/) | Aplicações Python no Databricks (Dash, Streamlit, Gradio, Flask, FastAPI, Reflex) com OAuth, SQL warehouse e model serving |
 | [`databricks-lakebase-autoscale`](databricks-lakebase-autoscale/) | Lakebase Autoscaling (PostgreSQL gerenciado): autoscaling, scale-to-zero, branching, synced tables e OAuth |
 | [`databricks-lakebase-provisioned`](databricks-lakebase-provisioned/) | Lakebase Provisioned (PostgreSQL OLTP): criação de instâncias, conexão de apps, reverse ETL e memória de agentes |
 | [`databricks-unstructured-pdf-generation`](databricks-unstructured-pdf-generation/) | Geração de PDFs a partir de HTML e upload para volumes do Unity Catalog |
@@ -374,13 +374,64 @@ Skills ficam na **raiz do repositório** — cada skill é uma pasta com `SKILL.
 
 ---
 
+## Sincronização das Skills Databricks (upstream)
+
+As skills `databricks-*`, `spark-python-data-source` e `TEMPLATE` **não são nossas** — elas vêm do repositório oficial da Databricks [`databricks-solutions/ai-dev-kit`](https://github.com/databricks-solutions/ai-dev-kit), pasta `databricks-skills/`. Para mantê-las atualizadas sem clonar o repo upstream dentro do nosso, há um GitHub Action que sincroniza automaticamente.
+
+### Como funciona
+
+```
+┌──────────────────────────────────────────────────────────────────────┐
+│  Toda segunda 06:00 UTC  (ou manualmente via "Run workflow")          │
+└───────────────────────────────────┬──────────────────────────────────┘
+                                    ▼
+   1. Descobre a ÚLTIMA TAG semver do upstream (ex: v0.1.12)
+      └─ segue releases publicadas, NÃO o branch main do upstream
+                                    ▼
+   2. Sparse + shallow checkout SÓ de databricks-skills/ num dir
+      efêmero do runner (.upstream/) — nada do repo upstream é
+      commitado no nosso repo (sem submodule, sem subtree)
+                                    ▼
+   3. Copia cada pasta de skill para a raiz do nosso repo
+      └─ NUNCA toca nas nossas 7 skills próprias (OWN_SKILLS)
+      └─ grava versão + commit em databricks-skills.lock
+                                    ▼
+   4. Se algo mudou → abre/atualiza 1 PR para a main (label: skills-sync)
+      Se nada mudou (mesma tag, mesmo conteúdo) → nenhum PR é criado
+                                    ▼
+   5. Você revisa o diff e faz o merge  ← respeita a Golden Rule
+```
+
+> **Por que segue tag e não `main`:** a tag é um corte estável e reproduzível. O `main` do upstream pode conter trabalho em andamento entre releases. Consequência: se o upstream ficar semanas sem nova release, os runs de segunda não geram PR algum — e está tudo certo. O PR só aparece quando há release nova (ou mudança de conteúdo naquela tag).
+
+### Skills próprias vs. upstream
+
+| Origem | Skills | Editar à mão? |
+|--------|--------|---------------|
+| **Upstream** (`ai-dev-kit`) | `databricks-*`, `spark-python-data-source`, `TEMPLATE` | ❌ Não — o sync sobrescreve. Contribua no upstream. |
+| **Nossas** | `sdd-workflow`, `staff-engineer`, `dev-workflow`, `code-reviewer`, `po`, `python-dev`, `test-generator` | ✅ Sim — não existem no upstream, o sync nunca as toca. |
+
+### Disparar manualmente
+
+Em **Actions → Sync Databricks Skills → Run workflow**. Aceita um input `ref` opcional para fixar uma tag específica (vazio = última release).
+
+> **Pré-requisito:** habilitar *Settings → Actions → General → "Allow GitHub Actions to create and approve pull requests"*, senão a abertura do PR falha.
+
+Arquivos envolvidos:
+- [`.github/workflows/sync-databricks-skills.yml`](.github/workflows/sync-databricks-skills.yml) — o workflow
+- `databricks-skills.lock` — manifesto de proveniência (versão + commit upstream + data), gerado pelo workflow
+
+---
+
 ## Estrutura do Repositório
 
 ```
-<skill-name>/            # 33 skills na raiz (Databricks + SDD workflow + Python + Spark)
-docs/                    # Documentação de referência extraída de fontes Databricks
-assets/                  # Assets locais (PDFs, repos) — gitignored
-.claude/                 # Claude Code CLI local — gitignored
+<skill-name>/                       # 33 skills na raiz (Databricks + SDD workflow + Python + Spark)
+docs/                               # Documentação de referência extraída de fontes Databricks
+.github/workflows/                  # CI — inclui o sync das skills Databricks (upstream)
+databricks-skills.lock              # Proveniência do último sync (versão + commit upstream)
+assets/                             # Assets locais (PDFs, repos) — gitignored
+.claude/                            # Claude Code CLI local — gitignored
 ```
 
 ## Git Workflow
