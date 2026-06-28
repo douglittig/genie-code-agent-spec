@@ -29,8 +29,11 @@ permissions:
 env:
   UPSTREAM: databricks-solutions/ai-dev-kit
   UPSTREAM_PATH: databricks-skills
-  # Skills NOSSAS — nunca devem ser sobrescritas pelo sync.
-  OWN_SKILLS: "sdd-workflow staff-engineer dev-workflow code-reviewer po python-dev test-generator"
+  # Skill upstream que vive FORA de databricks-skills/ — mapeada à parte.
+  # formato: "<path no upstream>:<pasta destino na raiz>"
+  EXTRA_SKILLS: ".claude/skills/python-dev:databricks-python-dev"
+  # Skills NOSSAS (prefixo custom-) — nunca devem ser sobrescritas pelo sync.
+  OWN_SKILLS: "custom-sdd-workflow custom-staff-engineer custom-dev-workflow custom-code-reviewer custom-test-generator custom-po"
 
 jobs:
   sync:
@@ -61,7 +64,12 @@ jobs:
           git clone --depth 1 --filter=blob:none --sparse \
             --branch "${{ steps.upstream.outputs.ref }}" \
             "https://github.com/$UPSTREAM" .upstream
-          git -C .upstream sparse-checkout set "$UPSTREAM_PATH"
+          # Inclui o path principal + os paths de origem das EXTRA_SKILLS.
+          EXTRA_PATHS=""
+          for map in $EXTRA_SKILLS; do
+            EXTRA_PATHS="$EXTRA_PATHS ${map%%:*}"
+          done
+          git -C .upstream sparse-checkout set "$UPSTREAM_PATH" $EXTRA_PATHS
           echo "sha=$(git -C .upstream rev-parse HEAD)" >> "$GITHUB_OUTPUT"
 
       - name: Copiar skills para a raiz
@@ -78,6 +86,19 @@ jobs:
             # --delete poda arquivos removidos no upstream, mas SÓ dentro
             # da pasta da skill — nunca afeta pastas irmãs nem a raiz.
             rsync -a --delete "$dir" "./$name/"
+          done
+
+      - name: Copiar skills upstream fora de databricks-skills/ (EXTRA_SKILLS)
+        run: |
+          set -euo pipefail
+          for map in $EXTRA_SKILLS; do
+            src=".upstream/${map%%:*}"
+            dest="${map##*:}"
+            if [ ! -d "$src" ]; then
+              echo "AVISO: origem não encontrada no upstream: ${map%%:*}"; continue
+            fi
+            echo "sync (extra): ${map%%:*} -> $dest"
+            rsync -a --delete "$src/" "./$dest/"
           done
 
       - name: Gravar manifesto de proveniência

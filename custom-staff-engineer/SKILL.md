@@ -1,5 +1,5 @@
 ---
-name: staff-engineer
+name: custom-staff-engineer
 description: |
   Engenheiro sênior responsável por decisões arquiteturais antes do desenvolvimento.
   Use de forma PROATIVA na Fase 2 do fluxo de desenvolvimento — após a Spec (DEFINE) e
@@ -7,11 +7,11 @@ description: |
 
   Exemplo 1 — Tech lead tem o DEFINE pronto e precisa decidir a arquitetura:
   user: "Temos o DEFINE_PIPELINE_VENDAS.md pronto, precisamos decidir a arquitetura"
-  assistant: "Vou usar o @staff-engineer para revisar a spec e conduzir a discussão arquitetural."
+  assistant: "Vou usar o @custom-staff-engineer para revisar a spec e conduzir a discussão arquitetural."
 
   Exemplo 2 — Dúvida sobre padrão para um caso específico:
   user: "Devo usar DLT ou Structured Streaming para este caso?"
-  assistant: "Vou invocar o @staff-engineer para analisar os trade-offs e registrar a decisão."
+  assistant: "Vou invocar o @custom-staff-engineer para analisar os trade-offs e registrar a decisão."
 ---
 
 # Staff Engineer
@@ -25,11 +25,11 @@ description: |
 ## Posição no Fluxo de Desenvolvimento
 
 ```
-Fase 1: @sdd-workflow define  → docs/specs/DEFINE_{FEATURE}.md
-Fase 2: @staff-engineer       → docs/adr/ADR_{FEATURE}.md        ← ESTA SKILL
+Fase 1: @custom-sdd-workflow define  → docs/specs/DEFINE_{FEATURE}.md
+Fase 2: @custom-staff-engineer       → docs/adr/ADR_{FEATURE}.md        ← ESTA SKILL
 Fase 3: @po                   → Epic + Stories + Tasks no Jira
-Fase 4: @dev-workflow         → branch → código → PR
-         └─ @sdd-workflow design usa o ADR como fonte de verdade arquitetural
+Fase 4: @custom-dev-workflow         → branch → código → PR
+         └─ @custom-sdd-workflow design usa o ADR como fonte de verdade arquitetural
 ```
 
 O ADR gerado aqui é **vinculante** para o `design-agent` — decisões arquiteturais documentadas no ADR não são reaberturas durante o Design ou Build.
@@ -192,7 +192,7 @@ O ADR gerado aqui é **vinculante** para o `design-agent` — decisões arquitet
 |---------|---------|
 | [`adr-template.md`](adr-template.md) | Template padrão do ADR |
 | [`decision-guide.md`](decision-guide.md) | Padrões e restrições arquiteturais do time — **preencher antes de usar** |
-| `@sdd-workflow` → `agents/design-agent.md` | Consumidor do ADR na Fase de Design |
+| `@custom-sdd-workflow` → `agents/design-agent.md` | Consumidor do ADR na Fase de Design |
 | `@databricks-spark-declarative-pipelines` | Padrões DLT/SDP para decisão de processamento |
 | `@databricks-spark-structured-streaming` | Padrões Streaming para decisão de processamento |
 | `@databricks-unity-catalog` | Governança, permissões, PII |

@@ -1,16 +1,16 @@
 ---
-name: code-reviewer
+name: custom-code-reviewer
 description: |
   Especialista em code review garantindo qualidade, segurança e manutenibilidade.
   Use de forma PROATIVA após escrever ou modificar código significativo.
 
   **Exemplo 1:** Usuário acabou de escrever uma nova função ou módulo
   - user: "Revise este código que acabei de escrever"
-  - assistant: "Vou usar o code-reviewer para realizar uma revisão abrangente."
+  - assistant: "Vou usar o custom-code-reviewer para realizar uma revisão abrangente."
 
   **Exemplo 2:** Usuário pede revisão de segurança
   - user: "Verifique este código de autenticação por problemas de segurança"
-  - assistant: "Vou usar o code-reviewer para escanear por vulnerabilidades."
+  - assistant: "Vou usar o custom-code-reviewer para escanear por vulnerabilidades."
 ---
 
 # Code Reviewer
@@ -176,7 +176,7 @@ CHECKLIST PRÉ-VOO
 ```markdown
 ## Relatório de Code Review
 
-**Revisor:** code-reviewer
+**Revisor:** custom-code-reviewer
 **Arquivos:** {count} arquivos, {linhas} linhas
 **Confiança:** {score} | **Fonte:** {padrão do projeto ou WebSearch}
 

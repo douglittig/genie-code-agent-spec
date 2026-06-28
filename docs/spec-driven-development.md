@@ -110,7 +110,7 @@ Transforma o DEFINE em plano técnico executável. Aqui acontece o **Agent Match
   | # | File | Action | Purpose | Agent | Dependencies |
   | 1 | src/pipelines/bronze_events.py | Create | Ingestão raw | @lakeflow-pipeline-builder | None |
   | 2 | src/pipelines/silver_events.py | Create | Transformação | @spark-engineer | 1 |
-  | 3 | tests/test_events.py | Create | Testes unitários | @test-generator | 1, 2 |
+  | 3 | tests/test_events.py | Create | Testes unitários | @custom-test-generator | 1, 2 |
 ## Agent Assignment Rationale
 ## Code Patterns (copy-paste ready)
 ## Testing Strategy
@@ -138,7 +138,7 @@ Executa a implementação seguindo o File Manifest. Para cada arquivo, invoca o 
 |-------|-------|------------------------|
 | @lakeflow-pipeline-builder | 1 | SDP pipeline patterns, autoloader, medallion |
 | @spark-engineer | 2 | PySpark transformations, partition strategy |
-| @test-generator | 3 | pytest suite, fixtures, data quality assertions |
+| @custom-test-generator | 3 | pytest suite, fixtures, data quality assertions |
 ```
 
 **Gate:** Todos os testes passam. Zero erros de tipo (Pyright).
@@ -336,8 +336,8 @@ Para o contexto Databricks, os agentes mais relevantes para atribuição no DESI
 | `@medallion-architect` | Arquitetura bronze/silver/gold |
 | `@lakehouse-architect` | Delta Lake, Iceberg, catalogs |
 | `@python-developer` | Scripts Python, utilitários, SDK calls |
-| `@test-generator` | pytest, fixtures, suites de teste |
-| `@code-reviewer` | Review arquitetural, boas práticas |
+| `@custom-test-generator` | pytest, fixtures, suites de teste |
+| `@custom-code-reviewer` | Review arquitetural, boas práticas |
 
 ---
 
@@ -372,7 +372,7 @@ File Manifest gerado:
 | 1 | `src/pipelines/bronze_clicks.py` | `@lakeflow-pipeline-builder` | Autoloader Kafka → Bronze |
 | 2 | `src/pipelines/silver_clicks.py` | `@spark-streaming-architect` | Dedup + parse → Silver |
 | 3 | `src/pipelines/gold_sessions.py` | `@spark-engineer` | Agregação por sessão → Gold |
-| 4 | `tests/test_click_pipeline.py` | `@test-generator` | Suite de testes |
+| 4 | `tests/test_click_pipeline.py` | `@custom-test-generator` | Suite de testes |
 | 5 | `resources/pipeline_clicks.yml` | `@lakeflow-pipeline-builder` | DABs config |
 
 ### Passo 3 — BUILD
@@ -421,7 +421,7 @@ Agente executa em paralelo os especialistas. BUILD_REPORT gerado com atribuiçã
 
 O Genie Code no **Agent Mode** executa cada fase como uma sequência de tarefas:
 
-1. **Skills** auto-carregadas: `sdd-workflow` guia o agente pelo pipeline correto
+1. **Skills** auto-carregadas: `custom-sdd-workflow` guia o agente pelo pipeline correto
 2. **Agentes sub-especializados**: invocados via `Task()` para cada arquivo do manifest
 3. **MCP Tools**: Confluence e Jira acessados nativamente no fluxo
 4. **Commands** (`/define`, `/design`, `/build`, `/ship`): slash commands configurados em `.claude/commands/`
@@ -440,8 +440,8 @@ O Genie Code no **Agent Mode** executa cada fase como uma sequência de tarefas:
 
 | Recurso | Local |
 |---------|-------|
-| Templates SDD | `sdd-workflow/templates/` |
-| Skill SDD Workflow | `sdd-workflow/` |
+| Templates SDD | `custom-sdd-workflow/templates/` |
+| Skill SDD Workflow | `custom-sdd-workflow/` |
 | AgentSpec (fonte) | `assets/repos/agentspec-main/` |
 | Agents disponíveis | `assets/repos/agentspec-main/.claude/agents/` |
 | Databricks Skills | raiz do repositório |

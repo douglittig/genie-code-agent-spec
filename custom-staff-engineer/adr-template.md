@@ -1,7 +1,7 @@
 # ADR: {Nome da Feature}
 
 > **Architecture Decision Record** — documento vinculante para o design e build desta feature.
-> Gerado pelo `@staff-engineer` na Fase 2 do fluxo de desenvolvimento.
+> Gerado pelo `@custom-staff-engineer` na Fase 2 do fluxo de desenvolvimento.
 
 ## Metadata
 

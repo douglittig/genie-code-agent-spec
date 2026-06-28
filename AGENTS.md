@@ -2,7 +2,7 @@
 
 This file provides guidance to Genie Code when working with code in this repository.
 
-> **Status:** Fases 1 e 2 prontas para uso (`@sdd-workflow` Define + `@staff-engineer`). Fases 3 e 4 em desenvolvimento — não usar `@po`, `@dev-workflow` nem as fases Design/Build/Ship do `@sdd-workflow` em ambiente real ainda.
+> **Status:** Fases 1 e 2 prontas para uso (`@custom-sdd-workflow` Define + `@custom-staff-engineer`). Fases 3 e 4 em desenvolvimento — não usar `@custom-po`, `@custom-dev-workflow` nem as fases Design/Build/Ship do `@custom-sdd-workflow` em ambiente real ainda.
 
 ## Project
 
@@ -31,29 +31,33 @@ O índice completo das skills está no **[README.md](README.md)**, organizado po
 
 ### Proveniência: skills upstream vs. skills próprias
 
-⚠️ **As skills `databricks-*`, `spark-python-data-source` e `TEMPLATE` vêm do upstream [`databricks-solutions/ai-dev-kit`](https://github.com/databricks-solutions/ai-dev-kit) (`databricks-skills/`). NÃO editar à mão** — o sync sobrescreve. Para mudar uma delas, contribuir no upstream.
+Há dois prefixos que indicam a origem da skill:
+
+- **`databricks-*`** + `spark-python-data-source` + `TEMPLATE` → vêm do upstream [`databricks-solutions/ai-dev-kit`](https://github.com/databricks-solutions/ai-dev-kit). ⚠️ **NÃO editar à mão** — o sync sobrescreve. Para mudar, contribuir no upstream.
+- **`custom-*`** → skills **nossas**, não existem no upstream, livres para editar.
 
 - **Sincronização:** [`.github/workflows/sync-databricks-skills.yml`](.github/workflows/sync-databricks-skills.yml) faz sparse checkout efêmero do upstream, copia as pastas para a raiz e abre um PR. O upstream **nunca** é commitado aqui (sem submodule/subtree). Roda semanalmente + `workflow_dispatch`.
 - **Versão fixada:** última tag semver do upstream, registrada em `databricks-skills.lock` (gerado pelo workflow).
-- **Skills NOSSAS, editáveis** (não existem no upstream): `sdd-workflow`, `staff-engineer`, `dev-workflow`, `code-reviewer`, `po`, `python-dev`, `test-generator`. O workflow tem uma salvaguarda (`OWN_SKILLS`) que nunca as sobrescreve.
+- **Origem das pastas upstream:** a maioria vem de `databricks-skills/`. Exceção: **`databricks-python-dev`** vem de `.claude/skills/python-dev` do upstream (mapeado para `databricks-python-dev` no sync).
+- **Skills NOSSAS, editáveis** (prefixo `custom-`, salvaguardadas em `OWN_SKILLS`): `custom-sdd-workflow`, `custom-staff-engineer`, `custom-dev-workflow`, `custom-code-reviewer`, `custom-test-generator`, `custom-po` (planejada). O workflow nunca as sobrescreve.
 
 ### Skills de Workflow
 
 | Skill | Fase | Status | Propósito |
 |-------|------|--------|-----------|
-| `sdd-workflow` | 1 | **PRONTO** | Brainstorm + Define via MCP Confluence → `docs/specs/DEFINE_*.md` |
-| `staff-engineer` | 2 | **PRONTO** | Revisão de spec, decisão arquitetural → `docs/adr/ADR_*.md` |
-| `po` | 3 | EM DESENVOLVIMENTO | Epic → Stories (Fibonacci) → Tasks no Jira |
-| `sdd-workflow` (Design→Ship) | 4 | EM DESENVOLVIMENTO | Design + Build + Ship a partir do DEFINE aprovado |
-| `dev-workflow` | 4 | EM DESENVOLVIMENTO | Branch → código → validação → PR → merge |
-| `code-reviewer` | 4 | EM DESENVOLVIMENTO | Code review: segurança, qualidade, performance |
+| `custom-sdd-workflow` | 1 | **PRONTO** | Brainstorm + Define via MCP Confluence → `docs/specs/DEFINE_*.md` |
+| `custom-staff-engineer` | 2 | **PRONTO** | Revisão de spec, decisão arquitetural → `docs/adr/ADR_*.md` |
+| `custom-po` | 3 | EM DESENVOLVIMENTO | Epic → Stories (Fibonacci) → Tasks no Jira |
+| `custom-sdd-workflow` (Design→Ship) | 4 | EM DESENVOLVIMENTO | Design + Build + Ship a partir do DEFINE aprovado |
+| `custom-dev-workflow` | 4 | EM DESENVOLVIMENTO | Branch → código → validação → PR → merge |
+| `custom-code-reviewer` | 4 | EM DESENVOLVIMENTO | Code review: segurança, qualidade, performance |
 
-### sdd-workflow — estrutura especial
+### custom-sdd-workflow — estrutura especial
 
-A skill `sdd-workflow` tem subdivisões além do `SKILL.md`:
+A skill `custom-sdd-workflow` tem subdivisões além do `SKILL.md`:
 
 ```
-sdd-workflow/
+custom-sdd-workflow/
 ├── SKILL.md          # Entry point — orquestra as 5 fases
 ├── agents/           # 6 agentes especializados por fase (brainstorm, define, design, build, ship, iterate)
 └── templates/        # 5 templates de documentos SDD
@@ -74,7 +78,7 @@ Documentação de referência sobre features do Genie Code extraída de fontes D
 | `genie-code-overview.md` | Visão geral do Genie Code (Agent mode vs Chat mode) |
 | `mcp-integration.md` | Configuração MCP, limite de 20 ferramentas, restrições |
 | `pipeline-development.md` | Desenvolvimento de pipelines no Databricks |
-| `spec-driven-development.md` | Conceito SDD e como usar o sdd-workflow |
+| `spec-driven-development.md` | Conceito SDD e como usar o custom-sdd-workflow |
 | `tips-and-tricks.md` | Boas práticas e dicas para o Genie Code |
 
 ## Git Workflow — Golden Rule

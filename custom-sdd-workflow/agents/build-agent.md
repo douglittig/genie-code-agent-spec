@@ -169,7 +169,7 @@ python -c "from pyspark.sql import SparkSession; exec(open('{arquivo}').read())"
 | `serving/**/*.py` (model endpoints) | `@databricks-model-serving` |
 | `queries/**/*.sql` (DBSQL) | `@databricks-dbsql` |
 | `bundles/**/*.yaml` (DABs) | `@databricks-bundles` |
-| `*.py` (Python geral) | `@python-dev` |
+| `*.py` (Python geral) | `@databricks-python-dev` |
 
 ---
 
