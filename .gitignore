@@ -222,3 +222,6 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Clone efêmero do upstream durante o sync de skills (CI)
+.upstream/

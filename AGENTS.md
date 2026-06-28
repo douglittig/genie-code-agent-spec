@@ -29,6 +29,14 @@ Cada subpasta na raiz é uma skill autocontida seguindo o padrão open Agent Ski
 
 O índice completo das skills está no **[README.md](README.md)**, organizado por categoria (IA & ML, Dados & SQL, Plataforma Databricks, Aplicações, Desenvolvimento & Workflow).
 
+### Proveniência: skills upstream vs. skills próprias
+
+⚠️ **As skills `databricks-*`, `spark-python-data-source` e `TEMPLATE` vêm do upstream [`databricks-solutions/ai-dev-kit`](https://github.com/databricks-solutions/ai-dev-kit) (`databricks-skills/`). NÃO editar à mão** — o sync sobrescreve. Para mudar uma delas, contribuir no upstream.
+
+- **Sincronização:** [`.github/workflows/sync-databricks-skills.yml`](.github/workflows/sync-databricks-skills.yml) faz sparse checkout efêmero do upstream, copia as pastas para a raiz e abre um PR. O upstream **nunca** é commitado aqui (sem submodule/subtree). Roda semanalmente + `workflow_dispatch`.
+- **Versão fixada:** última tag semver do upstream, registrada em `databricks-skills.lock` (gerado pelo workflow).
+- **Skills NOSSAS, editáveis** (não existem no upstream): `sdd-workflow`, `staff-engineer`, `dev-workflow`, `code-reviewer`, `po`, `python-dev`, `test-generator`. O workflow tem uma salvaguarda (`OWN_SKILLS`) que nunca as sobrescreve.
+
 ### Skills de Workflow
 
 | Skill | Fase | Status | Propósito |
