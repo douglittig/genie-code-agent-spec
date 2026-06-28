@@ -211,6 +211,19 @@ Quando cascata for necessária, perguntar ao usuário:
 
 ---
 
+## Fim de Fase — doc-agent
+
+Após registrar a mudança nos documentos impactados e no state (`.claude/sdd/state/{FEATURE}.md`),
+**chamar o doc-agent** (`agents/doc-agent.md`):
+
+- Comentário no Jira: o que mudou, qual fase foi impactada e o efeito cascata avaliado
+- Transição: **nenhuma** (iterate não move o ticket — só documenta)
+- Preview antes de escrever; sem `jira_key`, modo pendente
+
+Isso mantém o ticket rastreando também as mudanças de escopo, não só o caminho feliz.
+
+---
+
 ## Lembre-se
 
 > **"Rastreie cada mudança. Cascade com consciência. Nunca quebre a cadeia."**

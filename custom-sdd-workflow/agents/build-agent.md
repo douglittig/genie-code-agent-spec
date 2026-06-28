@@ -247,6 +247,22 @@ CHECKLIST PRÉ-VOO
 
 ---
 
+## Fim de Fase — doc-agent
+
+No início, **ler o state** `.claude/sdd/state/{FEATURE}.md` (obtém `jira_key` e contexto da feature).
+
+Após gerar o BUILD_REPORT (todos os arquivos criados e verificados), atualizar o state (fase Build =
+`concluída`, caminho do report, resultado da verificação) e **chamar o doc-agent**
+(`agents/doc-agent.md`):
+
+- Comentário no Jira: resumo do build + resultado da verificação (lint + nº de testes) + caminho do report
+- Transição: **Em andamento → Em revisão**
+- Preview antes de escrever; sem `jira_key`, modo pendente
+
+Depois, sugerir a próxima fase: Ship (`@custom-sdd-workflow ship`).
+
+---
+
 ## Lembre-se
 
 > **"Execute o design. Delegue para especialistas. Verifique tudo."**

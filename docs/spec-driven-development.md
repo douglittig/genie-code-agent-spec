@@ -15,10 +15,14 @@ O framework de referência é o [AgentSpec v2.1](https://github.com/PedroHBCruz/
 ## O Fluxo SDD para Genie Code
 
 ```
-Confluence (SPEC) → DEFINE → DESIGN → BUILD → Jira (update) → PR → Review
-       ↑                                              ↓
-  (via MCP)                                      (via MCP)
+Confluence (SPEC) → DEFINE → ADR → @custom-po → DESIGN → BUILD → SHIP → PR → Review
+       ↑                       (Stories/Jira)                                 │
+       │              └────────── doc-agent documenta cada fase no Jira ──────┘
+  (via MCP)                          (comentário + transição via MCP)
 ```
+
+A cada fim de fase o **doc-agent** posta um comentário no ticket e transiciona o status. A chave do
+Jira é capturada no Define e guardada no ledger `.claude/sdd/state/{FEATURE}.md`.
 
 ### Visão geral das etapas
 
@@ -147,14 +151,15 @@ Executa a implementação seguindo o File Manifest. Para cada arquivo, invoca o 
 
 ### Fase 4: Ship
 
-Arquiva os artefatos e captura lições aprendidas. **Antes do archive**, atualiza o Jira via MCP.
+Arquiva os artefatos e captura lições aprendidas. **Antes do archive**, o doc-agent comenta o
+SHIPPED + link do PR no Jira e transiciona o ticket para "Concluído".
 
 **Entrada:** Todos os artefatos do feature
 
 **Saída:**
-- `archive/{FEATURE}/` com todos os documentos
+- `archive/{FEATURE}/` com todos os documentos (incluindo o `{FEATURE}.state.md`)
 - `SHIPPED_{DATE}.md` com lições aprendidas
-- Ticket Jira atualizado (via MCP)
+- Ticket Jira atualizado pelo doc-agent (comentário + transição → Concluído)
 
 ---
 
@@ -205,34 +210,32 @@ Antes de avançar para o DESIGN, preciso dessas respostas.
 
 ---
 
-## Integração com Jira via MCP
+## Integração com Jira via MCP — doc-agent
 
-### Quando atualizar o Jira
+A documentação no Jira **não é manual**: o `doc-agent` (`custom-sdd-workflow/agents/doc-agent.md`)
+é um hook transversal acionado ao **final de cada fase**. Ele lê a `jira_key` do ledger de state,
+monta um comentário a partir de `JIRA_UPDATE_TEMPLATE.md`, mostra um **preview** ao usuário e então
+posta o comentário + transiciona o ticket.
 
-| Momento | Ação no Jira |
-|---------|-------------|
-| Após DEFINE aprovado | Adiciona link para `DEFINE_{FEATURE}.md` / muda status para "In Progress" |
-| Após BUILD concluído | Adiciona link para PR / adiciona BUILD_REPORT como comentário |
-| Após `/review` sem críticos | Move para "In Review" |
-| Após merge do PR | Move para "Done" / adiciona link do commit |
+### Mapa fase → ação no Jira
 
-### Fluxo Jira no Build + Ship
+| Fase concluída | Comentário | Transição (por intenção) |
+|----------------|------------|--------------------------|
+| Define | DEFINE + Clarity Score + origem Confluence | To Do → Em andamento |
+| ADR | decisões-chave + link do ADR | mantém Em andamento |
+| Design | File Manifest + link do DESIGN | mantém Em andamento |
+| Build | BUILD_REPORT + verificação | Em andamento → Em revisão |
+| Ship | SHIPPED + link do PR | Em revisão → Concluído |
 
-```
-# Após BUILD completo:
-mcp_jira_update_issue(
-    issue_id="PROJ-123",
-    status="In Review",
-    comment=f"BUILD concluído. PR: {pr_url}\n\nAgentes usados:\n{build_report_summary}"
-)
+### Ferramentas MCP usadas (4)
 
-# Após merge:
-mcp_jira_update_issue(
-    issue_id="PROJ-123",
-    status="Done",
-    comment=f"Mergeado em main. Commit: {commit_sha}"
-)
-```
+`jira_get_issue`, `jira_get_transitions` (descobre a transição por intenção — nunca hardcoda ID),
+`jira_add_comment`, `jira_transition_issue`. Sem `jira_key` no state → **modo pendente** (registra
+e avisa, não escreve no Jira).
+
+> **Limite de 20 slots — ok para a demo:** habilitando o conjunto completo, Confluence + Jira
+> passariam de 20. Na demonstração usamos um subconjunto (doc-agent: 4 tools Jira; intake: ~1 do
+> Confluence), ~14 no total — então os dois MCPs podem ficar ativos juntos, sem troca.
 
 ---
 
@@ -291,18 +294,22 @@ Após criar o PR, rodar o review dual — análise estática + revisão arquitet
 Todos os artefatos ficam em `.claude/sdd/`:
 
 ```
+docs/                            # artefatos versionados no repo do projeto
+├── specs/    BRAINSTORM_*.md, DEFINE_*.md
+├── adr/      ADR_*.md
+├── planning/ STORIES_*.md   (@custom-po)
+└── designs/  DESIGN_*.md
+
 .claude/sdd/
-├── features/                    # Trabalho ativo
-│   ├── BRAINSTORM_{FEATURE}.md  # Fase 0 (opcional)
-│   ├── DEFINE_{FEATURE}.md      # Fase 1
-│   └── DESIGN_{FEATURE}.md      # Fase 2
-├── reports/
-│   └── BUILD_REPORT_{FEATURE}.md # Fase 3
+├── state/                       # {FEATURE}.md — ledger de rastreabilidade (jira_key, fases, log Jira)
+├── reports/                     # BUILD_REPORT_{FEATURE}.md
 └── archive/
-    └── {FEATURE}/               # Fase 4 (fechado)
+    └── {FEATURE}/               # Ship (fechado)
         ├── DEFINE_{FEATURE}.md
+        ├── ADR_{FEATURE}.md
         ├── DESIGN_{FEATURE}.md
         ├── BUILD_REPORT_{FEATURE}.md
+        ├── {FEATURE}.state.md
         └── SHIPPED_{DATE}.md
 ```
 
@@ -310,7 +317,7 @@ Todos os artefatos ficam em `.claude/sdd/`:
 
 ## Templates
 
-Os templates estão em `.claude/sdd/templates/`:
+Os templates estão em `custom-sdd-workflow/templates/`:
 
 | Template | Fase | Uso |
 |----------|------|-----|
@@ -319,6 +326,8 @@ Os templates estão em `.claude/sdd/templates/`:
 | `DESIGN_TEMPLATE.md` | 2 | Design técnico + file manifest |
 | `BUILD_REPORT_TEMPLATE.md` | 3 | Relatório de construção |
 | `SHIPPED_TEMPLATE.md` | 4 | Archive + lições aprendidas |
+| `STATE_TEMPLATE.md` | todas | Ledger de rastreabilidade (jira_key, fases, log Jira) |
+| `JIRA_UPDATE_TEMPLATE.md` | todas | Comentário de fim de fase postado pelo doc-agent |
 
 ---
 

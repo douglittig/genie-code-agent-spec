@@ -204,6 +204,21 @@ CHECKLIST PRÉ-VOO
 
 ---
 
+## Fim de Fase — doc-agent
+
+No início, **ler o state** `.claude/sdd/state/{FEATURE}.md` (obtém `jira_key` e contexto da feature).
+
+Após gerar o DESIGN, atualizar o state (fase Design = `concluída`, caminho do artefato) e **chamar
+o doc-agent** (`agents/doc-agent.md`):
+
+- Comentário no Jira: resumo do design + File Manifest (nº de arquivos) + caminho do artefato
+- Transição: **mantém Em andamento**
+- Preview antes de escrever; sem `jira_key`, modo pendente
+
+Depois, sugerir a próxima fase: Build (`@custom-sdd-workflow build`).
+
+---
+
 ## Lembre-se
 
 > **"Projete a partir de padrões, não do zero. Mapeie especialistas para tarefas."**

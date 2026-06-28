@@ -2,7 +2,7 @@
 
 Repositório de skills, custom instructions e integrações MCP para Databricks Genie Code e Claude Code.
 
-> **Status:** Fases 1 e 2 prontas para uso. Fases 3 e 4 em desenvolvimento — não testar em ambiente real ainda.
+> **Status:** As 5 fases do `@custom-sdd-workflow` (Brainstorm → Define → Design → Build → Ship) + `@custom-staff-engineer` (ADR) + `@custom-po` (Stories/Tasks no Jira) prontas para uso, com **documentação automática no Jira via `doc-agent`** ao final de cada fase. `@custom-dev-workflow` e `@custom-code-reviewer` ainda em desenvolvimento.
 
 ---
 
@@ -15,7 +15,7 @@ Repositório de skills, custom instructions e integrações MCP para Databricks 
 | Databricks workspace | Genie Code habilitado (Agent mode disponível) |
 | Acesso de admin | Permissão para criar Git Folders em `Workspace/` |
 | Git provider configurado | GitHub, GitLab ou Bitbucket conectado ao workspace |
-| MCP por fase | Confluence (Fase 1), Jira (Fase 3/6), Bitbucket (Fase 4) |
+| MCP por fase | Confluence (Define), Jira (doc-agent ao fim de cada fase + Ship), Bitbucket (Fase 4) |
 
 ---
 
@@ -142,20 +142,22 @@ O desenvolvimento de features segue 4 fases com configurações MCP distintas po
 └────────────────────────────┬────────────────────────────────────┘
                              │
 ┌────────────────────────────▼────────────────────────────────────┐
-│ FASE 3 — Planejamento  [EM DESENVOLVIMENTO]                     │
-│                                  MCP: Jira (14 slots)           │
+│ FASE 3 — Planejamento                                          │
+│                                  MCP: Jira                      │
 │  Quem: Product Owner / Tech lead                                │
 │  Skill: @custom-po                                                     │
-│  Output: Epic + Stories (Fibonacci) + Tasks no Jira             │
+│  Output: docs/planning/STORIES_*.md + Stories/Tasks no Jira     │
+│          + doc-agent comenta o plano no Epic                    │
 └────────────────────────────┬────────────────────────────────────┘
                              │
 ┌────────────────────────────▼────────────────────────────────────┐
-│ FASE 4 — Desenvolvimento  [EM DESENVOLVIMENTO]                  │
-│                             MCP: Bitbucket (~6) + Jira (14)     │
+│ FASE 4 — Desenvolvimento                                       │
+│   @custom-sdd-workflow: PRONTO · @custom-dev-workflow: EM DEV   │
+│                             MCP: Jira (14)                      │
 │  Quem: Desenvolvedor                                            │
 │  Skills: @custom-sdd-workflow (Design → Build → Ship)                  │
-│          @custom-dev-workflow  (branch → commit → PR → merge)          │
-│  Output: branch → código → PR → ticket Jira atualizado          │
+│          + doc-agent documenta cada fase no Jira               │
+│  Output: código + DESIGN/BUILD_REPORT/SHIPPED + Jira atualizado │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
@@ -183,10 +185,29 @@ projeto/
 ├── src/
 ├── tests/
 └── docs/
-    ├── specs/      # DEFINE_{FEATURE}.md  — saída da Fase 1
-    ├── adr/        # ADR_{FEATURE}.md     — saída da Fase 2
-    └── designs/    # DESIGN_{FEATURE}.md  — saída do custom-sdd-workflow
+    ├── specs/      # DEFINE_{FEATURE}.md   — saída da Fase 1
+    ├── adr/        # ADR_{FEATURE}.md      — saída da Fase 2
+    ├── planning/   # STORIES_{FEATURE}.md  — saída da Fase 3 (@custom-po)
+    └── designs/    # DESIGN_{FEATURE}.md   — saída da Fase 4 (custom-sdd-workflow)
+
+.claude/sdd/        # estado e relatórios do fluxo (no repo do projeto)
+├── state/          # {FEATURE}.md  — ledger de rastreabilidade (jira_key, fases, log Jira)
+├── reports/        # BUILD_REPORT_{FEATURE}.md
+└── archive/        # {FEATURE}/ com todos os docs + state + SHIPPED_*.md
 ```
+
+### Documentação automática no Jira (doc-agent)
+
+Ao final de **cada** fase, o `doc-agent` posta um comentário estruturado no ticket Jira (resumo +
+link do artefato + origem Confluence + gate) e **transiciona** o status (Define → Em andamento,
+Build → Em revisão, Ship → Concluído). A chave do ticket é capturada uma vez no Define e guardada
+no ledger `.claude/sdd/state/{FEATURE}.md`. Há **preview** antes de qualquer escrita; sem chave, o
+agente entra em modo pendente e não toca o Jira.
+
+> **Limite de 20 slots MCP — ok para a demo:** habilitando o *conjunto completo* de ferramentas,
+> Confluence + Jira passariam de 20. Mas na demonstração usamos só um **subconjunto** (o doc-agent
+> precisa de 4 tools Jira; o intake usa ~1 do Confluence), totalizando ~14 — dentro do limite. Logo,
+> Confluence e Jira podem ficar **ativos juntos** durante todo o fluxo, sem troca de MCP.
 
 ### Configuração MCP por fase
 
@@ -211,6 +232,8 @@ Mostra todos os pontos de entrada, o que cada nó chama, para onde vai, o que é
 ╔══════════════════════════════════════════════════════════════════════════════╗
 ║  ITERATE — cross-cutting (disponível em qualquer fase)                       ║
 ║  @custom-sdd-workflow / iterate-agent  →  atualiza artefato da fase + cascata       ║
+║  DOC-AGENT — cross-cutting (fim de cada fase)                                 ║
+║  @custom-sdd-workflow / doc-agent  →  Jira: comentário + transição + state          ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 
 ENTRADAS                                 NÓS
@@ -291,11 +314,12 @@ ENTRADAS                                 NÓS
 | [0] Brainstorm | @custom-sdd-workflow | — | `docs/specs/BRAINSTORM_*.md` | Usuário confirmou abordagem → vai para [1] | OPCIONAL |
 | [1] Define | @custom-sdd-workflow | Confluence | `docs/specs/DEFINE_*.md` | Clarity Score ≥ 12/15 | PRONTO |
 | [2] Arquitetura | @custom-staff-engineer | — | `docs/adr/ADR_*.md` | ADR revisado e aceito | PRONTO |
-| [3] Planejamento | @custom-po | Jira | Epic + Stories + Tasks | — | EM DESENVOLVIMENTO |
-| [4] Design | @custom-sdd-workflow | — | `docs/designs/DESIGN_*.md` | File Manifest completo | EM DESENVOLVIMENTO |
-| [5] Build | @custom-sdd-workflow | — | código + `BUILD_REPORT_*.md` | Lint + testes ok, sem credenciais | EM DESENVOLVIMENTO |
-| [6] Ship | @custom-sdd-workflow | Jira | `SHIPPED_*.md` + Jira fechado | Acceptance tests ok | EM DESENVOLVIMENTO |
+| [3] Planejamento | @custom-po | Jira | `docs/planning/STORIES_*.md` + Stories/Tasks no Jira | Stories estimadas (Fibonacci) e criadas | PRONTO |
+| [4] Design | @custom-sdd-workflow | — | `docs/designs/DESIGN_*.md` | File Manifest completo | PRONTO |
+| [5] Build | @custom-sdd-workflow | — | código + `BUILD_REPORT_*.md` | Lint + testes ok, sem credenciais | PRONTO |
+| [6] Ship | @custom-sdd-workflow | Jira | `SHIPPED_*.md` + Jira fechado | Acceptance tests ok | PRONTO |
 | Iterate | @custom-sdd-workflow | — | Artefato da fase atualizado | — | CROSS-CUTTING |
+| doc-agent | @custom-sdd-workflow | Jira | comentário + transição no ticket + `.claude/sdd/state/*` | — | CROSS-CUTTING (fim de fase) |
 
 ### Delegações em Fase 4
 
@@ -364,13 +388,13 @@ Skills ficam na **raiz do repositório** — cada skill é uma pasta com `SKILL.
 
 | Skill | Fase | Descrição |
 |-------|------|-----------|
-| [`custom-sdd-workflow`](custom-sdd-workflow/) | 1 e 4 | Workflow Spec-Driven Development em 5 fases (Brainstorm → Define → Design → Build → Ship). Fase 1: Brainstorm + Define via MCP Confluence. Fase 4: Design + Build + Ship (dentro do @custom-dev-workflow) |
+| [`custom-sdd-workflow`](custom-sdd-workflow/) | 1 e 4 | Workflow Spec-Driven Development em 5 fases (Brainstorm → Define → Design → Build → Ship), com `doc-agent` documentando cada fase no Jira (comentário + transição via MCP) e ledger de rastreabilidade em `.claude/sdd/state/`. Fase 1: Define via MCP Confluence |
 | [`custom-dev-workflow`](custom-dev-workflow/) | 4 | Fluxo de desenvolvimento seguro: discussão → branch → código → validação → auto-review → PR → merge |
 | [`custom-code-reviewer`](custom-code-reviewer/) | 4 | Review de segurança, qualidade de código, performance e boas práticas para projetos Databricks e Python |
 | [`databricks-python-dev`](databricks-python-dev/) | 4 | Padrões de desenvolvimento Python: uv, type hints, Ruff, Pyright e pytest |
 | [`custom-test-generator`](custom-test-generator/) | 4 | Geração de testes unitários pytest, testes de integração e fixtures para código Python e data engineering |
 | [`custom-staff-engineer`](custom-staff-engineer/) | 2 | Revisão de spec, discussão arquitetural e geração de ADR (`docs/adr/`) |
-| `custom-po` | 3 | Quebra de Epic em Stories (Fibonacci) e Tasks no Jira — **em desenvolvimento** |
+| [`custom-po`](custom-po/) | 3 | Product Owner: quebra a feature em Epic → Stories (Fibonacci) → Tasks, cria no Jira via MCP e gera `docs/planning/STORIES_*.md` |
 
 ---
 
@@ -428,7 +452,7 @@ Arquivos envolvidos:
 ## Estrutura do Repositório
 
 ```
-<skill-name>/                       # 33 skills na raiz (Databricks + SDD workflow + Python + Spark)
+<skill-name>/                       # 34 skills na raiz (Databricks + SDD workflow + Python + Spark)
 docs/                               # Documentação de referência extraída de fontes Databricks
 .github/workflows/                  # CI — inclui o sync das skills Databricks (upstream)
 databricks-skills.lock              # Proveniência do último sync (versão + commit upstream)

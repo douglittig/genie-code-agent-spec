@@ -25,14 +25,16 @@ description: |
 ## Posição no Fluxo de Desenvolvimento
 
 ```
-Fase 1: @custom-sdd-workflow define  → docs/specs/DEFINE_{FEATURE}.md
+Fase 1: @custom-sdd-workflow define  → docs/specs/DEFINE_{FEATURE}.md  (+ captura jira_key no state)
 Fase 2: @custom-staff-engineer       → docs/adr/ADR_{FEATURE}.md        ← ESTA SKILL
-Fase 3: @po                   → Epic + Stories + Tasks no Jira
-Fase 4: @custom-dev-workflow         → branch → código → PR
-         └─ @custom-sdd-workflow design usa o ADR como fonte de verdade arquitetural
+Fase 3: @custom-po                   → Stories (Fibonacci) + Tasks no Jira
+Fase 4: @custom-sdd-workflow design  → docs/designs/DESIGN_{FEATURE}.md (usa o ADR como verdade)
+         └─ a cada fim de fase, o doc-agent documenta no Jira (comentário + transição)
 ```
 
-O ADR gerado aqui é **vinculante** para o `design-agent` — decisões arquiteturais documentadas no ADR não são reaberturas durante o Design ou Build.
+O ADR gerado aqui é **vinculante** para o `design-agent` — decisões arquiteturais documentadas no
+ADR não são reaberturas durante o Design ou Build. Ao final, esta skill aciona o **doc-agent** do
+`@custom-sdd-workflow` para registrar as decisões no ticket Jira (ver Capacidade 4).
 
 ---
 
@@ -156,7 +158,7 @@ O ADR gerado aqui é **vinculante** para o `design-agent` — decisões arquitet
 [ ] PII e governança explicitamente endereçados
 [ ] Riscos CRÍTICOS têm mitigação definida
 [ ] Restrições para o design-agent listadas (o que NÃO pode ser mudado)
-[ ] Próximos passos (Fase 3: @po) documentados
+[ ] Próximos passos (Fase 3 — `@custom-po` para planejamento no Jira) documentados
 ```
 
 ---
@@ -170,7 +172,13 @@ O ADR gerado aqui é **vinculante** para o `design-agent` — decisões arquitet
    - Skills Databricks aprovadas (quais usar)
    - Skills Databricks descartadas (quais não usar e por quê)
    - Restrições arquiteturais vinculantes
-2. Informar: "ADR pronto — `docs/adr/ADR_{FEATURE}.md`. Próximo passo: `@po` para planejamento no Jira."
+2. **Fim de fase — doc-agent:** atualizar o state `.claude/sdd/state/{FEATURE}.md` (fase ADR =
+   `concluída`, caminho do ADR) e acionar o `doc-agent` do `@custom-sdd-workflow`
+   (`agents/doc-agent.md`) para documentar no Jira:
+   - Comentário: decisões-chave do ADR + restrições vinculantes + caminho do artefato
+   - Transição: **mantém Em andamento**
+   - Preview antes de escrever; sem `jira_key` no state, modo pendente
+3. Informar: "ADR pronto — `docs/adr/ADR_{FEATURE}.md`. Próximo passo: `@custom-po` para quebrar em Stories/Tasks no Jira."
 
 ---
 
@@ -193,6 +201,8 @@ O ADR gerado aqui é **vinculante** para o `design-agent` — decisões arquitet
 | [`adr-template.md`](adr-template.md) | Template padrão do ADR |
 | [`decision-guide.md`](decision-guide.md) | Padrões e restrições arquiteturais do time — **preencher antes de usar** |
 | `@custom-sdd-workflow` → `agents/design-agent.md` | Consumidor do ADR na Fase de Design |
+| `@custom-sdd-workflow` → `agents/doc-agent.md` | Documenta o fim da fase ADR no Jira |
+| `@custom-po` | Fase 3 — consome este ADR para quebrar em Stories/Tasks no Jira |
 | `@databricks-spark-declarative-pipelines` | Padrões DLT/SDP para decisão de processamento |
 | `@databricks-spark-structured-streaming` | Padrões Streaming para decisão de processamento |
 | `@databricks-unity-catalog` | Governança, permissões, PII |
