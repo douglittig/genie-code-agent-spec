@@ -27,7 +27,8 @@ description: |
 ```
 Fase 1: @custom-sdd-workflow define  → docs/specs/DEFINE_{FEATURE}.md  (+ captura jira_key no state)
 Fase 2: @custom-staff-engineer       → docs/adr/ADR_{FEATURE}.md        ← ESTA SKILL
-Fase 3: @custom-sdd-workflow design  → docs/designs/DESIGN_{FEATURE}.md (usa o ADR como verdade)
+Fase 3: @custom-po                   → Stories (Fibonacci) + Tasks no Jira
+Fase 4: @custom-sdd-workflow design  → docs/designs/DESIGN_{FEATURE}.md (usa o ADR como verdade)
          └─ a cada fim de fase, o doc-agent documenta no Jira (comentário + transição)
 ```
 
@@ -157,7 +158,7 @@ ADR não são reaberturas durante o Design ou Build. Ao final, esta skill aciona
 [ ] PII e governança explicitamente endereçados
 [ ] Riscos CRÍTICOS têm mitigação definida
 [ ] Restrições para o design-agent listadas (o que NÃO pode ser mudado)
-[ ] Próximos passos (Design — `@custom-sdd-workflow design`) documentados
+[ ] Próximos passos (Fase 3 — `@custom-po` para planejamento no Jira) documentados
 ```
 
 ---
@@ -177,7 +178,7 @@ ADR não são reaberturas durante o Design ou Build. Ao final, esta skill aciona
    - Comentário: decisões-chave do ADR + restrições vinculantes + caminho do artefato
    - Transição: **mantém Em andamento**
    - Preview antes de escrever; sem `jira_key` no state, modo pendente
-3. Informar: "ADR pronto — `docs/adr/ADR_{FEATURE}.md`. Próximo passo: `@custom-sdd-workflow design`."
+3. Informar: "ADR pronto — `docs/adr/ADR_{FEATURE}.md`. Próximo passo: `@custom-po` para quebrar em Stories/Tasks no Jira."
 
 ---
 
@@ -201,6 +202,7 @@ ADR não são reaberturas durante o Design ou Build. Ao final, esta skill aciona
 | [`decision-guide.md`](decision-guide.md) | Padrões e restrições arquiteturais do time — **preencher antes de usar** |
 | `@custom-sdd-workflow` → `agents/design-agent.md` | Consumidor do ADR na Fase de Design |
 | `@custom-sdd-workflow` → `agents/doc-agent.md` | Documenta o fim da fase ADR no Jira |
+| `@custom-po` | Fase 3 — consome este ADR para quebrar em Stories/Tasks no Jira |
 | `@databricks-spark-declarative-pipelines` | Padrões DLT/SDP para decisão de processamento |
 | `@databricks-spark-structured-streaming` | Padrões Streaming para decisão de processamento |
 | `@databricks-unity-catalog` | Governança, permissões, PII |

@@ -16,11 +16,11 @@ Spec-Driven Development transforma requisitos em código rastreável. Cada arqui
 ## Fluxo Completo
 
 ```
-Confluence (SPEC) → DEFINE → @custom-staff-engineer → DESIGN → BUILD → PR/Review → SHIP
-      ↑                           (ADR)                                            ↓
-  (via MCP)                                                                  (via MCP Jira)
-                      └──────────── doc-agent (hook por fase) ───────────────┘
-                            comentário + transição no ticket Jira
+Confluence (SPEC) → DEFINE → @custom-staff-engineer → @custom-po → DESIGN → BUILD → PR/Review → SHIP
+      ↑                           (ADR)              (Stories/Jira)                            ↓
+  (via MCP)                                                                             (via MCP Jira)
+                      └──────────────────── doc-agent (hook por fase) ────────────────────┘
+                                    comentário + transição no ticket Jira
 ```
 
 O **doc-agent** é transversal: ao final de **cada** fase ele documenta o avanço no ticket Jira
@@ -29,11 +29,12 @@ O **doc-agent** é transversal: ao final de **cada** fase ele documenta o avanç
 ## Regras do Fluxo
 
 1. **Brainstorm** é opcional — pular para Define se a SPEC já está clara
-2. **Define** exige Clarity Score ≥ 12/15 antes de avançar; captura a `jira_key` e cria o **state**
-3. **Após Define** — acionar `@custom-staff-engineer` para gerar o ADR antes do Design
-4. **Design** usa o ADR como fonte de verdade vinculante; deve ter File Manifest completo
-5. **Build** delega cada arquivo à skill Databricks indicada no manifest
-6. **Ship** arquiva todos os artefatos (incluindo o state) e fecha o ticket no Jira
+2. **Define** exige Clarity Score ≥ 12/15 antes de avançar; captura a `jira_key` (Epic) e cria o **state**
+3. **Após Define** — acionar `@custom-staff-engineer` para gerar o ADR
+4. **Após ADR** — acionar `@custom-po` para quebrar em Stories (Fibonacci) + Tasks no Jira
+5. **Design** usa o ADR como fonte de verdade vinculante; deve ter File Manifest completo
+6. **Build** delega cada arquivo à skill Databricks indicada no manifest
+7. **Ship** arquiva todos os artefatos (incluindo o state) e fecha o ticket no Jira
 
 ### Protocolo de Fim-de-Fase (obrigatório em toda fase)
 

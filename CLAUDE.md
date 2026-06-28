@@ -2,7 +2,7 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-> **Status:** As 5 fases do `@custom-sdd-workflow` (Brainstorm → Define → Design → Build → Ship) + `@custom-staff-engineer` (ADR) estão prontas para uso, com **documentação automática no Jira via `doc-agent`** ao final de cada fase. Ainda em desenvolvimento: `@custom-po`, `@custom-dev-workflow` e `@custom-code-reviewer`.
+> **Status:** As 5 fases do `@custom-sdd-workflow` (Brainstorm → Define → Design → Build → Ship) + `@custom-staff-engineer` (ADR) + `@custom-po` (Stories/Tasks no Jira) estão prontas para uso, com **documentação automática no Jira via `doc-agent`** ao final de cada fase. Ainda em desenvolvimento: `@custom-dev-workflow` e `@custom-code-reviewer`.
 
 ## Project
 
@@ -11,7 +11,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Repository Layout
 
 ```
-<skill-name>/            # 33 skills na raiz (Databricks + SDD workflow + Python + Spark)
+<skill-name>/            # 34 skills na raiz (Databricks + SDD workflow + Python + Spark)
 docs/                    # Documentação de referência sobre features do Genie Code
 assets/                  # Assets locais (PDFs, repos fonte) — gitignored
 .claude/                 # Claude Code CLI local — gitignored
@@ -45,7 +45,7 @@ Há dois prefixos que indicam a origem da skill:
 - **Sincronização:** [`.github/workflows/sync-databricks-skills.yml`](.github/workflows/sync-databricks-skills.yml) faz sparse checkout efêmero do upstream, copia as pastas para a raiz e abre um PR. O upstream **nunca** é commitado aqui (sem submodule/subtree). Roda semanalmente + `workflow_dispatch`.
 - **Versão fixada:** última tag semver do upstream, registrada em `databricks-skills.lock` (gerado pelo workflow).
 - **Origem das pastas upstream:** a maioria vem de `databricks-skills/`. Exceção: **`databricks-python-dev`** vem de `.claude/skills/python-dev` do upstream (mapeado para `databricks-python-dev` no sync).
-- **Skills NOSSAS, editáveis** (prefixo `custom-`, salvaguardadas em `OWN_SKILLS`): `custom-sdd-workflow`, `custom-staff-engineer`, `custom-dev-workflow`, `custom-code-reviewer`, `custom-test-generator`, `custom-po` (planejada). O workflow nunca as sobrescreve.
+- **Skills NOSSAS, editáveis** (prefixo `custom-`, salvaguardadas em `OWN_SKILLS`): `custom-sdd-workflow`, `custom-staff-engineer`, `custom-po`, `custom-dev-workflow`, `custom-code-reviewer`, `custom-test-generator`. O workflow nunca as sobrescreve.
 
 ### Skills de Workflow
 
@@ -53,9 +53,9 @@ Há dois prefixos que indicam a origem da skill:
 |-------|------|--------|-----------|
 | `custom-sdd-workflow` (Brainstorm + Define) | 1 | **PRONTO** | Brainstorm + Define via MCP Confluence → `docs/specs/DEFINE_*.md` (+ captura `jira_key` no state) |
 | `custom-staff-engineer` | 2 | **PRONTO** | Revisão de spec, decisão arquitetural → `docs/adr/ADR_*.md` |
-| `custom-sdd-workflow` (Design + Build + Ship) | 3 | **PRONTO** | Design + Build + Ship a partir do DEFINE/ADR aprovados |
+| `custom-po` | 3 | **PRONTO** | Epic → Stories (Fibonacci) → Tasks no Jira → `docs/planning/STORIES_*.md` |
+| `custom-sdd-workflow` (Design + Build + Ship) | 4 | **PRONTO** | Design + Build + Ship a partir do DEFINE/ADR aprovados |
 | `custom-sdd-workflow` → `doc-agent` | — | **PRONTO** | Hook de fim de fase: comentário + transição no Jira (MCP) |
-| `custom-po` | 4 | EM DESENVOLVIMENTO | Epic → Stories (Fibonacci) → Tasks no Jira |
 | `custom-dev-workflow` | 4 | EM DESENVOLVIMENTO | Branch → código → validação → PR → merge |
 | `custom-code-reviewer` | 4 | EM DESENVOLVIMENTO | Code review: segurança, qualidade, performance |
 

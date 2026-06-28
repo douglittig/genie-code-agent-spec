@@ -15,9 +15,10 @@ O framework de referência é o [AgentSpec v2.1](https://github.com/PedroHBCruz/
 ## O Fluxo SDD para Genie Code
 
 ```
-Confluence (SPEC) → DEFINE → ADR → DESIGN → BUILD → SHIP → PR → Review
-       ↑              └────── doc-agent documenta cada fase no Jira ──────┘
-  (via MCP)                       (comentário + transição via MCP)
+Confluence (SPEC) → DEFINE → ADR → @custom-po → DESIGN → BUILD → SHIP → PR → Review
+       ↑                       (Stories/Jira)                                 │
+       │              └────────── doc-agent documenta cada fase no Jira ──────┘
+  (via MCP)                          (comentário + transição via MCP)
 ```
 
 A cada fim de fase o **doc-agent** posta um comentário no ticket e transiciona o status. A chave do
@@ -232,8 +233,9 @@ posta o comentário + transiciona o ticket.
 `jira_add_comment`, `jira_transition_issue`. Sem `jira_key` no state → **modo pendente** (registra
 e avisa, não escreve no Jira).
 
-> **Limite de 20 slots:** Confluence (12) + Jira (14) não cabem juntos. Na fase Define, leia o
-> Confluence primeiro; depois troque para o MCP Jira e rode o doc-agent.
+> **Limite de 20 slots — ok para a demo:** habilitando o conjunto completo, Confluence + Jira
+> passariam de 20. Na demonstração usamos um subconjunto (doc-agent: 4 tools Jira; intake: ~1 do
+> Confluence), ~14 no total — então os dois MCPs podem ficar ativos juntos, sem troca.
 
 ---
 
@@ -293,9 +295,10 @@ Todos os artefatos ficam em `.claude/sdd/`:
 
 ```
 docs/                            # artefatos versionados no repo do projeto
-├── specs/   BRAINSTORM_*.md, DEFINE_*.md
-├── adr/     ADR_*.md
-└── designs/ DESIGN_*.md
+├── specs/    BRAINSTORM_*.md, DEFINE_*.md
+├── adr/      ADR_*.md
+├── planning/ STORIES_*.md   (@custom-po)
+└── designs/  DESIGN_*.md
 
 .claude/sdd/
 ├── state/                       # {FEATURE}.md — ledger de rastreabilidade (jira_key, fases, log Jira)

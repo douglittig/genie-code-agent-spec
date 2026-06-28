@@ -24,9 +24,21 @@
 | Brainstorm | {pendente \| concluída \| pulada} | `docs/specs/BRAINSTORM_{FEATURE}.md` | {n/a} | {YYYY-MM-DD} |
 | Define | {pendente \| concluída} | `docs/specs/DEFINE_{FEATURE}.md` | Clarity {X}/15 | {YYYY-MM-DD} |
 | ADR | {pendente \| concluída} | `docs/adr/ADR_{FEATURE}.md` | {decisões aprovadas} | {YYYY-MM-DD} |
+| Planejamento (PO) | {pendente \| concluída} | `docs/planning/STORIES_{FEATURE}.md` | {stories estimadas + criadas} | {YYYY-MM-DD} |
 | Design | {pendente \| concluída} | `docs/designs/DESIGN_{FEATURE}.md` | {File Manifest completo} | {YYYY-MM-DD} |
 | Build | {pendente \| concluída} | `.claude/sdd/reports/BUILD_REPORT_{FEATURE}.md` | {lint/testes ✅} | {YYYY-MM-DD} |
 | Ship | {pendente \| concluída} | `.claude/sdd/archive/{FEATURE}/SHIPPED_{DATE}.md` | {ticket fechado} | {YYYY-MM-DD} |
+
+---
+
+## Backlog Criado (custom-po)
+
+> Preenchido pelo `@custom-po` na Fase 3. Registra as Stories/Tasks criadas sob o Epic (`jira_key`).
+
+| Tipo | Jira | Resumo | Pontos | Parent |
+|------|------|--------|--------|--------|
+| Story | {STORY-KEY} | {título} | {Fibonacci} | {Epic} |
+| Task | {TASK-KEY} | {título} | — | {Story} |
 
 ---
 
