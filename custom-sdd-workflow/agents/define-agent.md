@@ -219,7 +219,10 @@ CHECKLIST PRÉ-VOO
 ├─ [ ] Skills Databricks relevantes identificadas para a fase de Design
 ├─ [ ] Contexto técnico coletado (localização, trigger, compute, impacto IaC)
 ├─ [ ] Fontes Confluence registradas (URL + página + seção) — se input foi Confluence
-└─ [ ] Clarity score >= 12/15
+├─ [ ] Clarity score >= 12/15
+├─ [ ] Chave do ticket Jira capturada (ou registrada como `pendente`)
+├─ [ ] State criado em `.claude/sdd/state/{FEATURE}.md`
+└─ [ ] doc-agent acionado (comentário + transição → Em andamento)
 ```
 
 **Decisão autônoma baseada no Clarity Score (após Confluence Intake):**
@@ -277,6 +280,34 @@ Clarity Score  < 9/15  → Bloquear, listar todas as lacunas, aguardar input do 
 
 ## Status: Pronto para Design
 ```
+
+---
+
+## Captura do Ticket Jira + Criação do State
+
+**Gatilho:** DEFINE gerado (Clarity Score ≥ 12/15).
+
+**Processo:**
+
+1. Perguntar ao usuário a **chave do ticket Jira** (ex: `PROJ-123`). Se não houver, registrar `pendente`.
+2. Criar o ledger `.claude/sdd/state/{FEATURE}.md` a partir de `templates/STATE_TEMPLATE.md`, preenchendo:
+   - `jira_key`, `confluence_url` (da Capacidade 0), `Fase Atual = Define`
+   - Status da fase Define = `concluída`, com o Clarity Score e o caminho do DEFINE
+3. O state passa a ser a fonte da verdade reutilizada por ADR, Design, Build e Ship.
+
+> A chave do Jira é capturada **uma vez** aqui e reaproveitada por todas as fases via state.
+
+---
+
+## Fim de Fase — doc-agent
+
+Após gerar o DEFINE e criar o state, **chamar o doc-agent** (`agents/doc-agent.md`):
+
+- Comentário no Jira: resumo do DEFINE + Clarity Score + URL do Confluence + caminho do artefato
+- Transição: **To Do → Em andamento**
+- O doc-agent mostra o **preview** antes de escrever; sem `jira_key`, entra em modo pendente
+
+Depois, sugerir a próxima fase: `@custom-staff-engineer` (ADR).
 
 ---
 

@@ -2,7 +2,7 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-> **Status:** Fases 1 e 2 prontas para uso (`@custom-sdd-workflow` Define + `@custom-staff-engineer`). Fases 3 e 4 em desenvolvimento — não usar `@custom-po`, `@custom-dev-workflow` nem as fases Design/Build/Ship do `@custom-sdd-workflow` em ambiente real ainda.
+> **Status:** As 5 fases do `@custom-sdd-workflow` (Brainstorm → Define → Design → Build → Ship) + `@custom-staff-engineer` (ADR) estão prontas para uso, com **documentação automática no Jira via `doc-agent`** ao final de cada fase. Ainda em desenvolvimento: `@custom-po`, `@custom-dev-workflow` e `@custom-code-reviewer`.
 
 ## Project
 
@@ -51,10 +51,11 @@ Há dois prefixos que indicam a origem da skill:
 
 | Skill | Fase | Status | Propósito |
 |-------|------|--------|-----------|
-| `custom-sdd-workflow` | 1 | **PRONTO** | Brainstorm + Define via MCP Confluence → `docs/specs/DEFINE_*.md` |
+| `custom-sdd-workflow` (Brainstorm + Define) | 1 | **PRONTO** | Brainstorm + Define via MCP Confluence → `docs/specs/DEFINE_*.md` (+ captura `jira_key` no state) |
 | `custom-staff-engineer` | 2 | **PRONTO** | Revisão de spec, decisão arquitetural → `docs/adr/ADR_*.md` |
-| `custom-po` | 3 | EM DESENVOLVIMENTO | Epic → Stories (Fibonacci) → Tasks no Jira |
-| `custom-sdd-workflow` (Design→Ship) | 4 | EM DESENVOLVIMENTO | Design + Build + Ship a partir do DEFINE aprovado |
+| `custom-sdd-workflow` (Design + Build + Ship) | 3 | **PRONTO** | Design + Build + Ship a partir do DEFINE/ADR aprovados |
+| `custom-sdd-workflow` → `doc-agent` | — | **PRONTO** | Hook de fim de fase: comentário + transição no Jira (MCP) |
+| `custom-po` | 4 | EM DESENVOLVIMENTO | Epic → Stories (Fibonacci) → Tasks no Jira |
 | `custom-dev-workflow` | 4 | EM DESENVOLVIMENTO | Branch → código → validação → PR → merge |
 | `custom-code-reviewer` | 4 | EM DESENVOLVIMENTO | Code review: segurança, qualidade, performance |
 
@@ -64,14 +65,16 @@ A skill `custom-sdd-workflow` tem subdivisões além do `SKILL.md`:
 
 ```
 custom-sdd-workflow/
-├── SKILL.md          # Entry point — orquestra as 5 fases
-├── agents/           # 6 agentes por fase (brainstorm, define, design, build, ship, iterate)
-└── templates/        # 5 templates de documentos SDD
+├── SKILL.md          # Entry point — orquestra as 5 fases + Protocolo de Fim-de-Fase
+├── agents/           # 7 agentes (brainstorm, define, design, build, ship, iterate, doc-agent)
+└── templates/        # 7 templates (BRAINSTORM, DEFINE, DESIGN, BUILD_REPORT, SHIPPED, STATE, JIRA_UPDATE)
 ```
 
 **Paradigma skills-first:** agentes desta skill usam as skills `@databricks-*` curadas pelo time Databricks ao invés de KB domains.
 
-**Artefatos SDD** (DEFINE, DESIGN, BUILD_REPORT, etc.) são criados no repositório do projeto em `docs/specs/`, `docs/designs/` e `.claude/sdd/`.
+**doc-agent + state:** o `doc-agent` é um hook transversal chamado ao final de **cada** fase — lê a `jira_key` do ledger `.claude/sdd/state/{FEATURE}.md` (criado no Define), monta um comentário a partir do `JIRA_UPDATE_TEMPLATE`, faz **preview** e então posta no Jira + transiciona o ticket (MCP: `jira_get_issue`, `jira_get_transitions`, `jira_add_comment`, `jira_transition_issue`). Sem `jira_key` → modo pendente (não escreve).
+
+**Artefatos SDD** (DEFINE, ADR, DESIGN, BUILD_REPORT, SHIPPED, state) são criados no repositório do projeto em `docs/specs/`, `docs/adr/`, `docs/designs/` e `.claude/sdd/`.
 
 ## docs/
 

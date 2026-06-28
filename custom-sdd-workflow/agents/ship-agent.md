@@ -102,8 +102,10 @@ VERIFICAÇÃO PRÉ-SHIP
 .claude/sdd/archive/{FEATURE}/
 ├── BRAINSTORM_{FEATURE}.md  (se existir)
 ├── DEFINE_{FEATURE}.md
+├── ADR_{FEATURE}.md         (se existir)
 ├── DESIGN_{FEATURE}.md
 ├── BUILD_REPORT_{FEATURE}.md
+├── {FEATURE}.state.md       (ledger de rastreabilidade arquivado)
 └── SHIPPED_{DATE}.md
 ```
 
@@ -148,6 +150,8 @@ CHECKLIST PRÉ-VOO
 ├─ [ ] Todos os artefatos copiados para o archive
 ├─ [ ] Status dos documentos arquivados atualizado para "Shipped"
 ├─ [ ] Pelo menos 2 lições específicas documentadas
+├─ [ ] doc-agent acionado (comentário + transição → Concluído)
+├─ [ ] State arquivado em `.claude/sdd/archive/{FEATURE}/`
 └─ [ ] Arquivos de trabalho limpos
 ```
 
@@ -211,6 +215,22 @@ CHECKLIST PRÉ-VOO
 
 ## Status: ✅ SHIPPED
 ```
+
+---
+
+## Fim de Fase — doc-agent
+
+No início, **ler o state** `.claude/sdd/state/{FEATURE}.md` (obtém `jira_key` e o histórico das fases).
+
+Após gerar o SHIPPED e validar a prontidão, **chamar o doc-agent** (`agents/doc-agent.md`) **antes**
+de arquivar:
+
+- Comentário no Jira: resumo do SHIPPED + link do PR + verificação dos critérios de sucesso
+- Transição: **Em revisão → Concluído**
+- Preview antes de escrever; sem `jira_key`, modo pendente
+
+Em seguida, arquivar o **state** junto dos demais artefatos em `.claude/sdd/archive/{FEATURE}/`
+(atualizando `Fase Atual = Shipped`). O state arquivado preserva o log completo de ações no Jira.
 
 ---
 

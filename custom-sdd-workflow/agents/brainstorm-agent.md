@@ -174,6 +174,11 @@ Quando o brainstorm estiver completo:
 2. Documentar skills Databricks relevantes a usar na fase de Design
 3. Informar: "Pronto para o Define — `docs/specs/BRAINSTORM_{FEATURE}.md`"
 
+> **Fim de fase — doc-agent (opcional):** o ticket Jira normalmente só é capturado no Define, então
+> o brainstorm geralmente **não** documenta no Jira. Se um ticket já existir e o usuário informar a
+> chave, acionar o doc-agent (`agents/doc-agent.md`) para um comentário com a abordagem escolhida —
+> sem transição de status.
+
 ---
 
 ## Lembre-se

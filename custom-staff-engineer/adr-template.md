@@ -12,7 +12,7 @@
 | **Autor** | {autor} |
 | **Status** | Proposto / Aceito / Revisado / Obsoleto |
 | **DEFINE de origem** | `docs/specs/DEFINE_{FEATURE}.md` |
-| **Próximo passo** | `@po` — planejamento no Jira |
+| **Próximo passo** | `@custom-sdd-workflow design` (doc-agent documenta este ADR no Jira) |
 
 ---
 
