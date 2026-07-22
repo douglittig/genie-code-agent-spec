@@ -76,6 +76,42 @@ custom-sdd-workflow/
 
 **Artefatos SDD** (DEFINE, ADR, DESIGN, BUILD_REPORT, SHIPPED, state) são criados no repositório do projeto em `docs/specs/`, `docs/adr/`, `docs/designs/` e `.claude/sdd/`.
 
+## Harness & Guardrails
+
+> **Agent = Model + Harness** — framing do paper *The New SDLC with Vibe Coding* (Google, Day 1, mai/2026; PDF em `assets/documentation/`). O modelo é o motor; o **harness** é tudo em volta que faz ele *terminar* a tarefa. Regra prática do paper: **a maioria das falhas de agente é falha de configuração, não do modelo** — ao errar, revisar o harness antes de culpar o modelo.
+
+Este repositório **é** um harness. Mapa dos 6 componentes:
+
+| Componente | Onde vive aqui | Status |
+|---|---|---|
+| **Instructions & Rule Files** | `CLAUDE.md`, `AGENTS.md`, os `SKILL.md` e `custom-sdd-workflow/agents/*.md` | ✅ |
+| **Tools** | MCP Confluence (`confluence_get_page`) + Jira (`jira_get_issue`, `jira_get_transitions`, `jira_add_comment`, `jira_transition_issue`, `jira_create_issue`) — limite de 20 ferramentas | ✅ |
+| **Sandbox / execução** | Genie Code Agent mode no workspace Databricks; compute definido no Contexto Técnico do DEFINE | ✅ |
+| **Orchestration** | 5 fases + Protocolo de Fim-de-Fase; handoffs Define→ADR→PO→Design→Build→Ship; delegação por File Manifest às `@databricks-*`; `doc-agent` como hook transversal | ✅ |
+| **Guardrails / Hooks** | Gates de fase (tabela abaixo) — hoje **prompt-level** (checklists nos agentes), **não** hooks determinísticos | ⚠️ parcial |
+| **Observability** | Ledger `.claude/sdd/state/{FEATURE}.md` (trajetória das fases + log de ações no Jira), `BUILD_REPORT_*`, `SHIPPED_*`, archive | ⚠️ sem custo/latência/evals |
+
+### Guardrails inegociáveis
+
+Regras que o agente **nunca** deve esquecer — valem em qualquer fase:
+
+| Guardrail | Onde é aplicado |
+|---|---|
+| Nunca commitar direto em `main` (Golden Rule) | Git Workflow |
+| Sem credenciais/segredos hardcoded | Gate do Build |
+| **Preview antes de qualquer escrita externa** (comentário, transição, criação de issue) | `doc-agent`, `custom-po` |
+| Operar somente na `jira_key` do state — nunca busca (`jira_search`) | `doc-agent`, `custom-po` |
+| Confluence: só `confluence_get_page` na URL dada — nunca `confluence_search` | `define-agent` |
+| Não editar skills `databricks-*` à mão (o sync sobrescreve) | Proveniência + `OWN_SKILLS` |
+| Clarity Score ≥ 12/15 antes de avançar do Define | Gate do Define |
+| ADR é vinculante — não reabrir decisões no Design/Build | `design-agent` |
+
+**Lacuna conhecida:** esses guardrails são *instruções*, não código determinístico. O paper é explícito que hooks existem justamente para "o que o agente nunca deveria esquecer mas sempre esquece". Fechar isso exige enforcement real (pre-commit, `PreToolUse`, branch protection) — ver [`BACKLOG.md`](BACKLOG.md) itens 4 e 7.
+
+### Loop de feedback do harness
+
+Quando um agente fizer algo que não deveria repetir, **virar regra**: adicionar o guardrail na tabela acima e no agente da fase correspondente, em vez de corrigir caso a caso. O harness é versionado e revisado como código.
+
 ## docs/
 
 Documentação de referência sobre features do Genie Code extraída de fontes Databricks:
