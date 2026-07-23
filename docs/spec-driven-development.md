@@ -15,13 +15,13 @@ O framework de referência é o [AgentSpec v2.1](https://github.com/PedroHBCruz/
 ## O Fluxo SDD para Genie Code
 
 ```
-Confluence (SPEC) → DEFINE → ADR → @custom-po → DESIGN → BUILD → SHIP → PR → Review
+Confluence (SPEC) → DEFINE → ADR → @sdd-po → DESIGN → BUILD → SHIP → PR → Review
        ↑                       (Stories/Jira)                                 │
-       │              └────────── doc-agent documenta cada fase no Jira ──────┘
+       │              └────────── sdd-doc documenta cada fase no Jira ──────┘
   (via MCP)                          (comentário + transição via MCP)
 ```
 
-A cada fim de fase o **doc-agent** posta um comentário no ticket e transiciona o status. A chave do
+A cada fim de fase o **sdd-doc** posta um comentário no ticket e transiciona o status. A chave do
 Jira é capturada no Define e guardada no ledger `.claude/sdd/state/{FEATURE}.md`.
 
 ### Visão geral das etapas
@@ -151,7 +151,7 @@ Executa a implementação seguindo o File Manifest. Para cada arquivo, invoca o 
 
 ### Fase 4: Ship
 
-Arquiva os artefatos e captura lições aprendidas. **Antes do archive**, o doc-agent comenta o
+Arquiva os artefatos e captura lições aprendidas. **Antes do archive**, o sdd-doc comenta o
 SHIPPED + link do PR no Jira e transiciona o ticket para "Concluído".
 
 **Entrada:** Todos os artefatos do feature
@@ -159,7 +159,7 @@ SHIPPED + link do PR no Jira e transiciona o ticket para "Concluído".
 **Saída:**
 - `archive/{FEATURE}/` com todos os documentos (incluindo o `{FEATURE}.state.md`)
 - `SHIPPED_{DATE}.md` com lições aprendidas
-- Ticket Jira atualizado pelo doc-agent (comentário + transição → Concluído)
+- Ticket Jira atualizado pelo sdd-doc (comentário + transição → Concluído)
 
 ---
 
@@ -210,9 +210,9 @@ Antes de avançar para o DESIGN, preciso dessas respostas.
 
 ---
 
-## Integração com Jira via MCP — doc-agent
+## Integração com Jira via MCP — sdd-doc
 
-A documentação no Jira **não é manual**: o `doc-agent` (`custom-sdd-workflow/agents/doc-agent.md`)
+A documentação no Jira **não é manual**: o `sdd-doc` (`sdd-doc/SKILL.md`)
 é um hook transversal acionado ao **final de cada fase**. Ele lê a `jira_key` do ledger de state,
 monta um comentário a partir de `JIRA_UPDATE_TEMPLATE.md`, mostra um **preview** ao usuário e então
 posta o comentário + transiciona o ticket.
@@ -223,6 +223,7 @@ posta o comentário + transiciona o ticket.
 |----------------|------------|--------------------------|
 | Define | DEFINE + Clarity Score + origem Confluence | To Do → Em andamento |
 | ADR | decisões-chave + link do ADR | mantém Em andamento |
+| Planejamento (PO) | Stories/Tasks criadas sob o Epic | mantém Em andamento |
 | Design | File Manifest + link do DESIGN | mantém Em andamento |
 | Build | BUILD_REPORT + verificação | Em andamento → Em revisão |
 | Ship | SHIPPED + link do PR | Em revisão → Concluído |
@@ -230,11 +231,11 @@ posta o comentário + transiciona o ticket.
 ### Ferramentas MCP usadas (4)
 
 `jira_get_issue`, `jira_get_transitions` (descobre a transição por intenção — nunca hardcoda ID),
-`jira_add_comment`, `jira_transition_issue`. Sem `jira_key` no state → **modo pendente** (registra
-e avisa, não escreve no Jira).
+`jira_add_comment`, `jira_transition_issue`. Sem `jira_key` no state — ou com o MCP Jira
+indisponível/falhando — → **modo pendente** (registra e avisa, não escreve no Jira).
 
 > **Limite de 20 slots — ok para a demo:** habilitando o conjunto completo, Confluence + Jira
-> passariam de 20. Na demonstração usamos um subconjunto (doc-agent: 4 tools Jira; intake: ~1 do
+> passariam de 20. Na demonstração usamos um subconjunto (sdd-doc: 4 tools Jira; intake: ~1 do
 > Confluence), ~14 no total — então os dois MCPs podem ficar ativos juntos, sem troca.
 
 ---
@@ -297,7 +298,7 @@ Todos os artefatos ficam em `.claude/sdd/`:
 docs/                            # artefatos versionados no repo do projeto
 ├── specs/    BRAINSTORM_*.md, DEFINE_*.md
 ├── adr/      ADR_*.md
-├── planning/ STORIES_*.md   (@custom-po)
+├── planning/ STORIES_*.md   (@sdd-po)
 └── designs/  DESIGN_*.md
 
 .claude/sdd/
@@ -317,17 +318,17 @@ docs/                            # artefatos versionados no repo do projeto
 
 ## Templates
 
-Os templates estão em `custom-sdd-workflow/templates/`:
+Cada template vive dentro da skill da fase que o usa (skills autocontidas):
 
-| Template | Fase | Uso |
-|----------|------|-----|
-| `BRAINSTORM_TEMPLATE.md` | 0 | Exploração inicial |
-| `DEFINE_TEMPLATE.md` | 1 | Captura de requisitos |
-| `DESIGN_TEMPLATE.md` | 2 | Design técnico + file manifest |
-| `BUILD_REPORT_TEMPLATE.md` | 3 | Relatório de construção |
-| `SHIPPED_TEMPLATE.md` | 4 | Archive + lições aprendidas |
-| `STATE_TEMPLATE.md` | todas | Ledger de rastreabilidade (jira_key, fases, log Jira) |
-| `JIRA_UPDATE_TEMPLATE.md` | todas | Comentário de fim de fase postado pelo doc-agent |
+| Template | Skill | Uso |
+|----------|-------|-----|
+| `sdd-brainstorm/BRAINSTORM_TEMPLATE.md` | `@sdd-brainstorm` | Exploração inicial |
+| `sdd-define/DEFINE_TEMPLATE.md` | `@sdd-define` | Captura de requisitos |
+| `sdd-define/STATE_TEMPLATE.md` | `@sdd-define` (criado aqui, usado por todas) | Ledger de rastreabilidade (jira_key, fases, log Jira) |
+| `sdd-design/DESIGN_TEMPLATE.md` | `@sdd-design` | Design técnico + file manifest |
+| `sdd-build/BUILD_REPORT_TEMPLATE.md` | `@sdd-build` | Relatório de construção |
+| `sdd-ship/SHIPPED_TEMPLATE.md` | `@sdd-ship` | Archive + lições aprendidas |
+| `sdd-doc/JIRA_UPDATE_TEMPLATE.md` | `@sdd-doc` | Comentário de fim de fase postado no Jira |
 
 ---
 
@@ -346,7 +347,7 @@ Para o contexto Databricks, os agentes mais relevantes para atribuição no DESI
 | `@lakehouse-architect` | Delta Lake, Iceberg, catalogs |
 | `@python-developer` | Scripts Python, utilitários, SDK calls |
 | `@custom-test-generator` | pytest, fixtures, suites de teste |
-| `@custom-code-reviewer` | Review arquitetural, boas práticas |
+| `@sdd-code-reviewer` | Review arquitetural, boas práticas |
 
 ---
 
@@ -430,7 +431,7 @@ Agente executa em paralelo os especialistas. BUILD_REPORT gerado com atribuiçã
 
 O Genie Code no **Agent Mode** executa cada fase como uma sequência de tarefas:
 
-1. **Skills** auto-carregadas: `custom-sdd-workflow` guia o agente pelo pipeline correto
+1. **Skills** auto-carregadas: `sdd-workflow` guia o agente pelo pipeline correto
 2. **Agentes sub-especializados**: invocados via `Task()` para cada arquivo do manifest
 3. **MCP Tools**: Confluence e Jira acessados nativamente no fluxo
 4. **Commands** (`/define`, `/design`, `/build`, `/ship`): slash commands configurados em `.claude/commands/`
@@ -449,8 +450,8 @@ O Genie Code no **Agent Mode** executa cada fase como uma sequência de tarefas:
 
 | Recurso | Local |
 |---------|-------|
-| Templates SDD | `custom-sdd-workflow/templates/` |
-| Skill SDD Workflow | `custom-sdd-workflow/` |
+| Templates SDD | dentro de cada skill `sdd-*` (ex.: `sdd-define/DEFINE_TEMPLATE.md`) |
+| Skills SDD | `sdd-workflow/` (orquestrador) + `sdd-brainstorm/`, `sdd-define/`, `sdd-design/`, `sdd-build/`, `sdd-ship/`, `sdd-iterate/`, `sdd-doc/` |
 | AgentSpec (fonte) | `assets/repos/agentspec-main/` |
 | Agents disponíveis | `assets/repos/agentspec-main/.claude/agents/` |
 | Databricks Skills | raiz do repositório |

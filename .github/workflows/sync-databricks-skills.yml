@@ -40,8 +40,8 @@ env:
   # Skill upstream que vive FORA de databricks-skills/ — mapeada à parte.
   # formato: "<path no upstream>:<pasta destino na raiz>"
   EXTRA_SKILLS: ".claude/skills/python-dev:databricks-python-dev"
-  # Skills NOSSAS (prefixo custom-) — nunca devem ser sobrescritas pelo sync.
-  OWN_SKILLS: "custom-sdd-workflow custom-staff-engineer custom-dev-workflow custom-code-reviewer custom-test-generator custom-po"
+  # Skills NOSSAS (prefixos sdd- e custom-) — nunca devem ser sobrescritas pelo sync.
+  OWN_SKILLS: "sdd-workflow sdd-brainstorm sdd-define sdd-design sdd-build sdd-ship sdd-iterate sdd-doc sdd-staff-engineer sdd-po sdd-dev-workflow sdd-code-reviewer custom-test-generator"
 
 jobs:
   sync:
