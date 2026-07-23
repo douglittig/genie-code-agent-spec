@@ -2,7 +2,7 @@
 
 > **Como usar:** Copie este template para o Confluence ao criar a spec de um novo pipeline.
 > Preencha **todos os campos obrigatórios** (marcados com `*`). Campos opcionais melhoram a qualidade do código gerado.
-> O `define-agent` lerá esta página via MCP (`confluence_get_page`) — estrutura previsível = extração determinística.
+> O `sdd-define` lerá esta página via MCP (`confluence_get_page`) — estrutura previsível = extração determinística.
 
 ---
 
@@ -180,7 +180,7 @@ Opções:
 
 ## Subpáginas desta spec (se houver)
 
-> O `define-agent` lerá subpáginas automaticamente via `confluence_get_page` na hierarquia desta página.
+> O `sdd-define` lerá subpáginas automaticamente via `confluence_get_page` na hierarquia desta página.
 
 - `Detalhamento de Schema — S1 (ERP SAP)`
 - `Regras de Negócio — Silver`
