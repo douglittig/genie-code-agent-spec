@@ -14,7 +14,7 @@ This file provides guidance to Genie Code when working with code in this reposit
 <skill-name>/            # 41 skills na raiz (Databricks + SDD workflow + Python + Spark)
 docs/                    # Documentação de referência sobre features do Genie Code
 assets/                  # documentation/ versionada (PDFs de referência); repos/ gitignored
-.claude/                 # Claude Code CLI local — gitignored
+.claude/                 # Claude Code CLI local — gitignored, exceto .claude/skills/ (run-genie-code-agent-spec: validador do repo)
 ```
 
 > **Como usar no Genie Code:** carregue este repo como Git Folder em `Workspace/.assistant/skills/`. As skills ficam disponíveis automaticamente em Agent mode.
