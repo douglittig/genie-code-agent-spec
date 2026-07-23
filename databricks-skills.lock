@@ -1,0 +1,7 @@
+# Gerado automaticamente por .github/workflows/sync-databricks-skills.yml
+# Não editar à mão.
+upstream_repo: databricks-solutions/ai-dev-kit
+upstream_path: databricks-skills
+version: v0.1.14
+commit: d2806ce2e3ab72eb7748268855af4e4779702271
+synced_at: 2026-07-23T00:24:28Z
