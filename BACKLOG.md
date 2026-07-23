@@ -50,6 +50,23 @@ Usar como base para próximas sessões de trabalho.
 
 ---
 
+### 7. Guardrails Determinísticos, Evals e Model Routing (fechar o harness)
+**Contexto:** A seção "Harness & Guardrails" do `CLAUDE.md`/`AGENTS.md` mapeia os 6 componentes do harness (paper *The New SDLC with Vibe Coding*, Google, Day 1). Três lacunas ficaram explícitas:
+
+1. **Guardrails são prompt-level, não determinísticos.** Os gates (sem credencial hardcoded, preview antes de escrever no Jira, nunca commitar na `main`) são checklists nos agentes — o agente pode esquecer. O paper posiciona hooks como "o lugar das coisas que o agente nunca deveria esquecer mas sempre esquece".
+2. **Faltam evals.** O Build valida só o determinístico (lint/testes). Falta avaliação por rubrica/LM-judge do **output** e da **trajetória** (o agente seguiu os passos certos?). Máxima do paper: *"set the bar at the eval, not the demo"*.
+3. **Sem model routing.** O paper recomenda modelo frontier para Requisitos/Arquitetura/Implementação e modelos menores e baratos para tarefas determinísticas (geração de testes, code review, monitoramento) — alavanca direta de OpEx.
+
+**O que falta:**
+- Hooks determinísticos: pre-commit (segredos + bloqueio de push na `main`) e, no Claude Code, `PreToolUse` em `settings.json`. Complementa o item 4 (branch protection no provider).
+- Eval-gate por rubrica no Build — possivelmente evolução do `custom-test-generator` ou uma skill `custom-evals`. O ledger `.claude/sdd/state/` já registra a trajetória e pode servir de insumo.
+- Anotar tier de modelo sugerido por fase/agente.
+
+**Referência:** `assets/documentation/Day_1_v3.pdf` (pp. 26–30 harness, 14–15 evals, 42 model routing).
+**Origem:** Leitura do paper Day 1 durante a evolução do `custom-sdd-workflow`.
+
+---
+
 ## Concluídos
 
 | Item | Sessão |
