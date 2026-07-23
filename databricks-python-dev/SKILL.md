@@ -1,5 +1,5 @@
 ---
-name: databricks-python-dev
+name: python-dev
 description: "Python development guidance with code quality standards, error handling, testing practices, and environment management. Use when writing, reviewing, or modifying Python code (.py files) or Jupyter notebooks (.ipynb files)."
 ---
 
