@@ -4,6 +4,11 @@ assets/repos/
 # Claude Code CLI — local development only, not for Genie Code
 .claude/
 
+# macOS — metadados do Finder, gerados em qualquer pasta visitada
+.DS_Store
+.AppleDouble
+.LSOverride
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]

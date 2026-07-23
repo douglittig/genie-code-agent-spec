@@ -13,7 +13,7 @@ This file provides guidance to Genie Code when working with code in this reposit
 ```
 <skill-name>/            # 34 skills na raiz (Databricks + SDD workflow + Python + Spark)
 docs/                    # Documentação de referência sobre features do Genie Code
-assets/                  # Assets locais (PDFs, repos fonte) — gitignored
+assets/                  # documentation/ versionada (PDFs de referência); repos/ gitignored
 .claude/                 # Claude Code CLI local — gitignored
 ```
 
