@@ -11,6 +11,14 @@ name: Sync Databricks Skills
 #      próprias (OWN_SKILLS) nem os arquivos meta do upstream.
 #   4. Grava a proveniência em `databricks-skills.lock`.
 #   5. Abre um PR (nunca commita direto em main — Golden Rule do repo).
+#
+# PRÉ-REQUISITO (setting do repositório, não do YAML):
+#   Settings → Actions → General → Workflow permissions →
+#   marcar "Allow GitHub Actions to create and approve pull requests".
+#   Sem isso o passo 5 falha com "GitHub Actions is not permitted to create or
+#   approve pull requests" — o branch é empurrado, mas nenhum PR é aberto. O
+#   bloco `permissions:` abaixo NÃO substitui esse setting.
+#   Verificar: gh api repos/<owner>/<repo>/actions/permissions/workflow
 
 on:
   schedule:
@@ -40,7 +48,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout deste repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Resolver tag do upstream
         id: upstream
@@ -119,7 +127,7 @@ jobs:
         run: rm -rf .upstream
 
       - name: Abrir Pull Request
-        uses: peter-evans/create-pull-request@v6
+        uses: peter-evans/create-pull-request@v7
         with:
           branch: chore/sync-databricks-skills
           delete-branch: true
