@@ -456,7 +456,7 @@ Arquivos envolvidos:
 docs/                               # Documentação de referência extraída de fontes Databricks
 .github/workflows/                  # CI — inclui o sync das skills Databricks (upstream)
 databricks-skills.lock              # Proveniência do último sync (versão + commit upstream)
-assets/                             # Assets locais (PDFs, repos) — gitignored
+assets/                             # documentation/ versionada (PDFs); repos/ gitignored
 .claude/                            # Claude Code CLI local — gitignored
 ```
 
