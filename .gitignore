@@ -2,7 +2,9 @@
 assets/repos/
 
 # Claude Code CLI — local development only, not for Genie Code
-.claude/
+# (exceto .claude/skills/ — skills locais versionadas, ex. run-genie-code-agent-spec)
+.claude/*
+!.claude/skills/
 
 # macOS — metadados do Finder, gerados em qualquer pasta visitada
 .DS_Store
