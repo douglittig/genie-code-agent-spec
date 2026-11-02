@@ -75,3 +75,4 @@ Usar como base para próximas sessões de trabalho.
 | `AGENTS.md` criado como espelho do `CLAUDE.md` | 2026-04-28 |
 | `assets/documentation/` removida do `.gitignore` | 2026-04-28 |
 | Guia `docs/bitbucket-mcp-guide.md` criado (Atlassian Rovo MCP + Genie Code) | 2026-04-28 |
+| Sync migrado para `databricks/databricks-agent-skills` (ai-dev-kit parou de distribuir skills na v0.2.0; sync falhava desde 31/08), poda de skills removidas, licença Databricks repassada | 2026-11-02 |

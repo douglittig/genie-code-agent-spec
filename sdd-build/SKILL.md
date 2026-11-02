@@ -168,13 +168,13 @@ python -c "from pyspark.sql import SparkSession; exec(open('{arquivo}').read())"
 
 | Tipo de Arquivo | Skill Databricks |
 |-----------------|-----------------|
-| `pipelines/**/*.py` (SDP/DLT) | `@databricks-spark-declarative-pipelines` |
+| `pipelines/**/*.py` (SDP/DLT) | `@databricks-pipelines` |
 | `streaming/**/*.py` (Structured Streaming) | `@databricks-spark-structured-streaming` |
-| `jobs/**/*.py` (PySpark batch) | `@databricks-spark-declarative-pipelines` |
+| `jobs/**/*.py` (PySpark batch) | `@databricks-pipelines` |
 | `schemas/**/*.sql` / Unity Catalog | `@databricks-unity-catalog` |
 | `serving/**/*.py` (model endpoints) | `@databricks-model-serving` |
 | `queries/**/*.sql` (DBSQL) | `@databricks-dbsql` |
-| `bundles/**/*.yaml` (DABs) | `@databricks-bundles` |
+| `bundles/**/*.yaml` (DABs) | `@databricks-dabs` |
 | `*.py` (Python geral) | `@databricks-python-dev` |
 
 ---

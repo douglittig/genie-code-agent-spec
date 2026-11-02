@@ -128,9 +128,9 @@
 
 | Skill | Uso |
 |-------|-----|
-| `@databricks-spark-declarative-pipelines` | {pipeline principal} |
+| `@databricks-pipelines` | {pipeline principal} |
 | `@databricks-unity-catalog` | {governança e permissões} |
-| `@databricks-bundles` | {deploy multi-ambiente} |
+| `@databricks-dabs` | {deploy multi-ambiente} |
 
 ## Skills Databricks Descartadas
 

@@ -48,7 +48,7 @@
 
 | # | Task | Jira | Skill `@databricks-*` sugerida |
 |---|------|------|-------------------------------|
-| 1 | {passo técnico} | {TASK-KEY} | {ex: @databricks-spark-declarative-pipelines} |
+| 1 | {passo técnico} | {TASK-KEY} | {ex: @databricks-pipelines} |
 | 2 | {passo técnico} | {TASK-KEY} | {ex: @databricks-unity-catalog} |
 
 ---

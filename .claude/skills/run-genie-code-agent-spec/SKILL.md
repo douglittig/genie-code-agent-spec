@@ -10,7 +10,7 @@ description: >
 
 # Run: genie-code-agent-spec
 
-Este repo é conteúdo (41 skills em Markdown na raiz), não uma aplicação. "Rodar"
+Este repo é conteúdo (51 skills em Markdown na raiz), não uma aplicação. "Rodar"
 o projeto = fazer o que o Genie Code/Claude Code faz ao carregar as skills:
 parsear o frontmatter de cada `SKILL.md`. O driver
 [.claude/skills/run-genie-code-agent-spec/driver.py](driver.py) simula isso e
@@ -44,7 +44,7 @@ e campos do `databricks-skills.lock`.
 Saída esperada num repo saudável:
 
 ```
-41 skills parseadas em <raiz>
+51 skills parseadas em <raiz>
 OK: 0 erros, 0 warning(s)
 ```
 
@@ -65,9 +65,10 @@ localização (`parents[3]`), então ele valida a árvore onde estiver copiado.
 
 ## Gotchas
 
-- **`databricks-python-dev` tem `name: python-dev`** — não é bug: o upstream
-  mapeia `.claude/skills/python-dev` → `databricks-python-dev` no sync. É a
-  única exceção name≠pasta e está hardcoded em `NAME_EXCEPTIONS` no driver.
+- **`databricks-python-dev` tem `name: python-dev`** — não é bug: é a cópia
+  congelada do antigo ai-dev-kit (v0.1.14), que mapeava `.claude/skills/python-dev`
+  → `databricks-python-dev`. É a única exceção name≠pasta e está hardcoded em
+  `NAME_EXCEPTIONS` no driver.
 - **Frontmatter não é YAML uniforme:** skills `databricks-*` usam string
   quotada; `sdd-*`/`custom-*` usam block scalar `|` multilinha. O parser do
   driver cobre os dois — não troque por `yaml.safe_load` sem lembrar que não

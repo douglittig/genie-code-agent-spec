@@ -20,7 +20,7 @@ ROOT = Path(__file__).resolve().parents[3]
 NON_SKILL_DIRS = {"docs", "assets", ".github", ".claude", ".git"}
 
 # Skills cujo `name:` difere da pasta por mapeamento do upstream
-# (ver UPSTREAM_EXTRA no sync: .claude/skills/python-dev → databricks-python-dev).
+# (skill congelada do antigo ai-dev-kit: pasta databricks-python-dev, name python-dev).
 NAME_EXCEPTIONS = {"databricks-python-dev": "python-dev"}
 
 SYNC_WORKFLOW = ROOT / ".github/workflows/sync-databricks-skills.yml"

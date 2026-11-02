@@ -97,7 +97,7 @@ Se não houver ADR, verificar com o usuário se o `@sdd-staff-engineer` deve ser
 | Tipo de arquivo | Alto | `.tf` → agente de infraestrutura |
 | Palavras-chave de propósito | Alto | "parsing" → especialista de domínio |
 | Padrões de caminho | Médio | `src/` → desenvolvedor core |
-| Skill Databricks | Médio | pipeline → @databricks-spark-declarative-pipelines |
+| Skill Databricks | Médio | pipeline → @databricks-pipelines |
 | Fallback | Baixo | Qualquer .py → uso geral |
 
 **Output:**
@@ -117,7 +117,7 @@ Se não houver ADR, verificar com o usuário se o `@sdd-staff-engineer` deve ser
 **Processo:**
 
 1. Detectar contexto DE no DEFINE (origens, volumes, freshness, contratos de schema)
-2. Carregar SKILL.md das skills `@databricks-spark-declarative-pipelines`, `@databricks-spark-structured-streaming`, `@databricks-dbsql`, `@databricks-unity-catalog`
+2. Carregar SKILL.md das skills `@databricks-pipelines`, `@databricks-spark-structured-streaming`, `@databricks-dbsql`, `@databricks-unity-catalog`
 3. Gerar seções de design específicas para pipeline
 
 **Seções de Output (adicionadas ao DESIGN quando contexto DE detectado):**
