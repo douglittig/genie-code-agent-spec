@@ -514,10 +514,32 @@ docs/                               # Documentação de referência extraída de
 .github/workflows/ e scripts/       # CI — sync das skills Databricks (upstream)
 LICENSE-/NOTICE-databricks-agent-skills  # licença das skills upstream
 databricks-skills.lock              # Proveniência do último sync (versão + commit upstream)
-assets/                             # documentation/ versionada (PDFs); repos/ gitignored
+THIRD_PARTY_NOTICES.md              # créditos e licenças de terceiros (AgentSpec, Databricks)
+assets/                             # cópias locais de referência — gitignored
 .claude/                            # Claude Code CLI local — gitignored
 ```
 
 ## Git Workflow
 
 Nunca commitar direto em `main`. Sempre criar branch → PR → aguardar merge.
+
+---
+
+## Créditos
+
+O workflow SDD deste repositório começou como uma adaptação do **[AgentSpec](https://github.com/luanmorenommaciel/agentspec), de [Luan Moreno](https://github.com/luanmorenommaciel)** (v2.1, abril/2026, licença MIT), um framework de Spec-Driven Development para Claude Code.
+
+| Veio do AgentSpec | Construído aqui |
+|---|---|
+| As fases Brainstorm → Define → Design → Build → Ship e o Iterate | Adaptação para o Genie Code: skills autocontidas em `Workspace/.assistant/skills/`, Agent mode e `@skill` |
+| Clarity Score, File Manifest e os templates de artefato (BRAINSTORM, DEFINE, DESIGN, BUILD_REPORT, SHIPPED) | Define a partir do Confluence e documentação no Jira por fase via MCP (`sdd-doc`), dentro do limite de 20 ferramentas |
+| Code reviewer e gerador de testes | `sdd-staff-engineer` (ADR vinculante), `sdd-po` (Epic → Stories → Tasks), `sdd-dev-workflow` e o ledger de estado por feature |
+| | Delegação do Build às skills oficiais `@databricks-*`, com sync automático do upstream |
+
+Os arquivos derivados e o aviso de licença estão em [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md).
+
+## Referências
+
+- [Introducing Genie Code](https://www.databricks.com/blog/introducing-genie-code) — blog da Databricks
+- Documentação do Genie Code: [skills](https://docs.databricks.com/aws/en/genie-code/skills), [custom instructions](https://docs.databricks.com/aws/en/genie-code/instructions), [MCP](https://docs.databricks.com/aws/en/genie-code/mcp), [dicas](https://docs.databricks.com/aws/en/genie-code/tips) e [desenvolvimento de pipelines](https://docs.databricks.com/aws/en/ldp/de-agent)
+- [The New SDLC With Vibe Coding](https://www.kaggle.com/whitepaper-the-new-SDLC-with-vibe-coding) — Addy Osmani, Shubham Saboo e Sokratis Kartakis (Google, mai/2026), base da seção Harness & Guardrails
