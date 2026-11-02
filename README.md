@@ -16,7 +16,7 @@ Repositório de skills, custom instructions e integrações MCP para Databricks 
 | Acesso de admin | Permissão para criar Git Folders em `Workspace/` |
 | Git provider configurado | GitHub, GitLab ou Bitbucket conectado ao workspace |
 | MCP por fase | Confluence (Define), Jira (sdd-doc ao fim de cada fase + Ship), Bitbucket (Fase 4) |
-| Compute para os gates | Serverless (environment 5 ou mais) ou cluster com DBR 17.0 ou mais, com acesso à internet para instalar o pacote `sdd-gates` do GitHub |
+| Compute para os gates | Serverless (environment 5 ou mais) ou cluster com DBR 17.0 ou mais |
 | Git Folder do projeto | Criado com a opção **Use Git CLI** ligada. Os gates leem o git do projeto, e a opção não pode ser ligada depois numa pasta que já existe |
 
 ---
@@ -76,18 +76,21 @@ O agente listará as skills carregadas do `Workspace/.assistant/skills/`.
 
 ---
 
-### Passo 2b — Instalar os gates
+### Passo 2b — Montar os gates (segundo Git Folder)
 
-Os gates são scripts que decidem, por código, se uma etapa pode avançar (ex.: o Define só sai com a spec válida e aprovada). Eles ficam no pacote [`gates/`](gates/), **fora das skills**: o Genie Code não executa scripts que moram dentro de `.assistant/skills`.
+Os gates são scripts que decidem, por código, se uma etapa pode avançar (ex.: o Define só sai com a spec válida e aprovada). O código fica no pacote [`gates/`](gates/), e o Genie Code bloqueia os dois caminhos óbvios para rodá-lo: executar script dentro de `.assistant/skills` e fazer `pip install` direto do GitHub. Por isso o **mesmo repo é montado uma segunda vez, fora de `.assistant`**, e o agente roda os gates de lá, sem instalar nada.
 
-O próprio agente instala o pacote quando precisa, no compute do projeto. Para conferir na mão, numa célula ou no terminal web:
+1. Crie um Git Folder deste repo em `/Users/<você>/` (só para você) ou em `/Workspace/Shared/` (para o workspace).
+2. Renomeie para **`sdd-gates`**. Este folder só guarda código: não precisa de "Use Git CLI".
+3. Teste, numa célula `%sh` ou no terminal web:
 
 ```bash
-python3 -m pip install "git+https://github.com/douglittig/genie-code-agent-spec@main#subdirectory=gates"
-python3 -m sdd_gates selftest
+cd /tmp && PYTHONPATH=/Workspace/Users/<você>/sdd-gates/gates python3 -m sdd_gates selftest
 ```
 
-`selftest: OK` quer dizer que os gates reprovam o que devem reprovar. No serverless, o pacote vale para a sessão do compute: numa sessão nova, o agente instala de novo.
+`selftest: OK` quer dizer que os gates reprovam o que devem reprovar. As skills procuram o folder nesses dois lugares; se estiver em outro, o agente pergunta e grava o caminho no state da feature.
+
+> **Fora do Genie Code** (Claude Code, CI, máquina local), instale como pacote: `pip install "git+https://github.com/douglittig/genie-code-agent-spec@main#subdirectory=gates"`. Empresas que distribuem bibliotecas por Volume do Unity Catalog ou PyPI interno podem gerar um wheel com `python -m build gates`.
 
 ---
 
@@ -118,7 +121,7 @@ O agente irá:
 1. Ler a página do Confluence via MCP
 2. Perguntar o que for decisão sua (escopo, comportamento do dado, desvio da página), com recomendação
 3. Escrever os critérios de aceite em EARS (`QUANDO … ENTÃO o pipeline DEVE …`) e passar pela rubrica de requisitos implícitos de dados
-4. Gerar `docs/specs/DEFINE_{FEATURE}.md` no repositório do projeto e rodar o gate `python3 -m sdd_gates define`
+4. Gerar `docs/specs/DEFINE_{FEATURE}.md` no repositório do projeto e rodar o gate `sdd_gates define`
 5. Parar e esperar a sua aprovação, gravada com as suas palavras
 
 Com a spec aprovada, o agente sugere o próximo passo (conforme o tamanho da feature):
@@ -136,7 +139,7 @@ Para puxar atualizações deste repositório:
 1. No workspace, navegue até `Workspace/.assistant/skills/` (o Git Folder renomeado no Passo 1)
 2. Clique em **Pull** (ícone de atualização do Git Folder)
 3. As skills são recarregadas automaticamente na próxima sessão do Genie Code
-4. Reinstale os gates com `python3 -m pip install --force-reinstall --no-deps "git+https://github.com/douglittig/genie-code-agent-spec@main#subdirectory=gates"`
+4. Faça **Pull** também no Git Folder `sdd-gates`. Os dois folders precisam estar na mesma versão: se o `sdd-gates` ficar atrás, o agente avisa e pede o pull antes de rodar um gate
 
 ---
 
@@ -526,7 +529,7 @@ Arquivos envolvidos:
 ```
 <skill-name>/                       # 50 skills na raiz (Databricks oficiais + SDD workflow + Python + Spark)
 docs/                               # Documentação de referência extraída de fontes Databricks
-gates/                              # pacote sdd-gates: gates do SDD (instalado no compute via pip)
+gates/                              # pacote sdd-gates: gates do SDD (no Databricks, rodado de um 2º Git Folder)
 .github/workflows/ e scripts/       # CI — sync das skills Databricks (upstream)
 LICENSE-/NOTICE-databricks-agent-skills  # licença das skills upstream
 databricks-skills.lock              # Proveniência do último sync (versão + commit upstream)

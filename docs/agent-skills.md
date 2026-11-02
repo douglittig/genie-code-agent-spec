@@ -68,7 +68,7 @@ Workspace/.assistant/skills/
 
 Ao referenciar outros arquivos, use **caminhos relativos a partir da raiz da skill**.
 
-> **Observado neste repo (02/11/2026):** em Agent mode, o Genie Code **se recusou a executar** um script guardado dentro de `.assistant/skills`, com o motivo de que rodar código ali poderia alterar a configuração do assistente. O mesmo script, numa pasta comum do workspace, rodou normalmente. Por isso os gates do SDD não ficam em `scripts/` dentro das skills: ficam no pacote [`gates/`](../gates/), instalado no compute com `pip`. Ler um arquivo de `scripts/` como referência continua funcionando.
+> **Observado neste repo (02/11/2026):** em Agent mode, o Genie Code **se recusou a executar** um script guardado dentro de `.assistant/skills`, com o motivo de que rodar código ali poderia alterar a configuração do assistente. O mesmo script, numa pasta comum do workspace, rodou normalmente. Ele também bloqueou `pip install` direto do GitHub, por ser código remoto que ele não pode inspecionar. Por isso os gates do SDD não ficam em `scripts/` dentro das skills: ficam no pacote [`gates/`](../gates/), num segundo Git Folder fora de `.assistant`, e rodam com `PYTHONPATH` apontando para lá. Ler um arquivo de `scripts/` como referência continua funcionando.
 
 ---
 

@@ -10,7 +10,7 @@
 # MAGIC | 2 | Dá para saber o commit atual e se há mudança não commitada? | A prova vale para um commit específico |
 # MAGIC | 3 | O compute grava arquivo dentro do Git Folder? | Os gates gravam `proofs.md` e `verification.md` em `.sdd/` |
 # MAGIC | 4 | pytest e `assertDataFrameEqual` rodam aqui? | São a forma padrão de prova |
-# MAGIC | 5 | O pacote `sdd-gates` instala do GitHub e passa no selftest? | Os gates rodam pelo pacote, porque o Genie Code não executa scripts dentro de `.assistant/skills` |
+# MAGIC | 5 | Os gates rodam do Git Folder `sdd-gates` e passam no selftest? | O Genie Code não executa scripts dentro de `.assistant/skills` nem faz `pip install` do GitHub; os gates rodam de um segundo Git Folder |
 # MAGIC
 # MAGIC **Como rodar:** abra este notebook a partir do Git Folder do repo (`Workspace/.assistant/skills/tools/`) e rode tudo (*Run all*). Rode uma vez em **serverless** e uma vez num **cluster clássico**. A última célula imprime um JSON: cole o resultado das duas rodadas na conversa.
 # MAGIC
@@ -155,19 +155,27 @@ resultado["4_pytest"]
 
 # COMMAND ----------
 
-# MAGIC %md ## 5. Instalar e rodar o pacote `sdd-gates`
+# MAGIC %md ## 5. Rodar os gates do Git Folder `sdd-gates`
 # MAGIC
-# MAGIC Instala do GitHub, no mesmo Python do notebook, e roda o selftest (os gates contra artefatos com defeitos plantados). Troque `REF` para testar uma branch antes do merge.
+# MAGIC Pré-requisito: o mesmo repo montado uma segunda vez, fora de `.assistant`, com o nome `sdd-gates` (README, Passo 2b). Roda o selftest com `PYTHONPATH`, sem instalar nada. Se o folder estiver em outro lugar, troque `GATES`.
 
 # COMMAND ----------
 
-REF = "main"
-pacote = f"git+https://github.com/douglittig/genie-code-agent-spec@{REF}#subdirectory=gates"
+usuario = nb_path.split("/")[2]  # /Users/<usuário>/...
+GATES = f"/Workspace/Users/{usuario}/sdd-gates/gates"
+env_gates = {**os.environ, "PYTHONPATH": GATES}
+def roda_gate(args):
+    try:
+        p = subprocess.run([sys.executable, "-m", "sdd_gates", *args], cwd="/tmp", env=env_gates,
+                           capture_output=True, text=True, timeout=120)
+        return {"exit": p.returncode, "saida": (p.stdout + p.stderr).strip().splitlines()[-5:]}
+    except Exception as e:
+        return {"exit": None, "erro": f"{type(e).__name__}: {e}"}
 resultado["5_sdd_gates"] = {
-    "ref": REF,
-    "pip_install": roda([sys.executable, "-m", "pip", "install", "--quiet", "--force-reinstall", "--no-deps", pacote]),
-    "versao": roda([sys.executable, "-m", "sdd_gates", "--version"]),
-    "selftest": roda([sys.executable, "-m", "sdd_gates", "selftest"]),
+    "gates": GATES,
+    "existe": os.path.isdir(f"{GATES}/sdd_gates"),
+    "versao": roda_gate(["--version"]),
+    "selftest": roda_gate(["selftest"]),
 }
 resultado["5_sdd_gates"]
 
@@ -202,6 +210,6 @@ print(json.dumps(resultado, indent=2, ensure_ascii=False, default=str))
 # MAGIC 1. Numa sessão nova, peça para ler **um arquivo específico** do repo e resumir.
 # MAGIC 2. Anote se ela abriu outros arquivos ou consultou o workspace por conta própria. O Verificador não pode ler as notas do autor da feature.
 # MAGIC
-# MAGIC **D. O Genie Code instala e roda os gates pela skill?**
-# MAGIC 1. Numa sessão nova, em Agent mode: *"@sdd-workflow confira se os gates do SDD estão instalados neste compute e rode o selftest."*
-# MAGIC 2. Esperado: ele confere com `python3 -m sdd_gates --version`, instala com `pip` se faltar, roda `python3 -m sdd_gates selftest` e mostra `selftest: OK`. Anote se pediu aprovação para instalar e se algum passo foi recusado.
+# MAGIC **D. O Genie Code acha e roda os gates pela skill?**
+# MAGIC 1. Numa sessão nova, em Agent mode: *"@sdd-workflow confira se os gates do SDD estão disponíveis e rode o selftest."*
+# MAGIC 2. Esperado: ele acha o Git Folder `sdd-gates`, confere a versão com `PYTHONPATH=<gates> python3 -m sdd_gates --version` e roda o `selftest`, sem tentar `pip install`. Anote se pediu aprovação e se algum passo foi recusado.

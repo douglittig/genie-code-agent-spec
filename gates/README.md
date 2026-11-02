@@ -4,15 +4,25 @@ Gates do Spec-Driven Development para o Genie Code no Databricks. Um gate decide
 
 Os gates ficam neste pacote, e não dentro das skills, porque o Genie Code não executa scripts que moram em `.assistant/skills`.
 
-## Instalar
+## Rodar no Databricks (Genie Code)
 
-No compute do projeto (serverless ou cluster), pelo mesmo Python que vai rodar os gates:
+O Genie Code também bloqueia `pip install` direto do GitHub. Então o repo é montado uma segunda vez como Git Folder, fora de `.assistant` (ex.: `/Workspace/Users/<você>/sdd-gates`), e os gates rodam dali, sem instalação:
+
+```bash
+PYTHONPATH=/Workspace/Users/<você>/sdd-gates/gates python3 -m sdd_gates selftest
+```
+
+Passo a passo no [README do repo](../README.md) (Passo 2b).
+
+## Instalar (fora do Genie Code)
+
+Claude Code, CI ou máquina local:
 
 ```bash
 python3 -m pip install "git+https://github.com/douglittig/genie-code-agent-spec@main#subdirectory=gates"
 ```
 
-Só biblioteca padrão; sem dependências. Precisa de acesso à internet para baixar do GitHub.
+Só biblioteca padrão; sem dependências. Para distribuir por Volume do Unity Catalog ou PyPI interno, gere um wheel com `python -m build gates`.
 
 ## Gates
 
