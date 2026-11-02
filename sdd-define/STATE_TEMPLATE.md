@@ -12,7 +12,7 @@
 | **Tamanho** | {Pequeno \| Médio \| Grande \| Complexo} — {motivo em uma linha} |
 | **Jira Key** | {PROJ-123 \| `pendente` se não informada} |
 | **Confluence URL** | {url da página SPEC \| `n/a`} |
-| **Gates** | {caminho de `<gates>`, ex.: `/Workspace/Users/<usuário>/sdd-gates/gates`} — versão {0.1.0} |
+| **Gates** | {caminho de `<gates>`, ex.: `/Workspace/Users/<usuário>/sdd-gates/gates`} — versão {0.2.0} |
 | **Fase Atual** | {Define \| ADR \| Design \| Build \| Ship \| Shipped} |
 | **Criado em** | {YYYY-MM-DD HH:MM UTC} |
 | **Atualizado em** | {YYYY-MM-DD HH:MM UTC} |
@@ -35,7 +35,7 @@
 
 | Fase | Status | Artefato | Gate | Concluída em |
 |------|--------|----------|------|--------------|
-| Define | {pendente \| concluída} | `docs/specs/DEFINE_{FEATURE}.md` | {gate define ✅ + aprovado} | {YYYY-MM-DD} |
+| Define | {pendente \| concluída} | `docs/specs/DEFINE_{FEATURE}.md` | {última linha da saída do gate, como saiu, ex.: `sdd_gates define DEFINE_X.md: OK — 0 aviso(s)`; + aprovado} | {YYYY-MM-DD} |
 | ADR | {pendente \| concluída} | `docs/adr/ADR_{FEATURE}.md` | {decisões aprovadas} | {YYYY-MM-DD} |
 | Planejamento (PO) | {pendente \| concluída} | `docs/planning/STORIES_{FEATURE}.md` | {stories estimadas + criadas} | {YYYY-MM-DD} |
 | Design | {pendente \| concluída} | `docs/designs/DESIGN_{FEATURE}.md` | {File Manifest completo} | {YYYY-MM-DD} |

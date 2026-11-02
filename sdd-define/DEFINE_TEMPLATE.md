@@ -25,11 +25,33 @@
 
 ---
 
+## Registro do pedido e das respostas
+
+<!-- Gravado ANTES de perguntar, e atualizado a cada resposta no mesmo turno: o chat não sobrevive
+     a uma sessão nova. Transcrição literal. Os IDs Qn.m (n = rodada) são a origem na Rastreabilidade,
+     nas Suposições e na rubrica. Pergunta ainda sem resposta: escreva "aguardando". -->
+
+### Pedido original
+
+> "{o pedido do usuário, literal, como chegou}"
+
+### Rodada 1
+
+| ID | Pergunta, com a recomendação | Resposta do usuário |
+|----|------------------------------|---------------------|
+| Q1.1 | {pergunta, com a sua recomendação} | "{resposta literal \| aguardando}" |
+
+---
+
 ## Problema
+
+<!-- Vem do usuário (cite Qn.m) ou vira pergunta. Não preencha com o que parece plausível. -->
 
 {Quem tem o problema, qual é e o que custa hoje. Duas frases no máximo.}
 
 ## Quem usa o dado
+
+<!-- Vem do usuário (cite Qn.m). Não perguntado: "não informado" + pergunta em aberto. -->
 
 | Quem | Para quê | Dor hoje |
 |------|----------|----------|
@@ -67,8 +89,10 @@
 
 ## Requisitos implícitos de dados
 
-<!-- Cada dimensão termina em um lugar: um critério (R1.2), "fora do escopo", uma suposição (S-1)
-     ou "não se aplica: <motivo>". Nenhuma linha fica sem destino. -->
+<!-- Cada dimensão termina em um lugar: um critério (R1.2), "fora do escopo", uma suposição (S-1),
+     uma decisão do usuário que não vira critério ("decidido em Q2.3: serverless") ou
+     "não se aplica: <motivo>". Antes da aprovação, "pergunta em aberto n" vale como destino
+     provisório; com --aprovado, não. Nenhuma linha fica sem destino. -->
 
 | Dimensão | Como fica nesta feature |
 |----------|-------------------------|
@@ -131,15 +155,17 @@
 ## Suposições
 
 <!-- Só vira suposição o que o código resolve ou o que o usuário delegou ("você decide").
-     Decisão do usuário é pergunta, não suposição. Sem suposições: escreva "Nenhuma." -->
+     Decisão do usuário é pergunta, não suposição. Sem suposições: escreva "Nenhuma."
+     Origem, uma destas três: código: <caminho do arquivo que mostra o padrão> |
+     usuário delegou (Qn.m) | usuário não quis discutir (Qn.m). -->
 
 | ID | Padrão escolhido | Motivo | Origem | Se estiver errada |
 |----|------------------|--------|--------|-------------------|
-| S-1 | {o que foi assumido} | {por que este padrão} | {código \| usuário delegou \| usuário não quis discutir} | {o que muda} |
+| S-1 | {o que foi assumido} | {por que este padrão} | {código: `caminho/arquivo` \| usuário delegou (Qn.m) \| usuário não quis discutir (Qn.m)} | {o que muda} |
 
 ## Perguntas em aberto
 
-- {pergunta para o usuário, com a sua recomendação — antes da aprovação, esta lista fica "Nenhuma."}
+- {Qn.m ainda sem resposta, ou pergunta nova com a sua recomendação. Para aprovar, esta lista precisa ser "Nenhuma."}
 
 ---
 
@@ -147,7 +173,7 @@
 
 | Critério | Origem |
 |----------|--------|
-| R1.1 | {Confluence › seção \| pedido: "frase do usuário" \| área cinzenta} |
+| R1.1 | {pedido: "trecho literal" \| Q1.2: "trecho literal da resposta" \| Confluence › seção \| rubrica: dimensão \| área cinzenta} |
 | R1.2 | {…} |
 
 ---

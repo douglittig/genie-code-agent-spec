@@ -28,8 +28,8 @@ Só biblioteca padrão; sem dependências. Para distribuir por Volume do Unity C
 
 | Comando | Etapa | O que confere |
 |---|---|---|
-| `python3 -m sdd_gates define docs/specs/DEFINE_<FEATURE>.md` | Define | Seções, critérios EARS, rubrica de requisitos implícitos, suposições, rastreabilidade |
-| `python3 -m sdd_gates define … --aprovado` | antes do Build | O mesmo + aprovação gravada e nenhuma pergunta em aberto |
+| `python3 -m sdd_gates define docs/specs/DEFINE_<FEATURE>.md` | Define | Seções, registro literal do pedido e das respostas (`Qn.m`), critérios EARS, rubrica de requisitos implícitos, origem das suposições, rastreabilidade com a frase citada conferida na fonte |
+| `python3 -m sdd_gates define … --aprovado` | antes do Build | O mesmo + aprovação gravada, nenhuma pergunta em aberto (nem no registro) e toda dimensão da rubrica com destino |
 | `python3 -m sdd_gates selftest` | — | Testa os próprios gates por mutação |
 
 Códigos de saída: `0` passou, `1` não passou (a saída diz o que corrigir), `2` erro de uso. `--estrito` faz os avisos também reprovarem.

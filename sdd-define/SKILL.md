@@ -29,6 +29,20 @@ preencher:
 
 ---
 
+## Passo 0 — Achar o projeto e abrir o rascunho
+
+Tudo o que fica só no chat se perde: numa sessão nova, num chat novo ou quando o contexto é
+resumido. Por isso o rascunho nasce **antes** da primeira pergunta.
+
+1. **Ache a raiz do repo do projeto:** o Git Folder do projeto. Não serve o Git Folder das skills
+   nem o `sdd-gates`. Se não souber qual é, pergunte **só isso** antes de qualquer outra coisa.
+2. **Crie a branch da feature** (`feat/<feature>`, via `@sdd-dev-workflow`) antes de escrever o
+   primeiro arquivo. Nunca escreva na `main`.
+3. **Grave o rascunho:** `docs/specs/DEFINE_{FEATURE}.md` com Status "Rascunho" e o pedido do
+   usuário, literal, em "Registro do pedido e das respostas › Pedido original". Crie também o state
+   (`.sdd/features/{FEATURE}/state.md`, template [`STATE_TEMPLATE.md`](STATE_TEMPLATE.md)) com o
+   tamanho e a pasta dos gates.
+
 ## Passo 1 — Juntar as fontes
 
 - **Confluence:** use **só** `confluence_get_page` na URL que o usuário deu, e nas subpáginas
@@ -60,6 +74,15 @@ pergunte e registre em "Diferenças em relação à fonte", com quem aprovou.
 Você é parceiro de raciocínio, não um formulário. Comece aberto e deixe o usuário despejar o
 modelo mental dele; aprofunde no que ele enfatizar. As três perguntas que sempre precisam de
 resposta: **qual problema**, **quem usa o dado e para quê**, **como saberemos que deu certo**.
+Problema e "Quem usa o dado" vêm do usuário: o que ele não disse vira pergunta, nunca texto
+plausível.
+
+- **Antes de perguntar,** grave cada pergunta, com a sua recomendação, numa linha `Qn.m` da rodada
+  no Registro, com a resposta "aguardando".
+- **Quando ele responder,** copie a resposta literal na mesma linha, no mesmo turno.
+- **Resposta sem pergunta:** se o usuário responder a algo que não está nem no chat nem no
+  Registro, diga isso **antes** de escrever qualquer coisa e peça a pergunta de volta. Nunca
+  deduza a que ele estava respondendo.
 
 ## Passo 3 — Escrever os requisitos e os critérios
 
@@ -111,7 +134,7 @@ critério, "fora do escopo", uma suposição (`S-n`) ou "não se aplica: motivo"
 
 ## Passo 6 — Gate de fechamento
 
-Antes de apresentar, confira os quatro pontos e corrija no próprio arquivo:
+Antes de apresentar, confira os cinco pontos e corrija no próprio arquivo:
 
 1. **Sem ambiguidade:** todo critério tem uma única leitura e um resultado definido pela spec.
    Se não tem, pergunte, divida ou vire suposição explícita.
@@ -119,9 +142,12 @@ Antes de apresentar, confira os quatro pontos e corrija no próprio arquivo:
    perguntados, com a sua recomendação. Só vira suposição o que o código resolve ou o que o
    usuário delegou ("você decide").
 3. **Área cinzenta recusada vira suposição**, com origem "usuário não quis discutir". Nunca some.
-4. **O pedido, frase a frase:** releia o pedido e a página do Confluence, uma frase por vez.
-   Cada frase cai num critério, num item de Fora do escopo ou numa pergunta. Frase que não cai em
-   lugar nenhum é o requisito que vai sumir, porque ninguém relê o pedido depois.
+4. **O pedido, frase a frase:** releia o pedido original e a página do Confluence, uma frase por
+   vez. Cada frase cai num critério (`pedido: "trecho"` na Rastreabilidade), num item de Fora do
+   escopo ou numa pergunta. Frase que não cai em lugar nenhum é o requisito que vai sumir, porque
+   ninguém relê o pedido depois. O gate avisa o trecho do pedido que ninguém cita.
+5. **Origem verificável:** toda origem cita o pedido, um `Qn.m`, o Confluence, a rubrica ou uma
+   área cinzenta, com o trecho literal entre aspas. O gate confere se a frase está mesmo lá.
 
 O gate esclarece o que foi pedido. Ele não inventa requisito novo.
 
@@ -132,8 +158,12 @@ PYTHONPATH=<gates> python3 -m sdd_gates define docs/specs/DEFINE_{FEATURE}.md
 ```
 
 Rode a partir da raiz do repo do projeto. Rode o gate em vez de ler o código dele: as mensagens
-dizem o que mudar. Exit diferente de 0 → corrija e rode de novo. Se não conseguir executar, faça
-as mesmas checagens lendo o arquivo e **diga ao usuário que o gate não rodou**.
+dizem o que mudar. Exit diferente de 0 → corrija e rode de novo. Cada aviso: corrija, ou explique
+ao usuário por que fica. Se não conseguir executar, faça as mesmas checagens lendo o arquivo e
+**diga ao usuário que o gate não rodou**.
+
+Copie para o state a última linha da saída do gate, como ela saiu. Diga "o gate passou" só
+depois de ver essa linha.
 
 Com o validador verde, apresente o DEFINE com as perguntas em aberto e a sua recomendação para
 cada uma, e **pare**. É a primeira parada humana do contrato de execução.
@@ -155,8 +185,8 @@ PYTHONPATH=<gates> python3 -m sdd_gates define docs/specs/DEFINE_{FEATURE}.md --
 ## Passo 9 — State, Jira e fim de etapa
 
 1. Pergunte a chave do Jira (ex.: `PROJ-123`); sem chave, registre `pendente`.
-2. Crie `.sdd/features/{FEATURE}/state.md` a partir de [`STATE_TEMPLATE.md`](STATE_TEMPLATE.md):
-   tamanho, `jira_key`, URL do Confluence, etapa Define concluída, aprovação.
+2. Atualize o state, criado no Passo 0: `jira_key`, URL do Confluence, etapa Define concluída,
+   aprovação e a linha de saída do gate `--aprovado`.
 3. Chame `@sdd-doc` (comentário no Jira + transição para Em andamento; ele faz preview antes).
 4. Proponha o próximo passo, conforme o tamanho: `@sdd-staff-engineer` (Complexo, ou decisão de
    arquitetura), `@sdd-design` (Grande) ou `@sdd-build` (Médio).

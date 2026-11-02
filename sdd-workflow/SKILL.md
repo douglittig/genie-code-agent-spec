@@ -33,8 +33,8 @@ Vale em toda feature, mesmo que nenhuma outra skill tenha sido aberta.
    - Toda aprovação é gravada no artefato, com as palavras do usuário:
      `**Aprovado**: AAAA-MM-DD — usuário: "<palavras dele>"`. Nunca grave uma aprovação que o
      usuário não deu.
-   - Toda resposta do usuário vai para o arquivo da etapa **no mesmo turno**. O chat não
-     sobrevive a uma sessão nova.
+   - Toda pergunta vai para o arquivo da etapa **antes** de ser feita, e toda resposta do usuário
+     **no mesmo turno**. O chat não sobrevive a uma sessão nova nem a um chat novo.
 2. **Teste nasce do critério de aceite** (*acceptance criterion*) e confere o resultado que a
    spec define. Nunca espelha a implementação.
 3. **Uma tarefa só termina quando o gate passa.** Quem decide é o test runner, não a
@@ -45,13 +45,19 @@ Vale em toda feature, mesmo que nenhuma outra skill tenha sido aberta.
    convenções do repo → os artefatos em `docs/` e `.sdd/` → as skills `@databricks-*` → a
    documentação oficial. Nunca invente API, parâmetro ou comportamento: "não encontrei
    documentação para isso" vale mais que um palpite plausível.
+6. **A feature vive nos arquivos, nunca na memória do Genie Code.** Estado, decisões e respostas
+   do usuário vão para `docs/` e `.sdd/`. Não grave a feature na memória do assistente: ela passa
+   para outras sessões, inclusive a do Verifier, sem passar por revisão.
+7. **Relate só o que a ferramenta confirmou.** "Passou", "gravei", "fiz o commit" vêm depois da
+   saída que mostra isso, nunca antes. Ainda não viu o resultado: diga que ainda não viu.
 
 ---
 
 ## Tamanho da feature (*auto-sizing*)
 
 **A complexidade define a profundidade, não um pipeline fixo.** Antes de começar, classifique a
-feature, anuncie o tamanho em uma linha com o motivo e deixe o usuário corrigir. Grave no state.
+feature, anuncie o tamanho em uma linha com o motivo e deixe o usuário corrigir. Grave no state,
+que nasce no começo do Define (Passo 0 do `@sdd-define`).
 
 | Tamanho | Exemplos em dados | Etapas |
 |---|---|---|
@@ -88,13 +94,16 @@ Aprovar a spec e o plano libera **só o que é local ou do ambiente de desenvolv
 
 Na dúvida se uma ação sai do ambiente de desenvolvimento, trate como "exige ok".
 
+Trabalhe sempre na branch da feature, criada antes do primeiro arquivo. No Genie Code, a própria
+plataforma bloqueia o push para a `main`, mesmo com o ok do usuário.
+
 ---
 
 ## Gates (pacote `sdd-gates`)
 
 Um gate é um script que decide, por código, se a etapa pode avançar. O código dos gates fica num
 **segundo Git Folder deste mesmo repo, fora de `.assistant`**, chamado `sdd-gates`. Versão mínima
-exigida por estas skills: **0.1.0**.
+exigida por estas skills: **0.2.0**.
 
 Duas coisas que o Genie Code bloqueia, e que você não deve tentar contornar:
 - executar scripts dentro de `.assistant/skills` (nem copiando o código de lá);
@@ -109,6 +118,8 @@ Duas coisas que o Genie Code bloqueia, e que você não deve tentar contornar:
 3. **Rode o gate** a partir da raiz do repo do projeto:
    `PYTHONPATH=<gates> python3 -m sdd_gates <gate> …`. Nada é instalado.
    Exit 0: passou. Exit 1: não passou, e a saída diz o que corrigir. Exit 2: erro de uso.
+   Copie para o state a última linha da saída, como saiu (ex.:
+   `sdd_gates define DEFINE_X.md: OK — 0 aviso(s)`). É a prova de que o gate rodou.
 4. Se não conseguir executar, faça as checagens lendo o artefato, registre no state que o gate
    não rodou e diga isso ao usuário. **Nunca grave "gate ✅" sem ter rodado o gate.**
 
@@ -165,6 +176,9 @@ Numa sessão nova, ou depois que o contexto foi resumido:
 ---
 
 ## Onde ficam os artefatos
+
+Tudo fica no repo do projeto (o Git Folder do projeto), nunca no Git Folder das skills nem no
+`sdd-gates`.
 
 ```
 docs/                          # documentação da feature (revisada por humanos)
