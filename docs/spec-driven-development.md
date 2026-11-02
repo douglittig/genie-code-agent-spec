@@ -73,7 +73,7 @@ O coração do SDD. Transforma a SPEC do Confluence em um documento estruturado 
 ## Acceptance Tests (Given/When/Then)
 ## Technical Context
   | Deployment Location | src/pipelines/ | onde os arquivos vão |
-  | KB Domains          | databricks-spark-declarative-pipelines, databricks-unity-catalog |
+  | KB Domains          | databricks-pipelines, databricks-unity-catalog |
   | IaC Impact          | None / New resources / Modify existing |
 ## Out of Scope
 ## Clarity Score (mínimo 12/15 para avançar)

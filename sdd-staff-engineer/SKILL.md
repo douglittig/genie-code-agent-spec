@@ -202,9 +202,9 @@ para registrar as decisões no ticket Jira (ver Capacidade 4).
 | `@sdd-design` | Consumidor do ADR na Fase de Design |
 | `@sdd-doc` | Documenta o fim da fase ADR no Jira |
 | `@sdd-po` | Fase 3 — consome este ADR para quebrar em Stories/Tasks no Jira |
-| `@databricks-spark-declarative-pipelines` | Padrões DLT/SDP para decisão de processamento |
+| `@databricks-pipelines` | Padrões DLT/SDP para decisão de processamento |
 | `@databricks-spark-structured-streaming` | Padrões Streaming para decisão de processamento |
 | `@databricks-unity-catalog` | Governança, permissões, PII |
-| `@databricks-bundles` | Deploy multi-ambiente, DABs |
+| `@databricks-dabs` | Deploy multi-ambiente, DABs |
 | `@databricks-dbsql` | Camada de serving SQL |
 | `@databricks-model-serving` | Camada de serving ML/AI |

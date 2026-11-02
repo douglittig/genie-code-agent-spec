@@ -11,7 +11,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Repository Layout
 
 ```
-<skill-name>/            # 41 skills na raiz (Databricks + SDD workflow + Python + Spark)
+<skill-name>/            # 51 skills na raiz (Databricks oficiais + SDD workflow + Python + Spark)
 docs/                    # Documentação de referência sobre features do Genie Code
 assets/                  # documentation/ versionada (PDFs de referência); repos/ gitignored
 .claude/                 # Claude Code CLI local — gitignored, exceto .claude/skills/ (run-genie-code-agent-spec: validador do repo)
@@ -39,12 +39,14 @@ O índice completo das skills está no **[README.md](README.md)**, organizado po
 
 O prefixo indica a origem da skill:
 
-- **`databricks-*`** + `spark-python-data-source` + `TEMPLATE` → vêm do upstream [`databricks-solutions/ai-dev-kit`](https://github.com/databricks-solutions/ai-dev-kit). ⚠️ **NÃO editar à mão** — o sync sobrescreve. Para mudar, contribuir no upstream.
+- **`databricks-*`** + `spark-python-data-source` → vêm do repo oficial [`databricks/databricks-agent-skills`](https://github.com/databricks/databricks-agent-skills) (Databricks License — cópia em `LICENSE-databricks-agent-skills`). ⚠️ **NÃO editar à mão** — o sync sobrescreve. Para mudar, contribuir no upstream.
+- **Congelada:** `databricks-python-dev` veio do antigo upstream `databricks-solutions/ai-dev-kit` (v0.1.14), que deixou de distribuir skills na v0.2.0. Não existe no repo oficial; o sync não a toca (`FROZEN_SKILLS`). `TEMPLATE/` também ficou conosco.
 - **`sdd-*`** e **`custom-*`** → skills **nossas**, não existem no upstream, livres para editar. `sdd-*` = skills do workflow de Spec-Driven Development; `custom-*` = demais skills próprias.
 
-- **Sincronização:** [`.github/workflows/sync-databricks-skills.yml`](.github/workflows/sync-databricks-skills.yml) faz sparse checkout efêmero do upstream, copia as pastas para a raiz e abre um PR. O upstream **nunca** é commitado aqui (sem submodule/subtree). Roda semanalmente + `workflow_dispatch`.
-- **Versão fixada:** última tag semver do upstream, registrada em `databricks-skills.lock` (gerado pelo workflow).
-- **Origem das pastas upstream:** a maioria vem de `databricks-skills/`. Exceção: **`databricks-python-dev`** vem de `.claude/skills/python-dev` do upstream (mapeado para `databricks-python-dev` no sync).
+- **Sincronização:** [`.github/workflows/sync-databricks-skills.yml`](.github/workflows/sync-databricks-skills.yml) faz sparse checkout efêmero do upstream e chama [`.github/scripts/sync-databricks-skills.sh`](.github/scripts/sync-databricks-skills.sh), que copia as pastas para a raiz, poda as que saíram do upstream e grava o lock; o workflow abre um PR. O script roda igual na máquina local. O upstream **nunca** é commitado aqui (sem submodule/subtree). Roda semanalmente + `workflow_dispatch`.
+- **Versão fixada:** última release do upstream, registrada em `databricks-skills.lock` (versão, commit e lista de skills sincronizadas).
+- **Origem das pastas upstream:** `skills/` do repo oficial. Exceção: **`spark-python-data-source`** vem de `experimental/` (`EXTRA_SKILLS`).
+- **Upstream renomeou uma skill?** O PR do sync mostra a pasta antiga apagada e a nova criada. Antes do merge, trocar as referências `@databricks-*` nas skills `sdd-*` e rodar o validador.
 - **Skills NOSSAS, editáveis** (prefixos `sdd-` e `custom-`, salvaguardadas em `OWN_SKILLS`): `sdd-workflow`, `sdd-brainstorm`, `sdd-define`, `sdd-design`, `sdd-build`, `sdd-ship`, `sdd-iterate`, `sdd-doc`, `sdd-staff-engineer`, `sdd-po`, `sdd-dev-workflow`, `sdd-code-reviewer`, `custom-test-generator`. O workflow nunca as sobrescreve.
 
 ### Skills de Workflow (família `sdd-*`)

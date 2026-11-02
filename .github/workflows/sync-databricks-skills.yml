@@ -1,21 +1,26 @@
 name: Sync Databricks Skills
 
-# Mantém as skills de origem Databricks (databricks-*, spark-python-data-source,
-# TEMPLATE) sincronizadas com o upstream databricks-solutions/ai-dev-kit.
+# Mantém as skills de origem Databricks (databricks-* e spark-python-data-source)
+# sincronizadas com o repo OFICIAL databricks/databricks-agent-skills.
+#
+# Histórico: até a v0.1.14 elas vinham de databricks-solutions/ai-dev-kit. Na
+# v0.2.0 (28/07/2026) o ai-dev-kit deixou de distribuir skills e passou o papel
+# para o databricks-agent-skills (mantido pela engenharia da Databricks). Por isso
+# o sync falhava toda semana desde 31/08 (a pasta databricks-skills/ sumiu).
 #
 # Como funciona:
-#   1. Resolve a última tag semver do upstream (ou a ref passada no dispatch).
-#   2. Faz sparse + shallow checkout SÓ de `databricks-skills/` num diretório
-#      efêmero do runner — nada do repo upstream é commitado no nosso repo.
-#   3. Copia cada subpasta de skill para a raiz, sem nunca tocar nossas skills
-#      próprias (OWN_SKILLS) nem os arquivos meta do upstream.
-#   4. Grava a proveniência em `databricks-skills.lock`.
-#   5. Abre um PR (nunca commita direto em main — Golden Rule do repo).
+#   1. Resolve a última release do upstream (ou a ref passada no dispatch).
+#   2. Sparse + shallow checkout efêmero de skills/ e das EXTRA_SKILLS —
+#      nada do repo upstream é commitado aqui (sem submodule/subtree).
+#   3. .github/scripts/sync-databricks-skills.sh copia cada skill para a raiz,
+#      poda as que saíram do upstream, copia LICENSE/NOTICE e grava o lock.
+#      Nunca toca OWN_SKILLS nem FROZEN_SKILLS. Dá para rodar o script local.
+#   4. Abre um PR (nunca commita direto em main — Golden Rule do repo).
 #
 # PRÉ-REQUISITO (setting do repositório, não do YAML):
 #   Settings → Actions → General → Workflow permissions →
 #   marcar "Allow GitHub Actions to create and approve pull requests".
-#   Sem isso o passo 5 falha com "GitHub Actions is not permitted to create or
+#   Sem isso o passo 4 falha com "GitHub Actions is not permitted to create or
 #   approve pull requests" — o branch é empurrado, mas nenhum PR é aberto. O
 #   bloco `permissions:` abaixo NÃO substitui esse setting.
 #   Verificar: gh api repos/<owner>/<repo>/actions/permissions/workflow
@@ -35,11 +40,14 @@ permissions:
   pull-requests: write
 
 env:
-  UPSTREAM: databricks-solutions/ai-dev-kit
-  UPSTREAM_PATH: databricks-skills
-  # Skill upstream que vive FORA de databricks-skills/ — mapeada à parte.
+  UPSTREAM: databricks/databricks-agent-skills
+  UPSTREAM_PATH: skills
+  # Skill upstream que vive FORA de skills/ — mapeada à parte.
   # formato: "<path no upstream>:<pasta destino na raiz>"
-  EXTRA_SKILLS: ".claude/skills/python-dev:databricks-python-dev"
+  EXTRA_SKILLS: "experimental/spark-python-data-source:spark-python-data-source"
+  # Skills que o upstream oficial não tem e mantemos congeladas (cópia do
+  # ai-dev-kit v0.1.14). O sync não sobrescreve nem apaga.
+  FROZEN_SKILLS: "databricks-python-dev"
   # Skills NOSSAS (prefixos sdd- e custom-) — nunca devem ser sobrescritas pelo sync.
   OWN_SKILLS: "sdd-workflow sdd-brainstorm sdd-define sdd-design sdd-build sdd-ship sdd-iterate sdd-doc sdd-staff-engineer sdd-po sdd-dev-workflow sdd-code-reviewer custom-test-generator"
 
@@ -50,7 +58,7 @@ jobs:
       - name: Checkout deste repo
         uses: actions/checkout@v5
 
-      - name: Resolver tag do upstream
+      - name: Resolver release do upstream
         id: upstream
         env:
           GH_TOKEN: ${{ github.token }}
@@ -58,70 +66,29 @@ jobs:
           set -euo pipefail
           REF="${{ github.event.inputs.ref }}"
           if [ -z "$REF" ]; then
-            # Maior tag semver (sort -V trata v0.1.12 > v0.1.9 corretamente).
-            REF=$(gh api "repos/$UPSTREAM/tags" --jq '.[].name' | sort -V | tail -1)
+            REF=$(gh api "repos/$UPSTREAM/releases/latest" --jq .tag_name)
           fi
           echo "Sincronizando upstream ref: $REF"
           echo "ref=$REF" >> "$GITHUB_OUTPUT"
 
       - name: Sparse checkout do upstream (efêmero)
-        id: fetch
         run: |
           set -euo pipefail
           rm -rf .upstream
           git clone --depth 1 --filter=blob:none --sparse \
             --branch "${{ steps.upstream.outputs.ref }}" \
             "https://github.com/$UPSTREAM" .upstream
-          # Inclui o path principal + os paths de origem das EXTRA_SKILLS.
+          # Cone mode traz também os arquivos da raiz (LICENSE, NOTICE).
           EXTRA_PATHS=""
           for map in $EXTRA_SKILLS; do
             EXTRA_PATHS="$EXTRA_PATHS ${map%%:*}"
           done
           git -C .upstream sparse-checkout set "$UPSTREAM_PATH" $EXTRA_PATHS
-          echo "sha=$(git -C .upstream rev-parse HEAD)" >> "$GITHUB_OUTPUT"
 
-      - name: Copiar skills para a raiz
-        run: |
-          set -euo pipefail
-          SRC=".upstream/$UPSTREAM_PATH"
-          for dir in "$SRC"/*/; do
-            name=$(basename "$dir")
-            # Salvaguarda: nunca sobrescrever uma skill nossa.
-            case " $OWN_SKILLS " in
-              *" $name "*) echo "skip (skill própria): $name"; continue ;;
-            esac
-            echo "sync: $name"
-            # --delete poda arquivos removidos no upstream, mas SÓ dentro
-            # da pasta da skill — nunca afeta pastas irmãs nem a raiz.
-            rsync -a --delete "$dir" "./$name/"
-          done
-
-      - name: Copiar skills upstream fora de databricks-skills/ (EXTRA_SKILLS)
-        run: |
-          set -euo pipefail
-          for map in $EXTRA_SKILLS; do
-            src=".upstream/${map%%:*}"
-            dest="${map##*:}"
-            if [ ! -d "$src" ]; then
-              echo "AVISO: origem não encontrada no upstream: ${map%%:*}"; continue
-            fi
-            echo "sync (extra): ${map%%:*} -> $dest"
-            rsync -a --delete "$src/" "./$dest/"
-          done
-
-      - name: Gravar manifesto de proveniência
-        run: |
-          set -euo pipefail
-          cat > databricks-skills.lock <<EOF
-          # Gerado automaticamente por .github/workflows/sync-databricks-skills.yml
-          # Não editar à mão.
-          upstream_repo: $UPSTREAM
-          upstream_path: $UPSTREAM_PATH
-          version: ${{ steps.upstream.outputs.ref }}
-          commit: ${{ steps.fetch.outputs.sha }}
-          synced_at: $(date -u +%Y-%m-%dT%H:%M:%SZ)
-          EOF
-          cat databricks-skills.lock
+      - name: Copiar skills, podar removidas e gravar o lock
+        env:
+          UPSTREAM_REF: ${{ steps.upstream.outputs.ref }}
+        run: bash .github/scripts/sync-databricks-skills.sh .upstream .
 
       - name: Remover clone efêmero
         run: rm -rf .upstream
@@ -132,17 +99,18 @@ jobs:
           branch: chore/sync-databricks-skills
           delete-branch: true
           base: main
-          commit-message: "chore: sync databricks skills from ai-dev-kit ${{ steps.upstream.outputs.ref }}"
+          commit-message: "chore: sync databricks skills from databricks-agent-skills ${{ steps.upstream.outputs.ref }}"
           title: "chore: sync databricks-* skills → ${{ steps.upstream.outputs.ref }}"
           labels: skills-sync
           body: |
             Sync automático das skills de origem Databricks a partir do upstream
-            [`${{ env.UPSTREAM }}`](https://github.com/databricks-solutions/ai-dev-kit).
+            [`${{ env.UPSTREAM }}`](https://github.com/databricks/databricks-agent-skills).
 
             - **Versão:** `${{ steps.upstream.outputs.ref }}`
-            - **Commit upstream:** `${{ steps.fetch.outputs.sha }}`
-            - **Origem:** `databricks-skills/` (sparse checkout efêmero — nada do repo upstream foi commitado aqui)
+            - **Origem:** `skills/` + `${{ env.EXTRA_SKILLS }}` (sparse checkout efêmero — nada do repo upstream foi commitado aqui)
+            - Commit exato e lista de skills em `databricks-skills.lock`
 
-            Skills **nossas** (`${{ env.OWN_SKILLS }}`) não são tocadas.
+            Skills **nossas** (`${{ env.OWN_SKILLS }}`) e **congeladas** (`${{ env.FROZEN_SKILLS }}`) não são tocadas.
+            Se o upstream renomeou ou removeu uma skill, confira as referências `@databricks-*` nas skills `sdd-*`.
 
             Revise o diff e faça merge se estiver tudo certo.

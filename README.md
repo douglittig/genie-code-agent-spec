@@ -43,7 +43,7 @@ Workspace/
 3. Crie a pasta `.assistant/` se não existir — clique com botão direito → **Create folder**
 4. Entre na pasta `.assistant/` — **não crie `skills/` manualmente**
 5. Clique com botão direito dentro de `.assistant/` → **Add Git Folder**
-6. Cole a URL deste repositório: `https://github.com/<org>/genie-code-agent-spec`
+6. Cole a URL deste repositório: `https://github.com/douglittig/genie-code-agent-spec` (ou a do seu fork)
 7. Escolha a branch `main`
 8. **Renomeie o Git Folder para `skills`** (o padrão seria o nome do repo)
 9. Confirme — o Git Folder será criado em `Workspace/.assistant/skills/`
@@ -114,7 +114,7 @@ Quando o Clarity Score atingir ≥ 12/15, o agente sugere o próximo passo:
 
 Para puxar atualizações deste repositório:
 
-1. No workspace, navegue até `Workspace/.assistant/skills/genie-code-agent-spec/`
+1. No workspace, navegue até `Workspace/.assistant/skills/` (o Git Folder renomeado no Passo 1)
 2. Clique em **Pull** (ícone de atualização do Git Folder)
 3. As skills são recarregadas automaticamente na próxima sessão do Genie Code
 
@@ -338,50 +338,62 @@ Durante os nós [4] a [6], o orquestrador @sdd-workflow coordena com outras skil
 
 Skills ficam na **raiz do repositório** — cada skill é uma pasta com `SKILL.md` (frontmatter + instruções) e arquivos de referência opcionais. No Genie Code, são invocadas via `@skill-name` em Agent mode. Para usar: carregue este repo como Git Folder em `Workspace/.assistant/skills/` no Databricks.
 
+> As skills `databricks-*` são cópia do repo oficial [`databricks/databricks-agent-skills`](https://github.com/databricks/databricks-agent-skills) (ver [Sincronização](#sincronização-das-skills-databricks-upstream)). Descrições resumidas do frontmatter de cada uma.
+
 ### IA & ML
 
 | Skill | Descrição |
 |-------|-----------|
-| [`databricks-agent-bricks`](databricks-agent-bricks/) | Knowledge Assistants para Q&A sobre documentos, Genie Spaces para exploração SQL e Supervisor Agents para orquestração multi-agente |
-| [`databricks-ai-functions`](databricks-ai-functions/) | Funções AI nativas do Databricks SQL (`ai_classify`, `ai_extract`, `ai_summarize`, etc.) para adicionar IA diretamente em pipelines SQL e PySpark |
-| [`databricks-aibi-dashboards`](databricks-aibi-dashboards/) | Criação de dashboards AI/BI (Lakeview) — exige validação de todas as queries via `execute_sql` antes do deploy |
-| [`databricks-genie`](databricks-genie/) | Criação e consulta de Genie Spaces para exploração SQL em linguagem natural; inclui Conversation API e migração entre workspaces |
-| [`databricks-mlflow-evaluation`](databricks-mlflow-evaluation/) | Avaliação de agentes GenAI com MLflow 3: `mlflow.genai.evaluate()`, scorers, MemAlign e GEPA para otimização de prompts |
-| [`databricks-model-serving`](databricks-model-serving/) | Deploy e consulta de endpoints de Model Serving para modelos MLflow, ChatAgent/ResponsesAgent e agentes com UC Functions |
-| [`databricks-vector-search`](databricks-vector-search/) | Criação e consulta de índices de Vector Search para RAG, busca semântica e similaridade |
+| [`databricks-ai-functions`](databricks-ai-functions/) | Funções AI nativas do Databricks SQL (`ai_classify`, `ai_extract`, `ai_summarize`, etc.) em pipelines SQL e PySpark |
+| [`databricks-ai-runtime`](databricks-ai-runtime/) | AI Runtime (`databricks air`): submeter e acompanhar workloads de treino em GPU serverless |
+| [`databricks-genie-agents`](databricks-genie-agents/) | Genie Agents (antigos Genie Spaces) sobre tabelas UC, Metric Views e documentos; substitui Knowledge Assistant e Supervisor Agent |
+| [`databricks-ml-training`](databricks-ml-training/) | Treino de modelos (XGBoost, scikit-learn, PyTorch) com Optuna, aliases @prod/@challenger, feature tables e batch scoring |
+| [`databricks-mlflow-evaluation`](databricks-mlflow-evaluation/) | Avaliação de agentes GenAI com MLflow 3: `mlflow.genai.evaluate()`, scorers e otimização de prompts |
+| [`databricks-mlflow-tracing`](databricks-mlflow-tracing/) | Tracing e observabilidade com MLflow: instrumentar apps e agentes GenAI, analisar traces e métricas |
+| [`databricks-model-serving`](databricks-model-serving/) | Deploy e consulta de endpoints de Model Serving (MLflow, ChatAgent/ResponsesAgent, agentes com UC Functions) |
+| [`databricks-unity-gateway`](databricks-unity-gateway/) | Unity AI Gateway: modelos de fundação pay-per-token, serviços de modelo e MCP, orçamento e alertas de uso |
+| [`databricks-vector-search`](databricks-vector-search/) | Índices de Vector Search para RAG, busca semântica e similaridade |
 
 ### Dados & SQL
 
 | Skill | Descrição |
 |-------|-----------|
-| [`databricks-dbsql`](databricks-dbsql/) | Recursos avançados do Databricks SQL: SQL warehouses, SQL scripting, stored procedures e performance tuning |
-| [`databricks-iceberg`](databricks-iceberg/) | Tabelas Apache Iceberg no Databricks: Managed Iceberg, External Reads (Uniform), Iceberg REST Catalog e interop com Snowflake |
-| [`databricks-metric-views`](databricks-metric-views/) | Criação e gestão de metric views no Unity Catalog para definir KPIs e métricas de negócio padronizadas em YAML |
-| [`databricks-spark-declarative-pipelines`](databricks-spark-declarative-pipelines/) | Lakeflow Spark Declarative Pipelines (SDP/DLT): streaming tables, materialized views, CDC, SCD Type 2 e Auto Loader |
-| [`databricks-spark-structured-streaming`](databricks-spark-structured-streaming/) | Spark Structured Streaming em produção: Kafka, Real-Time Mode, triggers, operações stateful, checkpoints e stream-stream joins |
-| [`databricks-synthetic-data-gen`](databricks-synthetic-data-gen/) | Geração de dados sintéticos realistas com Spark + Faker em escala, múltiplos formatos (Parquet/JSON/CSV/Delta) |
-| [`databricks-unity-catalog`](databricks-unity-catalog/) | System tables (audit, lineage, billing) e operações com volumes (`/Volumes/`) no Unity Catalog |
-| [`databricks-zerobus-ingest`](databricks-zerobus-ingest/) | Clientes Zerobus Ingest para ingestão near real-time em tabelas Delta via gRPC, sem message bus |
-| [`spark-python-data-source`](spark-python-data-source/) | Data sources Python customizados para Spark (PySpark DataSource API): leitores/escritores batch e streaming para sistemas externos |
+| [`databricks-data-discovery`](databricks-data-discovery/) | Achar e consultar dados via Genie: "que tabelas existem", "onde vive X", perguntas em linguagem natural e geração de SQL |
+| [`databricks-dbsql`](databricks-dbsql/) | Databricks SQL: SQL warehouses, SQL scripting, stored procedures e performance tuning |
+| [`databricks-iceberg`](databricks-iceberg/) | Apache Iceberg no Databricks: Managed Iceberg, Uniform, Iceberg REST Catalog e interop |
+| [`databricks-lakeflow-connect`](databricks-lakeflow-connect/) | Ingestão gerenciada com Lakeflow Connect (Salesforce, Workday, ServiceNow, SQL Server, CDC de Postgres/MySQL) |
+| [`databricks-metric-views`](databricks-metric-views/) | Metric views no Unity Catalog: KPIs e métricas de negócio padronizadas em YAML |
+| [`databricks-pipelines`](databricks-pipelines/) | Lakeflow Spark Declarative Pipelines (antigo DLT): batch e streaming em Python/SQL, Auto CDC |
+| [`databricks-spark-structured-streaming`](databricks-spark-structured-streaming/) | Structured Streaming em produção: Kafka, Real-Time Mode, triggers, stateful, checkpoints e joins |
+| [`databricks-synthetic-data-gen`](databricks-synthetic-data-gen/) | Dados sintéticos realistas com Spark + Faker em escala |
+| [`databricks-unity-catalog`](databricks-unity-catalog/) | System tables (audit, lineage, billing) e volumes (`/Volumes/`) no Unity Catalog |
+| [`databricks-zerobus-ingest`](databricks-zerobus-ingest/) | Zerobus Ingest: ingestão near real-time em tabelas Delta via gRPC, sem message bus |
+| [`spark-python-data-source`](spark-python-data-source/) | Data sources Python customizados (PySpark DataSource API) para batch e streaming — *experimental* no upstream |
 
 ### Plataforma Databricks
 
 | Skill | Descrição |
 |-------|-----------|
-| [`databricks-bundles`](databricks-bundles/) | Declarative Automation Bundles (DABs): criação, configuração e deploy multi-ambiente com CICD |
-| [`databricks-config`](databricks-config/) | Gestão de conexões de workspace: verificar perfil atual, trocar workspace e autenticar via `~/.databrickscfg` |
-| [`databricks-docs`](databricks-docs/) | Referência de documentação Databricks via llms.txt — usar quando outras skills não cobrirem o tópico |
-| [`databricks-execution-compute`](databricks-execution-compute/) | Execução de código e gestão de compute no Databricks: serverless, clusters, Python/Scala/SQL/R |
-| [`databricks-jobs`](databricks-jobs/) | Criação, listagem, execução e monitoramento de Databricks Jobs via CLI, Python SDK e Asset Bundles |
-| [`databricks-python-sdk`](databricks-python-sdk/) | SDK Python do Databricks, Databricks Connect, CLI e REST API — referência completa com exemplos |
+| [`databricks-core`](databricks-core/) | Ponto de entrada do Databricks CLI: autenticação, perfis e bundles; carregar antes da skill do produto |
+| [`databricks-dabs`](databricks-dabs/) | Declarative Automation Bundles (DABs): criar, validar, fazer deploy e rodar jobs, pipelines, dashboards e apps |
+| [`databricks-docs`](databricks-docs/) | Documentação Databricks via llms.txt, quando outras skills não cobrem o tema |
+| [`databricks-execution-compute`](databricks-execution-compute/) | Execução de código e gestão de compute: serverless, clusters, Python/Scala/SQL/R |
+| [`databricks-jobs`](databricks-jobs/) | Databricks Jobs via CLI, Python SDK e bundles: criar, rodar e monitorar |
+| [`databricks-python-sdk`](databricks-python-sdk/) | Python SDK, Databricks Connect, CLI e REST API |
+| [`databricks-sandbox`](databricks-sandbox/) | Sandbox serverless sob demanda para rodar código gerado por agente ou não confiável |
+| [`databricks-serverless`](databricks-serverless/) | Compute serverless para jobs, pipelines e DABs (STANDARD ou PERFORMANCE_OPTIMIZED); carregar antes de escrever o job |
+| [`databricks-serverless-migration`](databricks-serverless-migration/) | Migrar notebooks, jobs, pipelines e JARs de compute clássico para serverless |
+| [`databricks-setup-local`](databricks-setup-local/) | Montar ou diagnosticar o `.venv` local (uv) para Databricks Connect, serverless ou bundle |
 
 ### Aplicações
 
 | Skill | Descrição |
 |-------|-----------|
-| [`databricks-apps-python`](databricks-apps-python/) | Aplicações Python no Databricks (Dash, Streamlit, Gradio, Flask, FastAPI, Reflex) com OAuth, SQL warehouse e model serving |
-| [`databricks-lakebase-autoscale`](databricks-lakebase-autoscale/) | Lakebase Autoscaling (PostgreSQL gerenciado): autoscaling, scale-to-zero, branching, synced tables e OAuth |
-| [`databricks-lakebase-provisioned`](databricks-lakebase-provisioned/) | Lakebase Provisioned (PostgreSQL OLTP): criação de instâncias, conexão de apps, reverse ETL e memória de agentes |
+| [`databricks-apps`](databricks-apps/) | Databricks Apps (AppKit): apps de dados, ferramentas analíticas e visualizações interativas |
+| [`databricks-apps-python`](databricks-apps-python/) | Apps Python (Dash, Streamlit, Gradio, Flask, FastAPI, Reflex) com OAuth, SQL warehouse e model serving |
+| [`databricks-app-design`](databricks-app-design/) | UX de telas de dados em AppKit/React: layout, gráficos, KPIs e estados obrigatórios |
+| [`databricks-lakebase`](databricks-lakebase/) | Lakebase Postgres: projetos, escala, conectividade, synced tables e Data API |
+| [`databricks-aibi-dashboards`](databricks-aibi-dashboards/) | Dashboards AI/BI (Lakeview), com validação das queries antes do deploy |
 | [`databricks-unstructured-pdf-generation`](databricks-unstructured-pdf-generation/) | Geração de PDFs a partir de HTML e upload para volumes do Unity Catalog |
 
 ### Desenvolvimento & Workflow — família SDD (`sdd-*`)
@@ -402,14 +414,26 @@ Cada fase do workflow SDD é uma skill autocontida (SKILL.md + template próprio
 | [`sdd-doc`](sdd-doc/) | cross | Hook de fim de fase: comentário + transição no ticket Jira via MCP |
 | [`sdd-dev-workflow`](sdd-dev-workflow/) | 4+ | Fluxo de desenvolvimento seguro: discussão → branch → código → validação → auto-review → PR → merge |
 | [`sdd-code-reviewer`](sdd-code-reviewer/) | 4+ | Review de segurança, qualidade de código, performance e boas práticas para projetos Databricks e Python |
-| [`databricks-python-dev`](databricks-python-dev/) | 4+ | Padrões de desenvolvimento Python: uv, type hints, Ruff, Pyright e pytest |
+| [`databricks-python-dev`](databricks-python-dev/) | 4+ | Padrões de desenvolvimento Python: uv, type hints, Ruff, Pyright e pytest — *congelada* (ai-dev-kit v0.1.14; não existe no repo oficial) |
 | [`custom-test-generator`](custom-test-generator/) | 4+ | Geração de testes unitários pytest, testes de integração e fixtures para código Python e data engineering |
 
 ---
 
 ## Sincronização das Skills Databricks (upstream)
 
-As skills `databricks-*`, `spark-python-data-source` e `TEMPLATE` **não são nossas** — elas vêm do repositório oficial da Databricks [`databricks-solutions/ai-dev-kit`](https://github.com/databricks-solutions/ai-dev-kit), pasta `databricks-skills/`. Para mantê-las atualizadas sem clonar o repo upstream dentro do nosso, há um GitHub Action que sincroniza automaticamente.
+As skills `databricks-*` e `spark-python-data-source` **não são nossas** — vêm do repositório oficial da Databricks [`databricks/databricks-agent-skills`](https://github.com/databricks/databricks-agent-skills) (pasta `skills/`; a `spark-python-data-source` vem de `experimental/`). Um GitHub Action mantém a cópia atualizada sem clonar o upstream dentro do nosso repo.
+
+> **Mudança de upstream (nov/2026):** até a v0.1.14 as skills vinham de [`databricks-solutions/ai-dev-kit`](https://github.com/databricks-solutions/ai-dev-kit). Na v0.2.0 (28/07/2026) o ai-dev-kit deixou de distribuí-las e passou o papel para o `databricks-agent-skills`, mantido pela engenharia da Databricks. Algumas skills mudaram de nome:
+>
+> | Antes (ai-dev-kit) | Agora (oficial) |
+> |---|---|
+> | `databricks-bundles` | `databricks-dabs` |
+> | `databricks-genie`, `databricks-agent-bricks` | `databricks-genie-agents` |
+> | `databricks-spark-declarative-pipelines` | `databricks-pipelines` |
+> | `databricks-lakebase-autoscale`, `databricks-lakebase-provisioned` | `databricks-lakebase` |
+> | `databricks-config` | `databricks-core` |
+>
+> `databricks-python-dev` não existe no repo oficial e ficou **congelada** na versão do ai-dev-kit v0.1.14 (`FROZEN_SKILLS`). O `TEMPLATE/` também não é mais sincronizado.
 
 ### Como funciona
 
@@ -418,24 +442,42 @@ As skills `databricks-*`, `spark-python-data-source` e `TEMPLATE` **não são no
 │  Toda segunda 06:00 UTC  (ou manualmente via "Run workflow")          │
 └───────────────────────────────────┬──────────────────────────────────┘
                                     ▼
-   1. Descobre a ÚLTIMA TAG semver do upstream (ex: v0.1.12)
+   1. Descobre a ÚLTIMA RELEASE do upstream (ex: v0.2.40)
       └─ segue releases publicadas, NÃO o branch main do upstream
                                     ▼
-   2. Sparse + shallow checkout de databricks-skills/ (+ .claude/skills/
-      python-dev) num dir efêmero do runner (.upstream/) — nada do repo
-      upstream é commitado no nosso repo (sem submodule, sem subtree)
+   2. Sparse + shallow checkout de skills/ (+ experimental/
+      spark-python-data-source) num dir efêmero do runner (.upstream/)
+      — nada do repo upstream é commitado (sem submodule, sem subtree)
                                     ▼
-   3. Copia cada pasta de skill para a raiz do nosso repo
-      └─ NUNCA toca nas nossas skills próprias sdd-*/custom-* (OWN_SKILLS)
-      └─ grava versão + commit em databricks-skills.lock
+   3. .github/scripts/sync-databricks-skills.sh:
+      └─ copia cada pasta com SKILL.md para a raiz
+      └─ PODA as skills que o sync anterior trouxe e o upstream removeu
+      └─ NUNCA toca OWN_SKILLS (sdd-*/custom-*) nem FROZEN_SKILLS
+      └─ copia LICENSE e NOTICE da Databricks
+      └─ grava versão, commit e lista de skills em databricks-skills.lock
                                     ▼
    4. Se algo mudou → abre/atualiza 1 PR para a main (label: skills-sync)
-      Se nada mudou (mesma tag, mesmo conteúdo) → nenhum PR é criado
+      Se nada mudou (mesma release) → nenhum PR é criado
                                     ▼
    5. Você revisa o diff e faz o merge  ← respeita a Golden Rule
 ```
 
-> **Por que segue tag e não `main`:** a tag é um corte estável e reproduzível. O `main` do upstream pode conter trabalho em andamento entre releases. Consequência: se o upstream ficar semanas sem nova release, os runs de segunda não geram PR algum — e está tudo certo. O PR só aparece quando há release nova (ou mudança de conteúdo naquela tag).
+> **Por que segue release e não `main`:** a release é um corte estável e reproduzível. O `main` do upstream pode conter trabalho em andamento.
+
+> **Se o upstream renomear uma skill:** o PR vai mostrar a pasta antiga apagada e a nova criada. Antes do merge, troque as referências `@databricks-*` nas skills `sdd-*` (`grep -rn "@databricks-<nome-antigo>" sdd-*`) e rode o validador.
+
+### Testar o sync localmente
+
+```bash
+git clone --depth 1 --filter=blob:none --sparse --branch v0.2.40 \
+  https://github.com/databricks/databricks-agent-skills /tmp/up
+git -C /tmp/up sparse-checkout set skills experimental/spark-python-data-source
+UPSTREAM=databricks/databricks-agent-skills UPSTREAM_PATH=skills UPSTREAM_REF=v0.2.40 \
+  EXTRA_SKILLS="experimental/spark-python-data-source:spark-python-data-source" \
+  FROZEN_SKILLS="databricks-python-dev" OWN_SKILLS="$(grep '^  OWN_SKILLS' .github/workflows/sync-databricks-skills.yml | cut -d'"' -f2)" \
+  bash .github/scripts/sync-databricks-skills.sh /tmp/up .
+python3 .claude/skills/run-genie-code-agent-spec/driver.py validate
+```
 
 ### Skills próprias vs. upstream
 
@@ -443,27 +485,34 @@ O prefixo da pasta indica a origem: **`databricks-*`** = upstream (não editar),
 
 | Origem | Skills | Editar à mão? |
 |--------|--------|---------------|
-| **Upstream** (`ai-dev-kit`) | `databricks-*` (inclui `databricks-python-dev`, de `.claude/skills/python-dev`), `spark-python-data-source`, `TEMPLATE` | ❌ Não — o sync sobrescreve. Contribua no upstream. |
-| **Nossas** (`sdd-*` e `custom-*`) | `sdd-workflow`, `sdd-brainstorm`, `sdd-define`, `sdd-design`, `sdd-build`, `sdd-ship`, `sdd-iterate`, `sdd-doc`, `sdd-staff-engineer`, `sdd-po`, `sdd-dev-workflow`, `sdd-code-reviewer`, `custom-test-generator` | ✅ Sim — não existem no upstream, o sync nunca as toca (`OWN_SKILLS`). |
+| **Upstream** (`databricks-agent-skills`) | `databricks-*`, `spark-python-data-source` | ❌ Não — o sync sobrescreve. Contribua no upstream. |
+| **Congelada** (ai-dev-kit v0.1.14) | `databricks-python-dev` | ⚠️ Pode — o sync não toca mais (`FROZEN_SKILLS`). |
+| **Nossas** (`sdd-*`, `custom-*` e `TEMPLATE`) | `sdd-workflow`, `sdd-brainstorm`, `sdd-define`, `sdd-design`, `sdd-build`, `sdd-ship`, `sdd-iterate`, `sdd-doc`, `sdd-staff-engineer`, `sdd-po`, `sdd-dev-workflow`, `sdd-code-reviewer`, `custom-test-generator` | ✅ Sim — o sync nunca as toca (`OWN_SKILLS`). |
+
+### Licença das skills Databricks
+
+As skills upstream seguem a **Databricks License**: uso permitido em conexão com os serviços Databricks, e quem redistribui precisa repassar a licença. Por isso o sync copia [`LICENSE-databricks-agent-skills`](LICENSE-databricks-agent-skills) e [`NOTICE-databricks-agent-skills`](NOTICE-databricks-agent-skills) para a raiz.
 
 ### Disparar manualmente
 
-Em **Actions → Sync Databricks Skills → Run workflow**. Aceita um input `ref` opcional para fixar uma tag específica (vazio = última release).
+Em **Actions → Sync Databricks Skills → Run workflow**. Aceita um input `ref` opcional para fixar uma release específica (vazio = última).
 
 > **Pré-requisito:** habilitar *Settings → Actions → General → "Allow GitHub Actions to create and approve pull requests"*, senão a abertura do PR falha.
 
 Arquivos envolvidos:
 - [`.github/workflows/sync-databricks-skills.yml`](.github/workflows/sync-databricks-skills.yml) — o workflow
-- `databricks-skills.lock` — manifesto de proveniência (versão + commit upstream + data), gerado pelo workflow
+- [`.github/scripts/sync-databricks-skills.sh`](.github/scripts/sync-databricks-skills.sh) — a cópia, poda e lock (roda igual local)
+- `databricks-skills.lock` — proveniência (release + commit upstream + data + lista de skills), gerado pelo sync
 
 ---
 
 ## Estrutura do Repositório
 
 ```
-<skill-name>/                       # 41 skills na raiz (Databricks + SDD workflow + Python + Spark)
+<skill-name>/                       # 51 skills na raiz (Databricks oficiais + SDD workflow + Python + Spark)
 docs/                               # Documentação de referência extraída de fontes Databricks
-.github/workflows/                  # CI — inclui o sync das skills Databricks (upstream)
+.github/workflows/ e scripts/       # CI — sync das skills Databricks (upstream)
+LICENSE-/NOTICE-databricks-agent-skills  # licença das skills upstream
 databricks-skills.lock              # Proveniência do último sync (versão + commit upstream)
 assets/                             # documentation/ versionada (PDFs); repos/ gitignored
 .claude/                            # Claude Code CLI local — gitignored

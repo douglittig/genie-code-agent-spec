@@ -1,12 +1,16 @@
 ---
 name: databricks-ai-functions
-description: "Use Databricks built-in AI Functions (ai_classify, ai_extract, ai_summarize, ai_mask, ai_translate, ai_fix_grammar, ai_gen, ai_analyze_sentiment, ai_similarity, ai_parse_document, ai_prep_search, ai_query, ai_forecast) to add AI capabilities directly to SQL and PySpark pipelines without managing model endpoints. Also covers document parsing and building custom RAG pipelines (parse → prep_search → index → query)."
+description: "Use Databricks built-in AI Functions (ai_classify, ai_decide, ai_extract, ai_summarize, ai_mask, ai_translate, ai_fix_grammar, ai_gen, ai_analyze_sentiment, ai_similarity, ai_parse_document, ai_prep_search, ai_query, ai_forecast) to add AI capabilities directly to SQL and PySpark pipelines without managing model endpoints. Also covers document parsing and building custom RAG pipelines (parse → prep_search → index → query)."
+compatibility: Requires databricks CLI (>= v1.0.0)
+metadata:
+  version: "0.3.0"
+parent: databricks-core
 ---
 
 # Databricks AI Functions
 
-> **Official Docs:** https://docs.databricks.com/en/large-language-models/ai-functions
-> Individual function reference: https://docs.databricks.com/en/sql/language-manual/functions/
+> **Official Docs:** https://docs.databricks.com/large-language-models/ai-functions
+> Individual function reference: https://docs.databricks.com/sql/language-manual/sql-ref-functions-builtin
 
 ## Overview
 
@@ -20,19 +24,20 @@ The **Function** column links to the in-repo deep reference (full options, schem
 
 | Function | Task | Input | Output | Extra prereqs | Docs |
 |---|---|---|---|---|---|
-| [`ai_analyze_sentiment`](1-task-functions.md#ai_analyze_sentiment) | Sentiment scoring | `content STRING` | `STRING` — `positive`/`negative`/`neutral`/`mixed`, or `NULL` | — | [↗](https://docs.databricks.com/en/sql/language-manual/functions/ai_analyze_sentiment) |
-| [`ai_classify`](1-task-functions.md#ai_classify) | Fixed-label routing | `content STRING\|VARIANT`, `labels` (2–500), `[options MAP]` | `VARIANT` — `{response:[label], error_message}` | — | [↗](https://docs.databricks.com/en/sql/language-manual/functions/ai_classify) |
-| [`ai_extract`](1-task-functions.md#ai_extract) | Entity / field extraction | `content STRING\|VARIANT`, `schema STRING` (JSON), `[options MAP]` | `VARIANT` — `{response:{…}, error_message, metadata}` | ≤128 fields, ≤7 nesting levels | [↗](https://docs.databricks.com/en/sql/language-manual/functions/ai_extract) |
-| [`ai_fix_grammar`](1-task-functions.md#ai_fix_grammar) | Grammar correction | `content STRING` | `STRING` (corrected) | — | [↗](https://docs.databricks.com/en/sql/language-manual/functions/ai_fix_grammar) |
-| [`ai_gen`](1-task-functions.md#ai_gen) | Free-form generation | `prompt STRING` | `STRING` | — | [↗](https://docs.databricks.com/en/sql/language-manual/functions/ai_gen) |
-| [`ai_mask`](1-task-functions.md#ai_mask) | PII redaction | `content STRING`, `labels ARRAY<STRING>` | `STRING` (entities → `[MASKED]`) | — | [↗](https://docs.databricks.com/en/sql/language-manual/functions/ai_mask) |
-| [`ai_similarity`](1-task-functions.md#ai_similarity) | Semantic similarity | `expr1 STRING`, `expr2 STRING` | `FLOAT` (0.0–1.0) | — | [↗](https://docs.databricks.com/en/sql/language-manual/functions/ai_similarity) |
-| [`ai_summarize`](1-task-functions.md#ai_summarize) | Summarization | `content STRING`, `[max_words INT]` (0 = uncapped) | `STRING` | Public Preview; English-tuned | [↗](https://docs.databricks.com/en/sql/language-manual/functions/ai_summarize) |
-| [`ai_translate`](1-task-functions.md#ai_translate) | Translation | `content STRING`, `to_lang STRING` | `STRING` | Langs: en, fr, de, hi, it, pt, es, th | [↗](https://docs.databricks.com/en/sql/language-manual/functions/ai_translate) |
-| [`ai_parse_document`](1-task-functions.md#ai_parse_document) | Parse PDF / Office / images | `content BINARY`, `[Map('version','2.0', …)]` | `VARIANT` — pages, elements, error_status | **DBR 17.3+**; ≤500 pages / 100 MB | [↗](https://docs.databricks.com/en/sql/language-manual/functions/ai_parse_document) |
-| [`ai_prep_search`](1-task-functions.md#ai_prep_search) | RAG chunking from parsed docs | `parsed VARIANT`, `[options MAP]` | `VARIANT` — `{document:{contents, pages, source_uri}, error_status}` | **DBR 18.2+** (serverless env v3+) | [↗](https://docs.databricks.com/en/sql/language-manual/functions/ai_prep_search) |
-| [`ai_query`](2-ai-query.md) | Any serving endpoint (built-in foundation or custom), multimodal, complex JSON (**last resort**) | `endpoint STRING`, `request STRING\|STRUCT`, `[returnType]`, `[failOnError BOOL]`, `[modelParameters STRUCT]`, `[responseFormat STRING]`, `[files]` | Parsed response; with `failOnError => false` a `STRUCT{response, errorMessage}` | **Pro/Serverless** warehouse; `CAN QUERY` on endpoint | [↗](https://docs.databricks.com/en/sql/language-manual/functions/ai_query) |
-| [`ai_forecast`](3-ai-forecast.md) | Time series forecasting (table-valued) | `observed TABLE`, `horizon`, `time_col`, `value_col`, `[group_col]`, `[prediction_interval_width]`, `[frequency]`, `[seed]`, `[parameters]` | Rows: time/group cols + per value `{v}_forecast`, `{v}_upper`, `{v}_lower` (DOUBLE) | **Pro/Serverless** warehouse; Public Preview | [↗](https://docs.databricks.com/en/sql/language-manual/functions/ai_forecast) |
+| [`ai_analyze_sentiment`](references/1-task-functions.md#ai_analyze_sentiment) | Sentiment scoring | `content STRING` | `STRING` — `positive`/`negative`/`neutral`/`mixed`, or `NULL` | — | [↗](https://docs.databricks.com/sql/language-manual/functions/ai_analyze_sentiment) |
+| [`ai_classify`](references/1-task-functions.md#ai_classify) | Fixed-label routing | `content STRING\|VARIANT`, `labels` (2–500), `[options MAP]` | `VARIANT` — `{response:[label], error_message}` | — | [↗](https://docs.databricks.com/sql/language-manual/functions/ai_classify) |
+| [`ai_decide`](references/1-task-functions.md#ai_decide) | Evaluate questions (boolean / choice / score) over text or structured data | `state STRING\|VARIANT`, `questions STRING` (JSON), `[options MAP]` | `VARIANT` — `{response:{answers}, metadata, error_message}` | Beta; admin-gated via Previews | [↗](https://docs.databricks.com/sql/language-manual/functions/ai_decide) |
+| [`ai_extract`](references/1-task-functions.md#ai_extract) | Entity / field extraction | `content STRING\|VARIANT`, `schema STRING` (JSON), `[options MAP]` | `VARIANT` — `{response:{…}, error_message, metadata}` | ≤256 fields, ≤12 nesting levels | [↗](https://docs.databricks.com/sql/language-manual/functions/ai_extract) |
+| [`ai_fix_grammar`](references/1-task-functions.md#ai_fix_grammar) | Grammar correction | `content STRING` | `STRING` (corrected) | — | [↗](https://docs.databricks.com/sql/language-manual/functions/ai_fix_grammar) |
+| [`ai_gen`](references/1-task-functions.md#ai_gen) | Free-form generation | `prompt STRING` | `STRING` | — | [↗](https://docs.databricks.com/sql/language-manual/functions/ai_gen) |
+| [`ai_mask`](references/1-task-functions.md#ai_mask) | PII redaction | `content STRING`, `labels ARRAY<STRING>` | `STRING` (entities → `[MASKED]`) | — | [↗](https://docs.databricks.com/sql/language-manual/functions/ai_mask) |
+| [`ai_similarity`](references/1-task-functions.md#ai_similarity) | Semantic similarity | `expr1 STRING`, `expr2 STRING` | `FLOAT` (0.0–1.0) | — | [↗](https://docs.databricks.com/sql/language-manual/functions/ai_similarity) |
+| [`ai_summarize`](references/1-task-functions.md#ai_summarize) | Summarization | `content STRING`, `[max_words INT]` (0 = uncapped) | `STRING` | Public Preview; English-tuned | [↗](https://docs.databricks.com/sql/language-manual/functions/ai_summarize) |
+| [`ai_translate`](references/1-task-functions.md#ai_translate) | Translation | `content STRING`, `to_lang STRING` | `STRING` | Langs: en, fr, de, hi, it, pt, es, th | [↗](https://docs.databricks.com/sql/language-manual/functions/ai_translate) |
+| [`ai_parse_document`](references/1-task-functions.md#ai_parse_document) | Parse PDF / Office / images | `content BINARY`, `[Map('version','2.0', …)]` | `VARIANT` — pages, elements, error_status | **DBR 17.3+**; ≤500 pages / 100 MB | [↗](https://docs.databricks.com/sql/language-manual/functions/ai_parse_document) |
+| [`ai_prep_search`](references/1-task-functions.md#ai_prep_search) | RAG chunking from parsed docs | `parsed VARIANT`, `[options MAP]` | `VARIANT` — `{document:{contents, pages, source_uri}, error_status}` | **DBR 18.2+** (serverless env v3+) | [↗](https://docs.databricks.com/sql/language-manual/functions/ai_prep_search) |
+| [`ai_query`](references/2-ai-query.md) | Any serving endpoint (built-in foundation or custom), multimodal, complex JSON (**last resort**) | `endpoint STRING`, `request STRING\|STRUCT`, `[returnType]`, `[failOnError BOOL]`, `[modelParameters STRUCT]`, `[responseFormat STRING]`, `[files]` | Parsed response; with `failOnError => false` a `STRUCT{response, errorMessage}` | **Pro/Serverless** warehouse; `CAN QUERY` on endpoint | [↗](https://docs.databricks.com/sql/language-manual/functions/ai_query) |
+| [`ai_forecast`](references/3-ai-forecast.md) | Time series forecasting (table-valued) | `observed TABLE`, `horizon`, `time_col`, `value_col`, `[group_col]`, `[prediction_interval_width]`, `[frequency]`, `[seed]`, `[parameters]` | Rows: time/group cols + per value `{v}_forecast`, `{v}_upper`, `{v}_lower` (DOUBLE) | **Pro/Serverless** warehouse; Public Preview | [↗](https://docs.databricks.com/sql/language-manual/functions/ai_forecast) |
 
 Models run under Apache 2.0 or LLAMA 3.3 Community License — you are responsible for compliance.
 
@@ -66,7 +71,7 @@ FROM companies a JOIN companies b ON a.id < b.id
 WHERE ai_similarity(a.name, b.name) > 0.85;
 ```
 
-**Forecasting** — table-valued; one row per future period (+ per group). Full param/group/interval forms → [3-ai-forecast.md](3-ai-forecast.md):
+**Forecasting** — table-valued; one row per future period (+ per group). Full param/group/interval forms → [3-ai-forecast.md](references/3-ai-forecast.md):
 
 ```sql
 SELECT * FROM ai_forecast(
@@ -75,7 +80,7 @@ SELECT * FROM ai_forecast(
 -- Returns: date, sales_forecast, sales_upper, sales_lower
 ```
 
-**Nested JSON via `ai_query`** (last resort — only past `ai_extract`'s limits) — parse the response with `from_json`. Model names, multimodal `files =>`, `modelParameters`, SQL UDF → [2-ai-query.md](2-ai-query.md):
+**Nested JSON via `ai_query`** (last resort — only past `ai_extract`'s limits) — parse the response with `from_json`. Model names, multimodal `files =>`, `modelParameters`, SQL UDF → [2-ai-query.md](references/2-ai-query.md):
 
 ```sql
 SELECT from_json(
@@ -126,7 +131,7 @@ FROM (
 );
 ```
 
-In a batch job, route the per-row error to a sidecar table instead of letting it crash the run: keep `ai_extract`'s `result:error_message` (VARIANT, colon-accessed, as above), and for `ai_query` pass `failOnError => false` and check `ai_response.errorMessage` (a STRUCT field, dot-accessed). See [2-ai-query.md](2-ai-query.md).
+In a batch job, route the per-row error to a sidecar table instead of letting it crash the run: keep `ai_extract`'s `result:error_message` (VARIANT, colon-accessed, as above), and for `ai_query` pass `failOnError => false` and check `ai_response.errorMessage` (a STRUCT field, dot-accessed). See [2-ai-query.md](references/2-ai-query.md).
 
 ### Custom RAG Pipeline — Parse → Prep → Index
 
@@ -143,21 +148,21 @@ SELECT
   variant_get(chunk, '$.chunk_to_retrieve', 'STRING') AS chunk_to_retrieve,
   variant_get(chunk, '$.chunk_to_embed',    'STRING') AS chunk_to_embed,
   source_path
-FROM prepped LATERAL VIEW explode(variant_get(prep, '$.chunks', 'ARRAY<VARIANT>')) c AS chunk;
+FROM prepped LATERAL VIEW explode(variant_get(prep, '$.document.contents', 'ARRAY<VARIANT>')) c AS chunk;
 ```
 
 Then enable CDF (`ALTER TABLE parsed_chunks SET TBLPROPERTIES (delta.enableChangeDataFeed = true)`) and use the **[databricks-vector-search](../databricks-vector-search/SKILL.md)** skill to build a Delta Sync index: PK `chunk_id`, embedding source `chunk_to_embed`, return `chunk_to_retrieve`.
 
 **Beyond batch:**
-- **Ask questions over the output** — point a Genie space at the resulting Delta table for natural-language querying instead of hand-written SQL; see the **[databricks-genie](../databricks-genie/SKILL.md)** skill.
+- **Ask questions over the output** — point a Genie Agent at the resulting Delta table for natural-language querying instead of hand-written SQL; see the **[databricks-genie-agents](../databricks-genie-agents/SKILL.md)** skill.
 - **Low-latency / serving** — to expose this as a real-time, governed endpoint (e.g. register a model to Unity Catalog and serve it), use the **[databricks-model-serving](../databricks-model-serving/SKILL.md)** skill.
 - **Production incremental ingestion** — for a runnable end-to-end streaming `ai_parse_document` job (checkpoints, `trigger(availableNow=True)`), see [databricks/bundle-examples · job_with_ai_parse_document](https://github.com/databricks/bundle-examples/tree/main/contrib/job_with_ai_parse_document).
 
 ## Reference Files
 
-- [1-task-functions.md](1-task-functions.md) — Deep reference for every task-specific function: full options/schemas (e.g. `ai_extract` v2.1 citations + confidence scores, `ai_classify` multilabel, `ai_parse_document` options + output schema, `ai_prep_search` chunk schema) and non-trivial examples. The Overview table above links to each function's section directly.
-- [2-ai-query.md](2-ai-query.md) — `ai_query` complete reference: all parameters, structured output with `responseFormat`, multimodal `files =>`, UDF patterns, and error handling
-- [3-ai-forecast.md](3-ai-forecast.md) — `ai_forecast` parameters, single-metric, multi-group, multi-metric, and confidence interval patterns
+- [1-task-functions.md](references/1-task-functions.md) — Deep reference for every task-specific function: full options/schemas (e.g. `ai_extract` v2.1 citations + confidence scores, `ai_classify` multilabel, `ai_parse_document` options + output schema, `ai_prep_search` chunk schema) and non-trivial examples. The Overview table above links to each function's section directly.
+- [2-ai-query.md](references/2-ai-query.md) — `ai_query` complete reference: all parameters, structured output with `responseFormat`, multimodal `files =>`, UDF patterns, and error handling
+- [3-ai-forecast.md](references/3-ai-forecast.md) — `ai_forecast` parameters, single-metric, multi-group, multi-metric, and confidence interval patterns
 
 ## Common Issues
 
@@ -165,11 +170,13 @@ Then enable CDF (`ALTER TABLE parsed_chunks SET TBLPROPERTIES (delta.enableChang
 |---|---|
 | `ai_parse_document` not found | Requires DBR **17.3+**. Check cluster runtime. |
 | `ai_prep_search` not found | Requires DBR **18.2+** (serverless env v3+). |
-| `explode()` fails on a VARIANT | `explode` needs ARRAY — cast first: `explode(variant_get(prep, '$.chunks', 'ARRAY<VARIANT>'))`. |
+| `ai_decide` not found / unavailable | **Beta** — a workspace admin must enable it on the **Previews** page. Requires Databricks SQL (not SQL Classic) or DBR **15.4 LTS+**. |
+| `explode()` fails on a VARIANT | `explode` needs ARRAY — cast first: `explode(variant_get(prep, '$.document.contents', 'ARRAY<VARIANT>'))`. |
 | Embedding the wrong RAG column | Embed `chunk_to_embed` (context-enriched); return `chunk_to_retrieve` to the LLM. |
 | `ai_forecast` fails | Requires **Pro or Serverless** SQL warehouse — not available on Classic or Starter. |
 | All functions return NULL | Input column is NULL. Filter with `WHERE col IS NOT NULL` before calling. |
-| `ai_translate` fails for a language | Supported: English, German, French, Italian, Portuguese, Hindi, Spanish, Thai. Use `ai_query` with a multilingual model for others. |
+| `ai_translate` fails for a language | Supported (8): English (`en`), French (`fr`), German (`de`), Hindi (`hi`), Italian (`it`), Portuguese (`pt`), Spanish (`es`), Thai (`th`) — `to_lang` takes the code or the full name (see [references/1-task-functions.md](references/1-task-functions.md)). Use `ai_query` with a multilingual model for others. |
 | `ai_classify` returns unexpected labels | Use clear, mutually exclusive label names. Fewer labels (2–5) produces more reliable results. |
 | `ai_query` raises on some rows in a batch job | Add `failOnError => false` — returns a STRUCT with `.response` and `.errorMessage` (dot-accessed) instead of raising. |
+| `ai_query` fails with 403 "no longer available" | The legacy `databricks-*` foundation-model endpoint name has been retired in favor of Unity Catalog model services. Switch to `system.ai.<model>` (same call, other args unchanged); custom endpoints are not affected by this migration and keep their existing name. See [2-ai-query.md](references/2-ai-query.md#unity-gateway-migration-403-permission_denied). |
 | Batch job runs slowly | Use DBR **15.4 ML LTS** cluster (not serverless or interactive) for optimized batch inference throughput. |

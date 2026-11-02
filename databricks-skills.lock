@@ -1,7 +1,44 @@
-# Gerado automaticamente por .github/workflows/sync-databricks-skills.yml
+# Gerado automaticamente por .github/scripts/sync-databricks-skills.sh
 # Não editar à mão.
-upstream_repo: databricks-solutions/ai-dev-kit
-upstream_path: databricks-skills
-version: v0.1.14
-commit: d2806ce2e3ab72eb7748268855af4e4779702271
-synced_at: 2026-07-27T09:36:30Z
+upstream_repo: databricks/databricks-agent-skills
+upstream_path: skills
+version: v0.2.40
+commit: 0ff187b19ed71744d9159c8eb0776a339d305d63
+synced_at: 2026-11-02T15:14:16Z
+skills:
+  - databricks-aibi-dashboards
+  - databricks-ai-functions
+  - databricks-ai-runtime
+  - databricks-app-design
+  - databricks-apps
+  - databricks-apps-python
+  - databricks-core
+  - databricks-dabs
+  - databricks-data-discovery
+  - databricks-dbsql
+  - databricks-docs
+  - databricks-execution-compute
+  - databricks-genie-agents
+  - databricks-iceberg
+  - databricks-jobs
+  - databricks-lakebase
+  - databricks-lakeflow-connect
+  - databricks-metric-views
+  - databricks-mlflow-evaluation
+  - databricks-mlflow-tracing
+  - databricks-ml-training
+  - databricks-model-serving
+  - databricks-pipelines
+  - databricks-python-sdk
+  - databricks-sandbox
+  - databricks-serverless
+  - databricks-serverless-migration
+  - databricks-setup-local
+  - databricks-spark-structured-streaming
+  - databricks-synthetic-data-gen
+  - databricks-unity-catalog
+  - databricks-unity-gateway
+  - databricks-unstructured-pdf-generation
+  - databricks-vector-search
+  - databricks-zerobus-ingest
+  - spark-python-data-source
