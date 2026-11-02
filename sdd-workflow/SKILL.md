@@ -45,7 +45,10 @@ Vale em toda feature, mesmo que nenhuma outra skill tenha sido aberta.
    convenções do repo → os artefatos em `docs/` e `.sdd/` → as skills `@databricks-*` → a
    documentação oficial. Nunca invente API, parâmetro ou comportamento: "não encontrei
    documentação para isso" vale mais que um palpite plausível.
-6. **Relate só o que a ferramenta confirmou.** "Passou", "gravei", "fiz o commit" vêm depois da
+6. **A feature vive nos arquivos, nunca na memória do Genie Code.** Estado, decisões e respostas
+   do usuário vão para `docs/` e `.sdd/`. Não grave a feature na memória do assistente: ela passa
+   para outras sessões, inclusive a do Verifier, sem passar por revisão.
+7. **Relate só o que a ferramenta confirmou.** "Passou", "gravei", "fiz o commit" vêm depois da
    saída que mostra isso, nunca antes. Ainda não viu o resultado: diga que ainda não viu.
 
 ---
