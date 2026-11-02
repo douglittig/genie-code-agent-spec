@@ -30,12 +30,12 @@ O `sdd-doc` **não é uma fase** — é um *hook transversal* chamado ao **final
 Define ─┐
 ADR ────┤
 PO ─────┤
-Design ─┼──► sdd-doc ──► Jira (comentário + transição) ──► .claude/sdd/state/{FEATURE}.md
+Design ─┼──► sdd-doc ──► Jira (comentário + transição) ──► .sdd/features/{FEATURE}/state.md
 Build ──┤
 Ship ───┘
 ```
 
-Cada fase termina com o **Protocolo de Fim-de-Fase** (ver `@sdd-workflow`): gerar artefato →
+Cada fase termina com o **fim de etapa** (ver `@sdd-workflow`): gerar artefato →
 atualizar state → **chamar o sdd-doc** → sugerir próxima fase.
 
 ---
@@ -50,7 +50,7 @@ atualizar state → **chamar o sdd-doc** → sugerir próxima fase.
 ├─────────────────────────────────────────────────────────────────────┤
 │                                                                     │
 │  1. LEDGER DE STATE (fonte da verdade da feature)                   │
-│     └─ Ler: .claude/sdd/state/{FEATURE}.md                          │
+│     └─ Ler: .sdd/features/{FEATURE}/state.md                          │
 │     └─ Extrair: jira_key, confluence_url, fase atual, log de ações  │
 │                                                                     │
 │  2. ARTEFATO DA FASE (o que documentar)                             │
@@ -180,7 +180,7 @@ CHECKLIST PRÉ-VOO
 **Ticket:** {jira_key}
 **Comentário postado:** ✅ (preview confirmado)
 **Transição:** {origem} → {destino}  (ou "mantida" / "n/a")
-**State atualizado:** `.claude/sdd/state/{FEATURE}.md`
+**State atualizado:** `.sdd/features/{FEATURE}/state.md`
 
 🔜 Próxima fase: {próxima fase + agente}
 ```

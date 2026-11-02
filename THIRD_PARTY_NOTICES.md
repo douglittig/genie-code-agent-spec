@@ -45,6 +45,16 @@ SOFTWARE.
 
 ---
 
+## TLC Spec-Driven — CC-BY-4.0 (texto) / MIT (scripts)
+
+Partes do workflow SDD são adaptadas do [TLC Spec-Driven](https://github.com/tech-leads-club/agent-skills) (`tlc-spec-driven` v4.1.0, de Felipe Rodrigues, Tech Leads Club). O texto das skills do Tech Leads Club é licenciado sob [Creative Commons Attribution 4.0 International](https://creativecommons.org/licenses/by/4.0/) (CC-BY-4.0); o código é MIT (Copyright (c) 2026 Tech Leads Club). As ideias foram traduzidas para PT-BR e adaptadas para o Genie Code e para engenharia de dados no Databricks.
+
+Adaptado do TLC Spec-Driven, com mudanças:
+
+- `sdd-workflow/SKILL.md`: tamanho da feature (*auto-sizing*), contrato de execução, raio de ação (*blast radius*, aqui com regras do Databricks) e retomada de sessão.
+
+---
+
 ## Databricks Agent Skills — Databricks License
 
 As skills `databricks-*` e `spark-python-data-source` são cópia do repositório oficial [`databricks/databricks-agent-skills`](https://github.com/databricks/databricks-agent-skills), sincronizada por workflow e não editada à mão. Licença em [`LICENSE-databricks-agent-skills`](LICENSE-databricks-agent-skills) e atribuições em [`NOTICE-databricks-agent-skills`](NOTICE-databricks-agent-skills).

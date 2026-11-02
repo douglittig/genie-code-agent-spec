@@ -207,7 +207,7 @@ CHECKLIST PRÉ-VOO
 
 ## Fim de Fase — sdd-doc
 
-No início, **ler o state** `.claude/sdd/state/{FEATURE}.md` (obtém `jira_key` e contexto da feature).
+No início, **ler o state** `.sdd/features/{FEATURE}/state.md` (obtém `jira_key` e contexto da feature).
 
 Após gerar o DESIGN, atualizar o state (fase Design = `concluída`, caminho do artefato) e **chamar
 a skill **`@sdd-doc`**:

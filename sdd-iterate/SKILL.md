@@ -213,7 +213,7 @@ Quando cascata for necessária, perguntar ao usuário:
 
 ## Fim de Fase — sdd-doc
 
-Após registrar a mudança nos documentos impactados e no state (`.claude/sdd/state/{FEATURE}.md`),
+Após registrar a mudança nos documentos impactados e no state (`.sdd/features/{FEATURE}/state.md`),
 **chamar a skill **`@sdd-doc`**:
 
 - Comentário no Jira: o que mudou, qual fase foi impactada e o efeito cascata avaliado

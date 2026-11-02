@@ -221,7 +221,7 @@ CHECKLIST PRÉ-VOO
 ├─ [ ] Fontes Confluence registradas (URL + página + seção) — se input foi Confluence
 ├─ [ ] Clarity score >= 12/15
 ├─ [ ] Chave do ticket Jira capturada (ou registrada como `pendente`)
-├─ [ ] State criado em `.claude/sdd/state/{FEATURE}.md`
+├─ [ ] State criado em `.sdd/features/{FEATURE}/state.md`
 └─ [ ] sdd-doc acionado (comentário + transição → Em andamento)
 ```
 
@@ -290,7 +290,7 @@ Clarity Score  < 9/15  → Bloquear, listar todas as lacunas, aguardar input do 
 **Processo:**
 
 1. Perguntar ao usuário a **chave do ticket Jira** (ex: `PROJ-123`). Se não houver, registrar `pendente`.
-2. Criar o ledger `.claude/sdd/state/{FEATURE}.md` a partir de `STATE_TEMPLATE.md`, preenchendo:
+2. Criar o ledger `.sdd/features/{FEATURE}/state.md` a partir de `STATE_TEMPLATE.md`, preenchendo:
    - `jira_key`, `confluence_url` (da Capacidade 0), `Fase Atual = Define`
    - Status da fase Define = `concluída`, com o Clarity Score e o caminho do DEFINE
 3. O state passa a ser a fonte da verdade reutilizada por ADR, Design, Build e Ship.

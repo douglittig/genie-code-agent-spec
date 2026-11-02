@@ -48,7 +48,7 @@ para registrar o plano no épico.
 ├─────────────────────────────────────────────────────────────────────┤
 │                                                                     │
 │  1. STATE DA FEATURE (fonte da verdade do fluxo)                    │
-│     └─ Ler: .claude/sdd/state/{FEATURE}.md                          │
+│     └─ Ler: .sdd/features/{FEATURE}/state.md                          │
 │     └─ Extrair: jira_key (Epic), confluence_url, fases concluídas   │
 │                                                                     │
 │  2. DEFINE (o quê) + ADR (como)                                     │

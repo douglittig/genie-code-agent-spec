@@ -34,7 +34,7 @@ description: |
 │  1. VERIFICAÇÃO DE ARTEFATOS (confirmar completude)                 │
 │     └─ Ler: docs/specs/DEFINE_{FEATURE}.md                          │
 │     └─ Ler: docs/designs/DESIGN_{FEATURE}.md                        │
-│     └─ Ler: .claude/sdd/reports/BUILD_REPORT_{FEATURE}.md           │
+│     └─ Ler: .sdd/features/{FEATURE}/BUILD_REPORT.md           │
 │     └─ Opcional: docs/specs/BRAINSTORM_{FEATURE}.md                 │
 │                                                                      │
 │  2. VALIDAÇÃO DO BUILD REPORT                                        │
@@ -92,7 +92,7 @@ VERIFICAÇÃO PRÉ-SHIP
 
 **Processo:**
 
-1. Criar diretório archive: `.claude/sdd/archive/{FEATURE}/`
+1. Criar diretório archive: `.sdd/archive/{FEATURE}/`
 2. Copiar todos os artefatos para o archive
 3. Atualizar status nos documentos arquivados para "Shipped"
 4. Remover de features/ e reports/
@@ -100,7 +100,7 @@ VERIFICAÇÃO PRÉ-SHIP
 **Estrutura do Archive:**
 
 ```text
-.claude/sdd/archive/{FEATURE}/
+.sdd/archive/{FEATURE}/
 ├── BRAINSTORM_{FEATURE}.md  (se existir)
 ├── DEFINE_{FEATURE}.md
 ├── ADR_{FEATURE}.md         (se existir)
@@ -152,7 +152,7 @@ CHECKLIST PRÉ-VOO
 ├─ [ ] Status dos documentos arquivados atualizado para "Shipped"
 ├─ [ ] Pelo menos 2 lições específicas documentadas
 ├─ [ ] sdd-doc acionado (comentário + transição → Concluído)
-├─ [ ] State arquivado em `.claude/sdd/archive/{FEATURE}/`
+├─ [ ] State arquivado em `.sdd/archive/{FEATURE}/`
 └─ [ ] Arquivos de trabalho limpos
 ```
 
@@ -221,7 +221,7 @@ CHECKLIST PRÉ-VOO
 
 ## Fim de Fase — sdd-doc
 
-No início, **ler o state** `.claude/sdd/state/{FEATURE}.md` (obtém `jira_key` e o histórico das fases).
+No início, **ler o state** `.sdd/features/{FEATURE}/state.md` (obtém `jira_key` e o histórico das fases).
 
 Após gerar o SHIPPED e validar a prontidão, **chamar a skill **`@sdd-doc`** **antes**
 de arquivar:
@@ -230,7 +230,7 @@ de arquivar:
 - Transição: **Em revisão → Concluído**
 - Preview antes de escrever; sem `jira_key`, modo pendente
 
-Em seguida, arquivar o **state** junto dos demais artefatos em `.claude/sdd/archive/{FEATURE}/`
+Em seguida, arquivar o **state** junto dos demais artefatos em `.sdd/archive/{FEATURE}/`
 (atualizando `Fase Atual = Shipped`). O state arquivado preserva o log completo de ações no Jira.
 
 ---

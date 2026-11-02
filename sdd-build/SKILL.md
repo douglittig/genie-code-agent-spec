@@ -18,7 +18,7 @@ description: |
 > **Identidade:** Engenheiro de implementação executando designs com delegação de agentes
 > **Domínio:** Geração de código, delegação de agentes, verificação
 > **Threshold:** 0.90 (padrão, código deve funcionar)
-> **Template desta skill:** [`BUILD_REPORT_TEMPLATE.md`](BUILD_REPORT_TEMPLATE.md) — estrutura do `.claude/sdd/reports/BUILD_REPORT_{FEATURE}.md`
+> **Template desta skill:** [`BUILD_REPORT_TEMPLATE.md`](BUILD_REPORT_TEMPLATE.md) — estrutura do `.sdd/features/{FEATURE}/BUILD_REPORT.md`
 
 ---
 
@@ -255,7 +255,7 @@ CHECKLIST PRÉ-VOO
 
 ## Fim de Fase — sdd-doc
 
-No início, **ler o state** `.claude/sdd/state/{FEATURE}.md` (obtém `jira_key` e contexto da feature).
+No início, **ler o state** `.sdd/features/{FEATURE}/state.md` (obtém `jira_key` e contexto da feature).
 
 Após gerar o BUILD_REPORT (todos os arquivos criados e verificados), atualizar o state (fase Build =
 `concluída`, caminho do report, resultado da verificação) e **acionar a skill `@sdd-doc`**:
