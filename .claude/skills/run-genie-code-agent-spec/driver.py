@@ -17,7 +17,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[3]
 
 # Pastas da raiz que não são skills.
-NON_SKILL_DIRS = {"docs", "assets", ".github", ".claude", ".git"}
+NON_SKILL_DIRS = {"docs", "assets", "tools", ".github", ".claude", ".git"}
 
 # Skills cujo `name:` difere da pasta por mapeamento do upstream
 # (skill congelada do antigo ai-dev-kit: pasta databricks-python-dev, name python-dev).
