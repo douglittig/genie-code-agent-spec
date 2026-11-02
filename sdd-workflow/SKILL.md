@@ -58,11 +58,11 @@ feature, anuncie o tamanho em uma linha com o motivo e deixe o usuário corrigir
 | **Pequeno** | Corrigir um filtro, renomear coluna, ajustar uma query; ≤ 3 arquivos, cabe numa frase | Spec de uma linha no chat (critério + teste) → `@sdd-build` |
 | **Médio** | Tabela ou coluna derivada nova num pipeline que já existe; job novo com padrão conhecido; < 10 tarefas | `@sdd-define` (curto) → `@sdd-build` → `@sdd-ship` |
 | **Grande** | Pipeline novo, mudança no modelo de dados, vários componentes | `@sdd-define` → `@sdd-design` → `@sdd-po` (com Jira) → `@sdd-build` → `@sdd-ship`; `@sdd-staff-engineer` se houver decisão de arquitetura |
-| **Complexo** | Domínio novo, migração, vários sistemas, requisito ambíguo | `@sdd-brainstorm` → `@sdd-define` → `@sdd-staff-engineer` → `@sdd-po` → `@sdd-design` → `@sdd-build` → `@sdd-ship` |
+| **Complexo** | Domínio novo, migração, vários sistemas, requisito ambíguo | `@sdd-define` (com áreas cinzentas) → `@sdd-staff-engineer` → `@sdd-po` → `@sdd-design` → `@sdd-build` → `@sdd-ship` |
 
 **Regras:**
 - **Define e Build sempre existem.** No Pequeno, o Define é a spec de uma linha no chat, sem arquivo.
-- **Brainstorm** só no Complexo, ou quando a ideia ainda é vaga.
+- **Áreas cinzentas** (exploração de opções dentro do `@sdd-define`) só no Complexo, ou quando a ideia ainda é vaga.
 - **Staff Engineer (ADR)** quando há decisão de arquitetura: padrão novo, tecnologia nova, trade-off
   com consequência duradoura.
 - **PO** quando a feature vai para o Jira e tem mais de uma story.
@@ -94,8 +94,7 @@ Na dúvida se uma ação sai do ambiente de desenvolvimento, trate como "exige o
 
 | Etapa | Skill | Artefato |
 |---|---|---|
-| Brainstorm | `@sdd-brainstorm` | `docs/specs/BRAINSTORM_{FEATURE}.md` |
-| Define | `@sdd-define` | `docs/specs/DEFINE_{FEATURE}.md` + `.sdd/features/{FEATURE}/state.md` |
+| Define | `@sdd-define` | `docs/specs/DEFINE_{FEATURE}.md` + `.sdd/features/{FEATURE}/state.md`; gate `validate_define.py` |
 | Arquitetura | `@sdd-staff-engineer` | `docs/adr/ADR_{FEATURE}.md` (vinculante para Design e Build) |
 | Planejamento | `@sdd-po` | `docs/planning/STORIES_{FEATURE}.md` + Stories e Tasks no Jira |
 | Design | `@sdd-design` | `docs/designs/DESIGN_{FEATURE}.md` |
@@ -141,7 +140,7 @@ Numa sessão nova, ou depois que o contexto foi resumido:
 
 ```
 docs/                          # documentação da feature (revisada por humanos)
-├── specs/      BRAINSTORM_*.md, DEFINE_*.md
+├── specs/      DEFINE_*.md
 ├── adr/        ADR_*.md
 ├── planning/   STORIES_*.md
 └── designs/    DESIGN_*.md
@@ -170,6 +169,7 @@ de antemão: a ausência do arquivo é o estado certo de uma etapa pulada.
 | Raio de ação | *blast radius* |
 | Gate | *gate* |
 | Parada humana | *human checkpoint* |
+| Área cinzenta | *gray area* |
 
 ---
 

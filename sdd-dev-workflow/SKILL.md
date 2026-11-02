@@ -50,7 +50,7 @@ Discussão → Branch → Desenvolvimento → Validação Local → Auto-review 
 
 | Situação | Rota |
 |----------|------|
-| Ideia vaga ou requisito impreciso | Usar `@sdd-workflow` fase Brainstorm |
+| Ideia vaga ou requisito impreciso | Usar `@sdd-define` (áreas cinzentas) |
 | Múltiplas abordagens possíveis | Apresentar opções com trade-offs, aguardar decisão |
 | Mudança simples e clara | Descrever o que será feito e aguardar aprovação inline |
 
@@ -218,7 +218,7 @@ Por padrão, aplicar:
 | Arquivo | Conteúdo |
 |---------|---------|
 | [`pr-template.md`](pr-template.md) | Template base de PR (placeholder corporativo) |
-| `@sdd-workflow` | Fase de Brainstorm para ideias vagas (Passo 0) |
+| `@sdd-define` | Áreas cinzentas para ideias vagas (Passo 0) |
 | `@sdd-code-reviewer` | Auto-review antes de PR (Passo 4) |
 
 ## Integração MCP (opcional)

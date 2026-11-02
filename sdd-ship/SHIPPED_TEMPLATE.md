@@ -116,7 +116,6 @@
 
 | Artefato | Localização |
 |----------|-------------|
-| BRAINSTORM | `./BRAINSTORM_{FEATURE}.md` (se a Fase 0 foi usada) |
 | DEFINE | `./DEFINE_{FEATURE}.md` |
 | DESIGN | `./DESIGN_{FEATURE}.md` |
 | BUILD_REPORT | `./BUILD_REPORT_{FEATURE}.md` |

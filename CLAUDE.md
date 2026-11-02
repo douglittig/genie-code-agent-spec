@@ -2,7 +2,7 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-> **Status:** O workflow SDD foi decomposto em **skills autocontidas com prefixo `sdd-*`** (alinhado à mudança da Databricks que trata cada skill como um ativo individual, em vez de agentes encadeados dentro de uma skill). `@sdd-workflow` orquestra as fases; `@sdd-brainstorm`, `@sdd-define`, `@sdd-design`, `@sdd-build` e `@sdd-ship` executam cada uma, com `@sdd-staff-engineer` (ADR), `@sdd-po` (Stories/Tasks no Jira), `@sdd-iterate` (mudanças mid-stream) e **documentação automática no Jira via `@sdd-doc`** ao final de cada fase. Ainda em desenvolvimento: `@sdd-dev-workflow` e `@sdd-code-reviewer`.
+> **Status:** O workflow SDD foi decomposto em **skills autocontidas com prefixo `sdd-*`** (alinhado à mudança da Databricks que trata cada skill como um ativo individual, em vez de agentes encadeados dentro de uma skill). `@sdd-workflow` decide o tamanho da feature e orquestra; `@sdd-define`, `@sdd-design`, `@sdd-build` e `@sdd-ship` executam cada uma, com `@sdd-staff-engineer` (ADR), `@sdd-po` (Stories/Tasks no Jira), `@sdd-iterate` (mudanças mid-stream) e **documentação automática no Jira via `@sdd-doc`** ao final de cada fase. Ainda em desenvolvimento: `@sdd-dev-workflow` e `@sdd-code-reviewer`.
 
 ## Project
 
@@ -11,7 +11,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Repository Layout
 
 ```
-<skill-name>/            # 51 skills na raiz (Databricks oficiais + SDD workflow + Python + Spark)
+<skill-name>/            # 50 skills na raiz (Databricks oficiais + SDD workflow + Python + Spark)
 docs/                    # Documentação de referência sobre features do Genie Code
 assets/                  # cópias locais de referência — gitignored (links no README, seção Referências)
 THIRD_PARTY_NOTICES.md   # créditos e licenças de terceiros (AgentSpec — MIT; skills Databricks)
@@ -38,7 +38,7 @@ O índice completo das skills está no **[README.md](README.md)**, organizado po
 
 ### Proveniência: skills upstream vs. skills próprias
 
-> **Origem do workflow SDD:** as fases `sdd-brainstorm/define/design/build/ship/iterate`, seus templates, `sdd-code-reviewer` e `custom-test-generator` derivam do [AgentSpec](https://github.com/luanmorenommaciel/agentspec), de Luan Moreno (MIT). Ao editar esses arquivos, manter o crédito em [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md); ao reescrever um deles do zero, atualizar a lista de arquivos derivados lá.
+> **Origem do workflow SDD:** as fases `sdd-design/build/ship/iterate`, seus templates, `sdd-code-reviewer` e `custom-test-generator` derivam do [AgentSpec](https://github.com/luanmorenommaciel/agentspec), de Luan Moreno (MIT). Ao editar esses arquivos, manter o crédito em [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md); ao reescrever um deles do zero, atualizar a lista de arquivos derivados lá.
 
 O prefixo indica a origem da skill:
 
@@ -50,15 +50,14 @@ O prefixo indica a origem da skill:
 - **Versão fixada:** última release do upstream, registrada em `databricks-skills.lock` (versão, commit e lista de skills sincronizadas).
 - **Origem das pastas upstream:** `skills/` do repo oficial. Exceção: **`spark-python-data-source`** vem de `experimental/` (`EXTRA_SKILLS`).
 - **Upstream renomeou uma skill?** O PR do sync mostra a pasta antiga apagada e a nova criada. Antes do merge, trocar as referências `@databricks-*` nas skills `sdd-*` e rodar o validador.
-- **Skills NOSSAS, editáveis** (prefixos `sdd-` e `custom-`, salvaguardadas em `OWN_SKILLS`): `sdd-workflow`, `sdd-brainstorm`, `sdd-define`, `sdd-design`, `sdd-build`, `sdd-ship`, `sdd-iterate`, `sdd-doc`, `sdd-staff-engineer`, `sdd-po`, `sdd-dev-workflow`, `sdd-code-reviewer`, `custom-test-generator`. O workflow nunca as sobrescreve.
+- **Skills NOSSAS, editáveis** (prefixos `sdd-` e `custom-`, salvaguardadas em `OWN_SKILLS`): `sdd-workflow`, `sdd-define`, `sdd-design`, `sdd-build`, `sdd-ship`, `sdd-iterate`, `sdd-doc`, `sdd-staff-engineer`, `sdd-po`, `sdd-dev-workflow`, `sdd-code-reviewer`, `custom-test-generator`. O workflow nunca as sobrescreve.
 
 ### Skills de Workflow (família `sdd-*`)
 
 | Skill | Fase | Status | Propósito |
 |-------|------|--------|-----------|
 | `sdd-workflow` | — | **PRONTO** | Orquestrador: tamanho da feature, contrato de execução, raio de ação no Databricks, fim de etapa |
-| `sdd-brainstorm` | 0 | **PRONTO** | Exploração de ideia, comparação de abordagens, YAGNI → `docs/specs/BRAINSTORM_*.md` |
-| `sdd-define` | 1 | **PRONTO** | Define via MCP Confluence → `docs/specs/DEFINE_*.md` (+ captura `jira_key` e cria o state) |
+| `sdd-define` | 1 | **PRONTO** | Spec de dados testável (Confluence via MCP): critérios EARS, rubrica de requisitos implícitos, áreas cinzentas, gate `validate_define.py`, aprovação gravada → `docs/specs/DEFINE_*.md` (+ `jira_key` e state) |
 | `sdd-staff-engineer` | 2 | **PRONTO** | Revisão de spec, decisão arquitetural → `docs/adr/ADR_*.md` |
 | `sdd-po` | 3 | **PRONTO** | Epic → Stories (Fibonacci) → Tasks no Jira → `docs/planning/STORIES_*.md` |
 | `sdd-design` | 4 | **PRONTO** | Arquitetura + File Manifest a partir do DEFINE/ADR → `docs/designs/DESIGN_*.md` |
@@ -106,7 +105,7 @@ Regras que o agente **nunca** deve esquecer — valem em qualquer fase:
 | Operar somente na `jira_key` do state — nunca busca (`jira_search`) | `sdd-doc`, `sdd-po` |
 | Confluence: só `confluence_get_page` na URL dada — nunca `confluence_search` | `sdd-define` |
 | Não editar skills `databricks-*` à mão (o sync sobrescreve) | Proveniência + `OWN_SKILLS` |
-| Clarity Score ≥ 12/15 antes de avançar do Define | Gate do Define |
+| `validate_define.py` verde e aprovação gravada antes de sair do Define; `--aprovado` antes do Build | Gate do Define (`sdd-define/scripts/`) |
 | ADR é vinculante — não reabrir decisões no Design/Build | `sdd-design` |
 | Aprovação da spec e do plano gravada com as palavras do usuário — nunca inventada | Contrato de execução (`sdd-workflow`) |
 | Raio de ação: aprovação libera só branch da feature e ambiente de desenvolvimento; deploy fora do dev, tabela de produção, grant e schedule pedem ok explícito | Contrato de execução (`sdd-workflow`) |

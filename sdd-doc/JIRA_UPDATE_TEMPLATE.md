@@ -15,7 +15,7 @@
 
 📄 Artefato: {caminho/no/repo/ARTEFATO_{FEATURE}.md}
 📐 Origem: {URL da página Confluence | n/a}
-✅ Gate: {resultado do gate — ex: "Clarity Score 13/15", "File Manifest completo", "lint + 8/8 testes ✅"}
+✅ Gate: {resultado do gate — ex: "validate_define ✅ + spec aprovada", "File Manifest completo", "lint + 8/8 testes ✅"}
 
 🔜 Próxima fase: {nome da próxima fase + agente responsável}
 
@@ -28,7 +28,7 @@
 
 | Fase | Resumo (exemplo) | Gate (exemplo) | Próxima fase |
 |------|------------------|----------------|--------------|
-| **Define** | Requisitos extraídos da SPEC e validados. | Clarity Score {X}/15 | ADR — `@sdd-staff-engineer` |
+| **Define** | Spec de dados aprovada: {N} critérios EARS, rubrica fechada. | validate_define ✅ + aprovação | ADR — `@sdd-staff-engineer` |
 | **ADR** | Decisões arquiteturais registradas e aprovadas. | {N} decisões / {M} domínios cobertos | Planejamento — `@sdd-po` |
 | **Planejamento (PO)** | Epic quebrado em Stories/Tasks no Jira. | {N} stories estimadas (Fibonacci) | Design — `@sdd-design` |
 | **Design** | Arquitetura e File Manifest definidos a partir do ADR. | File Manifest completo ({N} arquivos) | Build — `@sdd-build` |
@@ -51,7 +51,7 @@
 | Design | mantém Em andamento |
 | Build | Em andamento → **Em revisão** (In Review) |
 | Ship | Em revisão → **Concluído** (Done) |
-| Brainstorm / Iterate | nenhuma transição |
+| Iterate | nenhuma transição |
 
 ---
 

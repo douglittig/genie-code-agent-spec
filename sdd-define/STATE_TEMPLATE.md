@@ -12,7 +12,7 @@
 | **Tamanho** | {Pequeno \| Médio \| Grande \| Complexo} — {motivo em uma linha} |
 | **Jira Key** | {PROJ-123 \| `pendente` se não informada} |
 | **Confluence URL** | {url da página SPEC \| `n/a`} |
-| **Fase Atual** | {Brainstorm \| Define \| ADR \| Design \| Build \| Ship \| Shipped} |
+| **Fase Atual** | {Define \| ADR \| Design \| Build \| Ship \| Shipped} |
 | **Criado em** | {YYYY-MM-DD HH:MM UTC} |
 | **Atualizado em** | {YYYY-MM-DD HH:MM UTC} |
 
@@ -34,8 +34,7 @@
 
 | Fase | Status | Artefato | Gate | Concluída em |
 |------|--------|----------|------|--------------|
-| Brainstorm | {pendente \| concluída \| pulada} | `docs/specs/BRAINSTORM_{FEATURE}.md` | {n/a} | {YYYY-MM-DD} |
-| Define | {pendente \| concluída} | `docs/specs/DEFINE_{FEATURE}.md` | Clarity {X}/15 | {YYYY-MM-DD} |
+| Define | {pendente \| concluída} | `docs/specs/DEFINE_{FEATURE}.md` | {validate_define ✅ + aprovado} | {YYYY-MM-DD} |
 | ADR | {pendente \| concluída} | `docs/adr/ADR_{FEATURE}.md` | {decisões aprovadas} | {YYYY-MM-DD} |
 | Planejamento (PO) | {pendente \| concluída} | `docs/planning/STORIES_{FEATURE}.md` | {stories estimadas + criadas} | {YYYY-MM-DD} |
 | Design | {pendente \| concluída} | `docs/designs/DESIGN_{FEATURE}.md` | {File Manifest completo} | {YYYY-MM-DD} |
