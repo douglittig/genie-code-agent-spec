@@ -19,7 +19,22 @@
 | Fonte | Link | O que foi usado |
 |-------|------|-----------------|
 | Confluence: Pedidos — visão silver | https://exemplo.atlassian.net/wiki/spaces/DADOS/pages/123 | Visão Geral, Fontes de Dados, Qualidade de Dados |
-| Pedido do usuário | n/a | "quero a silver de pedidos sem duplicado até as 7h" |
+| Pedido do usuário | n/a | Pedido original e respostas, no Registro abaixo |
+
+---
+
+## Registro do pedido e das respostas
+
+### Pedido original
+
+> "quero a silver de pedidos sem duplicado até as 7h"
+
+### Rodada 1
+
+| ID | Pergunta, com a recomendação | Resposta do usuário |
+|----|------------------------------|---------------------|
+| Q1.1 | Há uma página no Confluence com a especificação? | "https://exemplo.atlassian.net/wiki/spaces/DADOS/pages/123" |
+| Q1.2 | Evento que chega depois de 02h entra na carga do dia ou do dia seguinte? Recomendo o dia seguinte. | "você decide" |
 
 ---
 
@@ -109,9 +124,9 @@ Finanças fecha a receita diária a partir da tabela bruta de pedidos, que tem d
 
 | ID | Padrão escolhido | Motivo | Origem | Se estiver errada |
 |----|------------------|--------|--------|-------------------|
-| S-1 | Evento depois de 02h entra na carga do dia seguinte | Combina com o fechamento às 7h | usuário delegou | Fechamento perde pedidos tardios |
-| S-2 | Retomada pelo checkpoint do pipeline, sem lógica própria | Padrão do Lakeflow, já usado no projeto | código | Reprocessamento manual em falha |
-| S-3 | Serverless padrão, sem modo performance | ~2 milhões de linhas por dia | código | Custo ou tempo acima do previsto |
+| S-1 | Evento depois de 02h entra na carga do dia seguinte | Combina com o fechamento às 7h | usuário delegou (Q1.2: "você decide") | Fechamento perde pedidos tardios |
+| S-2 | Retomada pelo checkpoint do pipeline, sem lógica própria | Padrão do Lakeflow, já usado no projeto | código: `src/pipelines/pedidos/pipeline.py` | Reprocessamento manual em falha |
+| S-3 | Serverless padrão, sem modo performance | ~2 milhões de linhas por dia | código: `resources/pedidos.pipeline.yml` | Custo ou tempo acima do previsto |
 
 ## Perguntas em aberto
 
