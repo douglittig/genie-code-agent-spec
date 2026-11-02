@@ -62,7 +62,7 @@ Usar como base para próximas sessões de trabalho.
 - Eval-gate por rubrica no Build — possivelmente evolução do `custom-test-generator` ou uma skill `custom-evals`. O ledger `.claude/sdd/state/` já registra a trajetória e pode servir de insumo.
 - Anotar tier de modelo sugerido por fase/agente.
 
-**Referência:** `assets/documentation/Day_1_v3.pdf` (pp. 26–30 harness, 14–15 evals, 42 model routing).
+**Referência:** [*The New SDLC With Vibe Coding*](https://www.kaggle.com/whitepaper-the-new-SDLC-with-vibe-coding) (pp. 26–30 harness, 14–15 evals, 42 model routing).
 **Origem:** Leitura do paper Day 1 durante a evolução do `sdd-workflow`.
 
 ---
@@ -75,4 +75,5 @@ Usar como base para próximas sessões de trabalho.
 | `AGENTS.md` criado como espelho do `CLAUDE.md` | 2026-04-28 |
 | `assets/documentation/` removida do `.gitignore` | 2026-04-28 |
 | Guia `docs/bitbucket-mcp-guide.md` criado (Atlassian Rovo MCP + Genie Code) | 2026-04-28 |
+| Créditos ao AgentSpec (`THIRD_PARTY_NOTICES.md`) e PDFs de referência trocados por links | 2026-11-02 |
 | Sync migrado para `databricks/databricks-agent-skills` (ai-dev-kit parou de distribuir skills na v0.2.0; sync falhava desde 31/08), poda de skills removidas, licença Databricks repassada | 2026-11-02 |

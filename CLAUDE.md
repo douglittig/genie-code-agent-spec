@@ -13,7 +13,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ```
 <skill-name>/            # 51 skills na raiz (Databricks oficiais + SDD workflow + Python + Spark)
 docs/                    # Documentação de referência sobre features do Genie Code
-assets/                  # documentation/ versionada (PDFs de referência); repos/ gitignored
+assets/                  # cópias locais de referência — gitignored (links no README, seção Referências)
+THIRD_PARTY_NOTICES.md   # créditos e licenças de terceiros (AgentSpec — MIT; skills Databricks)
 .claude/                 # Claude Code CLI local — gitignored, exceto .claude/skills/ (run-genie-code-agent-spec: validador do repo)
 ```
 
@@ -36,6 +37,8 @@ Cada subpasta na raiz é uma skill autocontida seguindo o padrão open Agent Ski
 O índice completo das skills está no **[README.md](README.md)**, organizado por categoria (IA & ML, Dados & SQL, Plataforma Databricks, Aplicações, Desenvolvimento & Workflow).
 
 ### Proveniência: skills upstream vs. skills próprias
+
+> **Origem do workflow SDD:** as fases `sdd-brainstorm/define/design/build/ship/iterate`, seus templates, `sdd-code-reviewer` e `custom-test-generator` derivam do [AgentSpec](https://github.com/luanmorenommaciel/agentspec), de Luan Moreno (MIT). Ao editar esses arquivos, manter o crédito em [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md); ao reescrever um deles do zero, atualizar a lista de arquivos derivados lá.
 
 O prefixo indica a origem da skill:
 
@@ -78,7 +81,7 @@ Cada fase é uma **skill de primeira classe na raiz do repo** (padrão de ativos
 
 ## Harness & Guardrails
 
-> **Agent = Model + Harness** — framing do paper *The New SDLC with Vibe Coding* (Google, Day 1, mai/2026; PDF em `assets/documentation/`). O modelo é o motor; o **harness** é tudo em volta que faz ele *terminar* a tarefa. Regra prática do paper: **a maioria das falhas de agente é falha de configuração, não do modelo** — ao errar, revisar o harness antes de culpar o modelo.
+> **Agent = Model + Harness** — framing do paper [*The New SDLC With Vibe Coding*](https://www.kaggle.com/whitepaper-the-new-SDLC-with-vibe-coding) (Google, Day 1, mai/2026). O modelo é o motor; o **harness** é tudo em volta que faz ele *terminar* a tarefa. Regra prática do paper: **a maioria das falhas de agente é falha de configuração, não do modelo** — ao errar, revisar o harness antes de culpar o modelo.
 
 Este repositório **é** um harness. Mapa dos 6 componentes:
 

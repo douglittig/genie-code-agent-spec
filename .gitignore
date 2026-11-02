@@ -1,5 +1,6 @@
 # Local assets (source repos — not committed)
 assets/repos/
+assets/documentation/
 
 # Claude Code CLI — local development only, not for Genie Code
 # (exceto .claude/skills/ — skills locais versionadas, ex. run-genie-code-agent-spec)

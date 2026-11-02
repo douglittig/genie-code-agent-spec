@@ -8,7 +8,7 @@ Guia de como usar Spec-Driven Development (SDD) no contexto do Databricks Genie 
 
 SDD é a abordagem que resolve o gap entre o "vibe coding" desestruturado e os documentos de especificação que ninguém lê. Em vez de gerar specs estáticas, o SDD usa a spec como **entrada executável**: o agente lê a spec, gera o código, e rastreia cada arquivo de volta ao requisito que o originou.
 
-O framework de referência é o [AgentSpec v2.1](https://github.com/PedroHBCruz/agentspec) — 5 fases, 58 agentes especializados, 23 domínios de conhecimento. A adaptação para Genie Code mantém as fases e os artefatos, mas conecta Confluence e Jira via MCP.
+O framework de referência é o [AgentSpec v2.1](https://github.com/luanmorenommaciel/agentspec), de Luan Moreno — 5 fases, 58 agentes especializados, 23 domínios de conhecimento. A adaptação para Genie Code mantém as fases e os artefatos, mas conecta Confluence e Jira via MCP.
 
 ---
 
@@ -452,6 +452,5 @@ O Genie Code no **Agent Mode** executa cada fase como uma sequência de tarefas:
 |---------|-------|
 | Templates SDD | dentro de cada skill `sdd-*` (ex.: `sdd-define/DEFINE_TEMPLATE.md`) |
 | Skills SDD | `sdd-workflow/` (orquestrador) + `sdd-brainstorm/`, `sdd-define/`, `sdd-design/`, `sdd-build/`, `sdd-ship/`, `sdd-iterate/`, `sdd-doc/` |
-| AgentSpec (fonte) | `assets/repos/agentspec-main/` |
-| Agents disponíveis | `assets/repos/agentspec-main/.claude/agents/` |
+| AgentSpec (origem do workflow) | [luanmorenommaciel/agentspec](https://github.com/luanmorenommaciel/agentspec) — créditos em [`THIRD_PARTY_NOTICES.md`](../THIRD_PARTY_NOTICES.md) |
 | Databricks Skills | raiz do repositório |
