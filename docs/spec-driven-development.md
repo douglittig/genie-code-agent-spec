@@ -1,5 +1,7 @@
 # Spec-Driven Development com Genie Code
 
+> **Em atualização.** Este guia ainda descreve a versão anterior do fluxo (Brainstorm separado, Clarity Score). A referência atual são as próprias skills: [`sdd-workflow`](../sdd-workflow/SKILL.md) (tamanho da feature, contrato de execução) e [`sdd-define`](../sdd-define/SKILL.md) (critérios EARS, rubrica de dados, `validate_define.py`). O guia será reescrito ao fim da evolução das skills.
+
 Guia de como usar Spec-Driven Development (SDD) no contexto do Databricks Genie Code, integrando Confluence, Jira e fluxos de code review automatizados.
 
 ---

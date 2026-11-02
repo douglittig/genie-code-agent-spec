@@ -10,7 +10,7 @@ description: >
 
 # Run: genie-code-agent-spec
 
-Este repo é conteúdo (51 skills em Markdown na raiz), não uma aplicação. "Rodar"
+Este repo é conteúdo (50 skills em Markdown na raiz), não uma aplicação. "Rodar"
 o projeto = fazer o que o Genie Code/Claude Code faz ao carregar as skills:
 parsear o frontmatter de cada `SKILL.md`. O driver
 [.claude/skills/run-genie-code-agent-spec/driver.py](driver.py) simula isso e
@@ -44,7 +44,7 @@ e campos do `databricks-skills.lock`.
 Saída esperada num repo saudável:
 
 ```
-51 skills parseadas em <raiz>
+50 skills parseadas em <raiz>
 OK: 0 erros, 0 warning(s)
 ```
 

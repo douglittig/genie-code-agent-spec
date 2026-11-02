@@ -127,7 +127,6 @@ conhecida do state. **Nunca** usar busca (`jira_search`) — evita tocar tickets
 
 | Fase concluída | Intenção |
 |----------------|----------|
-| Brainstorm | nenhuma |
 | Define | To Do → Em andamento (In Progress) |
 | ADR | mantém Em andamento |
 | Planejamento (PO) | mantém Em andamento |

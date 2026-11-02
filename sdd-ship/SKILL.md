@@ -35,7 +35,6 @@ description: |
 │     └─ Ler: docs/specs/DEFINE_{FEATURE}.md                          │
 │     └─ Ler: docs/designs/DESIGN_{FEATURE}.md                        │
 │     └─ Ler: .sdd/features/{FEATURE}/BUILD_REPORT.md           │
-│     └─ Opcional: docs/specs/BRAINSTORM_{FEATURE}.md                 │
 │                                                                      │
 │  2. VALIDAÇÃO DO BUILD REPORT                                        │
 │     └─ Todas as tarefas concluídas?                                 │
@@ -101,7 +100,6 @@ VERIFICAÇÃO PRÉ-SHIP
 
 ```text
 .sdd/archive/{FEATURE}/
-├── BRAINSTORM_{FEATURE}.md  (se existir)
 ├── DEFINE_{FEATURE}.md
 ├── ADR_{FEATURE}.md         (se existir)
 ├── DESIGN_{FEATURE}.md

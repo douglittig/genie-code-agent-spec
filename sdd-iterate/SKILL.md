@@ -31,7 +31,7 @@ description: |
 ├─────────────────────────────────────────────────────────────────────┤
 │                                                                      │
 │  1. CARREGAMENTO DE DOCUMENTO (entender estado atual)               │
-│     └─ Ler: Documento alvo (BRAINSTORM/DEFINE/DESIGN)               │
+│     └─ Ler: Documento alvo (DEFINE/ADR/DESIGN)                     │
 │     └─ Ler: Documentos downstream (se existirem)                    │
 │     └─ Identificar: Fase do documento e relacionamentos             │
 │                                                                      │
@@ -52,18 +52,17 @@ description: |
 ### Relacionamentos entre Documentos
 
 ```text
-BRAINSTORM ────► DEFINE ────► DESIGN ────► CÓDIGO
-     │              │            │            │
-     ▼              ▼            ▼            ▼
-  Mudanças      Pode precisar Pode precisar Pode precisar
-  aqui          de atualiz.   de atualiz.   de rebuild
+DEFINE ────► DESIGN ────► CÓDIGO
+   │            │            │
+   ▼            ▼            ▼
+Mudança     Pode precisar Pode precisar
+aqui        de atualiz.   de rebuild
 ```
 
 ### Matriz de Cascata
 
 | Mudança Em | Cascata Para | Exemplo |
 |------------|--------------|---------|
-| BRAINSTORM | DEFINE | Novos itens YAGNI → Atualizar fora do escopo |
 | DEFINE | DESIGN | Novo requisito → Adicionar componente |
 | DESIGN | CÓDIGO | Novo arquivo → Criar via build |
 | DESIGN | CÓDIGO | Arquivo removido → Deletar arquivo |
@@ -104,15 +103,6 @@ BRAINSTORM ────► DEFINE ────► DESIGN ────► CÓDIGO
 2. Para cada documento downstream, verificar se a mudança o afeta
 3. Calcular requisitos de cascata
 4. Apresentar opções ao usuário
-
-**Cascatas BRAINSTORM → DEFINE:**
-
-| Mudança no BRAINSTORM | Impacto no DEFINE |
-|-----------------------|-------------------|
-| Abordagem alterada | Pode precisar de foco diferente no problema |
-| Novos itens YAGNI | Fora do escopo precisa de atualização |
-| Usuários alterados | Seção de usuários-alvo precisa de atualização |
-| Restrições alteradas | Seção de restrições precisa de atualização |
 
 **Cascatas DEFINE → DESIGN:**
 

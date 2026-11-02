@@ -2,7 +2,7 @@
 
 Repositório de skills, custom instructions e integrações MCP para Databricks Genie Code e Claude Code.
 
-> **Status:** O workflow SDD é composto por **skills autocontidas com prefixo `sdd-*`** (padrão de ativos do Genie Code): `@sdd-workflow` orquestra; `@sdd-brainstorm`, `@sdd-define`, `@sdd-design`, `@sdd-build` e `@sdd-ship` executam as fases; `@sdd-staff-engineer` (ADR), `@sdd-po` (Stories/Tasks no Jira) e `@sdd-iterate` (mudanças mid-stream) completam o fluxo, com **documentação automática no Jira via `@sdd-doc`** ao final de cada fase. `@sdd-dev-workflow` e `@sdd-code-reviewer` ainda em desenvolvimento.
+> **Status:** O workflow SDD é composto por **skills autocontidas com prefixo `sdd-*`** (padrão de ativos do Genie Code): `@sdd-workflow` decide o tamanho da feature e orquestra; `@sdd-define`, `@sdd-design`, `@sdd-build` e `@sdd-ship` executam as fases; `@sdd-staff-engineer` (ADR), `@sdd-po` (Stories/Tasks no Jira) e `@sdd-iterate` (mudanças mid-stream) completam o fluxo, com **documentação automática no Jira via `@sdd-doc`** ao final de cada fase. `@sdd-dev-workflow` e `@sdd-code-reviewer` ainda em desenvolvimento.
 
 ---
 
@@ -97,12 +97,12 @@ Com o MCP do Confluence ativo e Agent mode ligado:
 
 O agente irá:
 1. Ler a página do Confluence via MCP
-2. Extrair requisitos, usuários, goals (MoSCoW) e restrições
-3. Fazer até 3 perguntas de contexto técnico
-4. Calcular o Clarity Score (0–15)
-5. Gerar `docs/specs/DEFINE_{FEATURE}.md` no repositório do projeto
+2. Perguntar o que for decisão sua (escopo, comportamento do dado, desvio da página), com recomendação
+3. Escrever os critérios de aceite em EARS (`QUANDO … ENTÃO o pipeline DEVE …`) e passar pela rubrica de requisitos implícitos de dados
+4. Rodar o `validate_define.py` e gerar `docs/specs/DEFINE_{FEATURE}.md` no repositório do projeto
+5. Parar e esperar a sua aprovação, gravada com as suas palavras
 
-Quando o Clarity Score atingir ≥ 12/15, o agente sugere o próximo passo:
+Com a spec aprovada, o agente sugere o próximo passo (conforme o tamanho da feature):
 
 ```
 @sdd-staff-engineer  ← Fase 2: revisão arquitetural e geração do ADR
@@ -242,13 +242,7 @@ Mostra todos os pontos de entrada, o que cada nó chama, para onde vai, o que é
 ENTRADAS                                 NÓS
 ────────                                 ────────────────────────────────────────
 
-(A) Ideia vaga ──────────────────────→   ┌── [0] BRAINSTORM ──────────────────┐
-                                         │  skill:  @sdd-brainstorm           │ OPCIONAL
-                                         │  mcp:    —                         │
-                                         │  output: docs/specs/BRAINSTORM_*.md│
-                                         │  gate:   usuário confirmou abord.  │
-                                         └──────────────────┬─────────────────┘
-                                                            │
+(A) Ideia vaga ─────────────────────────────────────────────┬─────────────────┐
 (B) Notas / docs brutos ────────────────────────────────────┼─────────────────┐
 (C) DEFINE_*.md já existe ──────────────────────────────────┼─────────────────┤
 (D) URL Confluence ─────────────────────────────────────────┼─────────────────┤
@@ -257,7 +251,7 @@ ENTRADAS                                 NÓS
                                          │  skill:  @sdd-define                │ OBRIGATÓRIO
                                          │  mcp:    Confluence (12 slots)      │
                                          │  output: docs/specs/DEFINE_*.md     │
-                                         │  gate:   Clarity Score ≥ 12/15      │
+                                         │  gate:   validate_define + aprovação│
                                          └───────────────────┬─────────────────┘
                                                              │
                                                              ▼
@@ -314,8 +308,7 @@ ENTRADAS                                 NÓS
 
 | Nó | Skill | MCP ativo | Output | Gate para avançar | Status |
 |----|-------|-----------|--------|-------------------|--------|
-| [0] Brainstorm | @sdd-brainstorm | — | `docs/specs/BRAINSTORM_*.md` | Usuário confirmou abordagem → vai para [1] | OPCIONAL |
-| [1] Define | @sdd-define | Confluence | `docs/specs/DEFINE_*.md` | Clarity Score ≥ 12/15 | PRONTO |
+| [1] Define | @sdd-define | Confluence | `docs/specs/DEFINE_*.md` | `validate_define.py` verde + aprovação gravada (ideia vaga: áreas cinzentas dentro do Define) | PRONTO |
 | [2] Arquitetura | @sdd-staff-engineer | — | `docs/adr/ADR_*.md` | ADR revisado e aceito | PRONTO |
 | [3] Planejamento | @sdd-po | Jira | `docs/planning/STORIES_*.md` + Stories/Tasks no Jira | Stories estimadas (Fibonacci) e criadas | PRONTO |
 | [4] Design | @sdd-design | — | `docs/designs/DESIGN_*.md` | File Manifest completo | PRONTO |
@@ -406,8 +399,7 @@ Cada fase do workflow SDD é uma skill autocontida (SKILL.md + template próprio
 | Skill | Fase | Descrição |
 |-------|------|-----------|
 | [`sdd-workflow`](sdd-workflow/) | — | Orquestrador: tamanho da feature (Pequeno → Complexo), contrato de execução, raio de ação no Databricks e fim de etapa |
-| [`sdd-brainstorm`](sdd-brainstorm/) | 0 | Exploração colaborativa de ideias, comparação de abordagens e YAGNI → `docs/specs/BRAINSTORM_*.md` |
-| [`sdd-define`](sdd-define/) | 1 | Extração de requisitos via MCP Confluence, Clarity Score e criação do state → `docs/specs/DEFINE_*.md` |
+| [`sdd-define`](sdd-define/) | 1 | Spec de dados testável: critérios EARS, rubrica de requisitos implícitos, áreas cinzentas, gate `validate_define.py` e aprovação gravada → `docs/specs/DEFINE_*.md` |
 | [`sdd-staff-engineer`](sdd-staff-engineer/) | 2 | Revisão de spec, discussão arquitetural e geração de ADR (`docs/adr/`) |
 | [`sdd-po`](sdd-po/) | 3 | Product Owner: quebra a feature em Epic → Stories (Fibonacci) → Tasks, cria no Jira via MCP e gera `docs/planning/STORIES_*.md` |
 | [`sdd-design`](sdd-design/) | 4 | Design técnico com File Manifest a partir do DEFINE/ADR → `docs/designs/DESIGN_*.md` |
@@ -490,7 +482,7 @@ O prefixo da pasta indica a origem: **`databricks-*`** = upstream (não editar),
 |--------|--------|---------------|
 | **Upstream** (`databricks-agent-skills`) | `databricks-*`, `spark-python-data-source` | ❌ Não — o sync sobrescreve. Contribua no upstream. |
 | **Congelada** (ai-dev-kit v0.1.14) | `databricks-python-dev` | ⚠️ Pode — o sync não toca mais (`FROZEN_SKILLS`). |
-| **Nossas** (`sdd-*`, `custom-*` e `TEMPLATE`) | `sdd-workflow`, `sdd-brainstorm`, `sdd-define`, `sdd-design`, `sdd-build`, `sdd-ship`, `sdd-iterate`, `sdd-doc`, `sdd-staff-engineer`, `sdd-po`, `sdd-dev-workflow`, `sdd-code-reviewer`, `custom-test-generator` | ✅ Sim — o sync nunca as toca (`OWN_SKILLS`). |
+| **Nossas** (`sdd-*`, `custom-*` e `TEMPLATE`) | `sdd-workflow`, `sdd-define`, `sdd-design`, `sdd-build`, `sdd-ship`, `sdd-iterate`, `sdd-doc`, `sdd-staff-engineer`, `sdd-po`, `sdd-dev-workflow`, `sdd-code-reviewer`, `custom-test-generator` | ✅ Sim — o sync nunca as toca (`OWN_SKILLS`). |
 
 ### Licença das skills Databricks
 
@@ -512,7 +504,7 @@ Arquivos envolvidos:
 ## Estrutura do Repositório
 
 ```
-<skill-name>/                       # 51 skills na raiz (Databricks oficiais + SDD workflow + Python + Spark)
+<skill-name>/                       # 50 skills na raiz (Databricks oficiais + SDD workflow + Python + Spark)
 docs/                               # Documentação de referência extraída de fontes Databricks
 .github/workflows/ e scripts/       # CI — sync das skills Databricks (upstream)
 LICENSE-/NOTICE-databricks-agent-skills  # licença das skills upstream
@@ -539,7 +531,7 @@ O workflow SDD deste repositório começou como uma adaptação do **[AgentSpec]
 | Code reviewer e gerador de testes | `sdd-staff-engineer` (ADR vinculante), `sdd-po` (Epic → Stories → Tasks), `sdd-dev-workflow` e o ledger de estado por feature |
 | | Delegação do Build às skills oficiais `@databricks-*`, com sync automático do upstream |
 
-O tamanho da feature (*auto-sizing*), o contrato de execução e o raio de ação do `sdd-workflow` foram adaptados do **[TLC Spec-Driven](https://github.com/tech-leads-club/agent-skills), de Felipe Rodrigues / Tech Leads Club** (CC-BY-4.0), com regras próprias para o Databricks.
+O tamanho da feature (*auto-sizing*), o contrato de execução e o raio de ação do `sdd-workflow`, e os critérios EARS, a rubrica de requisitos implícitos e o gate por script do `sdd-define`, foram adaptados do **[TLC Spec-Driven](https://github.com/tech-leads-club/agent-skills), de Felipe Rodrigues / Tech Leads Club** (CC-BY-4.0), com regras próprias para o Databricks.
 
 Os arquivos derivados e o aviso de licença estão em [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md).
 

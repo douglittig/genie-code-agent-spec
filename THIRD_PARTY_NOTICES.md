@@ -10,8 +10,6 @@ O workflow de Spec-Driven Development deste repositório nasceu de uma adaptaç�
 
 Arquivos derivados do AgentSpec:
 
-- `sdd-brainstorm/SKILL.md`, `sdd-brainstorm/BRAINSTORM_TEMPLATE.md`
-- `sdd-define/SKILL.md`, `sdd-define/DEFINE_TEMPLATE.md`
 - `sdd-design/SKILL.md`, `sdd-design/DESIGN_TEMPLATE.md`
 - `sdd-build/SKILL.md`, `sdd-build/BUILD_REPORT_TEMPLATE.md`
 - `sdd-ship/SKILL.md`, `sdd-ship/SHIPPED_TEMPLATE.md`
@@ -52,6 +50,8 @@ Partes do workflow SDD são adaptadas do [TLC Spec-Driven](https://github.com/te
 Adaptado do TLC Spec-Driven, com mudanças:
 
 - `sdd-workflow/SKILL.md`: tamanho da feature (*auto-sizing*), contrato de execução, raio de ação (*blast radius*, aqui com regras do Databricks) e retomada de sessão.
+- `sdd-define/SKILL.md`, `sdd-define/DEFINE_TEMPLATE.md`: critérios EARS (em PT-BR), rubrica de requisitos implícitos (reescrita para dados), gate de fechamento e áreas cinzentas.
+- `sdd-workflow/scripts/` e `sdd-define/scripts/`: a ideia de gates por script e de testar os gates por mutação; o código foi escrito do zero.
 
 ---
 

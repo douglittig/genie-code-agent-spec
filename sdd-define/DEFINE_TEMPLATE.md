@@ -1,225 +1,164 @@
-# DEFINE: {Feature Name}
+# DEFINE: {Nome da feature}
 
-> Descrição em uma frase do que estamos construindo
+> {Uma frase: o que esta feature entrega e para quem.}
 
-## Metadata
+<!-- Preencha tudo; o validate_define.py avisa sobre qualquer {placeholder} que sobrar.
+     Seções marcadas (opcional) podem sair inteiras quando não se aplicam. -->
 
-| Atributo | Valor |
-|----------|-------|
+## Identificação
+
+| Campo | Valor |
+|-------|-------|
 | **Feature** | {FEATURE_NAME} |
-| **Data** | {YYYY-MM-DD} |
-| **Autor** | {autor} |
-| **Status** | {Rascunho / Em Andamento / Precisa de Esclarecimento / Pronto para ADR} |
-| **Clarity Score** | {X}/15 |
+| **Tamanho** | {Médio \| Grande \| Complexo} — {motivo em uma linha} |
+| **Jira** | {PROJ-123 \| pendente} |
+| **Data** | {AAAA-MM-DD} |
+| **Status** | {Rascunho \| Aguardando aprovação \| Aprovado} |
 
 ---
 
 ## Fontes
 
-> Rastreabilidade: páginas Confluence lidas para gerar este documento.
-
-| Página | URL | Seções Utilizadas |
-|--------|-----|-------------------|
-| {nome da página principal} | {url} | Visão Geral, Fontes de Dados, Arquitetura, Configuração |
-
-**Subpáginas lidas:**
-
-| Página | URL |
-|--------|-----|
-| {nome da subpágina} | {url} |
+| Fonte | Link | O que foi usado |
+|-------|------|-----------------|
+| {Confluence: nome da página \| Pedido do usuário \| Ticket} | {url \| n/a} | {seções lidas} |
 
 ---
 
-## Problem Statement
+## Problema
 
-{1-2 frases descrevendo o problema que estamos resolvendo. Seja específico sobre quem tem o problema e qual é o impacto.}
+{Quem tem o problema, qual é e o que custa hoje. Duas frases no máximo.}
 
----
+## Quem usa o dado
 
-## Usuários-Alvo
-
-| Usuário | Função | Pain Point |
-|---------|--------|------------|
-| {Usuário 1} | {Função} | {O que os frustra} |
-| {Usuário 2} | {Função} | {O que os frustra} |
+| Quem | Para quê | Dor hoje |
+|------|----------|----------|
+| {time ou sistema consumidor} | {decisão ou processo que depende do dado} | {o que falta ou dá errado} |
 
 ---
 
-## Goals
+## Escopo
 
-Como fica o sucesso (priorizado):
+### Dentro do escopo
 
-| Prioridade | Goal |
-|------------|------|
-| **MUST** | {Goal primário - não negociável para o MVP} |
-| **MUST** | {Outro goal crítico} |
-| **SHOULD** | {Importante mas pode ser adiado se prazo for apertado} |
-| **COULD** | {Nice-to-have se houver tempo} |
+- {o que esta feature entrega}
 
-**Guia de Prioridade:**
-- **MUST** = MVP falha sem isso
-- **SHOULD** = Importante, mas existe workaround
-- **COULD** = Nice-to-have, cortar primeiro se necessário
+### Fora do escopo
+
+- {o que fica de fora, de propósito — nunca deixe vazio}
 
 ---
 
-## Critérios de Sucesso
+## Requisitos
 
-Resultados mensuráveis (devem incluir números):
+<!-- Um requisito por história de uso. Prioridade: P1 = sem isso não entrega (MVP); P2 = importante;
+     P3 = se der tempo. Critérios no formato EARS (ver @sdd-define), com ID R<n>.<m>. -->
 
-- [ ] {Métrica 1: ex., "Suportar 1000 requisições por minuto"}
-- [ ] {Métrica 2: ex., "Atingir 99,9% de uptime"}
-- [ ] {Métrica 3: ex., "Tempo de resposta abaixo de 200ms"}
+### R1: {título do requisito} — P1
 
----
+**Por quê:** {o valor para quem usa}
 
-## Acceptance Tests
+**Critérios de aceite (EARS):**
 
-| ID | Cenário | Given | When | Then |
-|----|---------|-------|------|------|
-| AT-001 | {Happy path} | {Estado inicial} | {Ação} | {Resultado esperado} |
-| AT-002 | {Caso de erro} | {Estado inicial} | {Ação} | {Resultado esperado} |
-| AT-003 | {Edge case} | {Estado inicial} | {Ação} | {Resultado esperado} |
+- **R1.1** QUANDO {gatilho} ENTÃO o {pipeline} DEVE {resultado verificável}.
+- **R1.2** SE {condição indesejada} ENTÃO o {pipeline} DEVE {reação verificável}.
 
 ---
 
-## Fora do Escopo
+## Requisitos implícitos de dados
 
-Explicitamente NÃO incluído nesta feature:
+<!-- Cada dimensão termina em um lugar: um critério (R1.2), "fora do escopo", uma suposição (S-1)
+     ou "não se aplica: <motivo>". Nenhuma linha fica sem destino. -->
 
-- {Item 1: O que NÃO estamos fazendo}
-- {Item 2: O que está adiado para o futuro}
-- {Item 3: O que está explicitamente excluído}
-
----
-
-## Restrições
-
-| Tipo | Restrição | Impacto |
-|------|-----------|---------|
-| Técnica | {ex., "Deve usar o schema de banco de dados existente"} | {Como isso afeta o design} |
-| Prazo | {ex., "Deve ser entregue no Q1"} | {Como isso afeta o escopo} |
-| Recurso | {ex., "Sem budget adicional de infraestrutura"} | {Como isso afeta a abordagem} |
-
----
-
-## Contexto Técnico
-
-> Contexto essencial para a fase de Design — previne arquivos mal posicionados e necessidades de infraestrutura ignoradas.
-
-| Aspecto | Valor | Notas |
-|---------|-------|-------|
-| **Localização do Deploy** | {src/ \| functions/ \| gen/ \| deploy/ \| caminho customizado} | {Por que esta localização} |
-| **Skills Databricks** | {Lista de skills @databricks-* relevantes para esta feature} | {Quais padrões consultar} |
-| **Impacto IaC** | {Novos recursos \| Modificar existentes \| Nenhum \| A definir} | {Mudanças de infraestrutura necessárias} |
-
-**Estratégia de Trigger:**
-
-| Campo | Valor |
-|-------|-------|
-| **Tipo** | {`batch_scheduled` \| `continuous` \| `streaming_triggered` \| `one_time`} |
-| **Schedule / Intervalo** | {ex: `"0 3 * * *"` (cron) \| `15 min` \| `n/a`} |
-| **SLA de Disponibilidade** | {ex: `Gold disponível até 07h UTC`} |
-| **Tolerância a Atraso** | {ex: `30 min aceitáveis`} |
-
-**Compute:**
-
-| Campo | Valor |
-|-------|-------|
-| **Tipo** | {`serverless` \| `job_cluster` \| `classic_dlt`} |
-| **Instância** | {ex: `i3.xlarge` \| `n/a para serverless`} |
-| **Workers** | {ex: `min: 2, max: 8 (autoscaling)` \| `n/a para serverless`} |
-| **Região / Cloud** | {ex: `AWS us-east-1`} |
-
-**Por que isso importa:**
-
-- **Localização** → A fase de Design usa a estrutura correta do projeto, evita arquivos mal posicionados
-- **Skills Databricks** → A fase de Design usa os padrões corretos
-- **Trigger** → O sdd-build configura o pipeline com o modo de execução correto sem perguntar
-- **Compute** → O sdd-build define o cluster/serverless sem perguntar
-- **Impacto IaC** → Dispara planejamento de infraestrutura, evita falhas "funciona localmente"
+| Dimensão | Como fica nesta feature |
+|----------|-------------------------|
+| Idempotência e reprocessamento | {R?.? \| fora do escopo \| S-? \| não se aplica: motivo} |
+| Dado atrasado ou fora de ordem | {…} |
+| Duplicidade | {…} |
+| Evolução de schema | {…} |
+| Backfill e carga histórica | {…} |
+| Qualidade (nulos, chaves, faixas de valor) | {…} |
+| Falha parcial e retomada | {…} |
+| PII, grants e Unity Catalog | {…} |
+| Freshness e SLA | {…} |
+| Volume, custo e compute | {…} |
+| Observabilidade e alerta | {…} |
 
 ---
 
-## Data Contract (se aplicável)
+## Contrato de dados (opcional)
 
-> Inclua esta seção quando a feature envolver pipelines de dados, ETL ou analytics.
+### Fontes de dados
 
-### Inventário de Origens
-| Origem | Tipo | Volume | Freshness | Dono |
-|--------|------|--------|-----------|------|
-| {origem_1} | {Postgres / Kafka / S3 / API} | {~linhas/dia} | {SLA} | {Time} |
+| Fonte | Tipo | Volume | Freshness | Dono |
+|-------|------|--------|-----------|------|
+| {fonte} | {tabela UC \| Kafka \| arquivos no volume \| API} | {~linhas/dia} | {SLA} | {time} |
 
-### Contrato de Schema
-| Coluna | Tipo | Restrições | PII? |
-|--------|------|------------|------|
-| {coluna_1} | {INT / VARCHAR / DECIMAL} | {NOT NULL, UNIQUE} | {Sim/Não} |
+### Schema de saída
 
-### SLAs de Freshness
-| Camada | Meta | Medição |
+| Coluna | Tipo | Regra | PII? |
+|--------|------|-------|------|
+| {coluna} | {BIGINT \| STRING \| DECIMAL(18,2)} | {NOT NULL, chave, faixa} | {sim \| não} |
+
+---
+
+## Contexto técnico (opcional)
+
+| Aspecto | Valor |
+|---------|-------|
+| **Onde fica no projeto** | {src/pipelines/… \| resources/…} |
+| **Skills Databricks** | {@databricks-pipelines, @databricks-dabs, …} |
+| **Infraestrutura nova** | {nenhuma \| recursos novos no bundle: …} |
+| **Trigger** | {agendado: cron \| contínuo \| disparado por arquivo \| execução única} |
+| **Compute** | {serverless \| job cluster: tipo e workers} |
+
+---
+
+## Áreas cinzentas (opcional — tamanho Complexo)
+
+| Área | Opções consideradas | Decisão | Quem decidiu |
+|------|---------------------|---------|--------------|
+| {ponto que tinha mais de um caminho válido} | {A; B; C} | {opção escolhida + por quê} | {usuário \| usuário delegou} |
+
+## Diferenças em relação à fonte (opcional)
+
+| O que a fonte diz | O que esta spec faz | Por quê | Aprovado por |
+|-------------------|---------------------|---------|--------------|
+| {trecho do Confluence} | {o que muda} | {motivo} | {usuário, AAAA-MM-DD} |
+
+---
+
+## Suposições
+
+<!-- Só vira suposição o que o código resolve ou o que o usuário delegou ("você decide").
+     Decisão do usuário é pergunta, não suposição. Sem suposições: escreva "Nenhuma." -->
+
+| ID | Padrão escolhido | Motivo | Origem | Se estiver errada |
+|----|------------------|--------|--------|-------------------|
+| S-1 | {o que foi assumido} | {por que este padrão} | {código \| usuário delegou \| usuário não quis discutir} | {o que muda} |
+
+## Perguntas em aberto
+
+- {pergunta para o usuário, com a sua recomendação — antes da aprovação, esta lista fica "Nenhuma."}
+
+---
+
+## Rastreabilidade
+
+| Critério | Origem |
+|----------|--------|
+| R1.1 | {Confluence › seção \| pedido: "frase do usuário" \| área cinzenta} |
+| R1.2 | {…} |
+
+---
+
+## Aprovação
+
+<!-- Preenchido só quando o usuário aprovar, com as palavras dele:
+     **Aprovado**: AAAA-MM-DD — usuário: "palavras do usuário" -->
+
+## Histórico de revisões
+
+| Versão | Data | Mudança |
 |--------|------|---------|
-| Raw / Staging | {Dentro de X minutos após mudança na origem} | {Comparação de timestamp} |
-| Marts | {Atualizado até HH:MM UTC diariamente} | {Tempo de conclusão do DAG} |
-
-### Métricas de Completude
-- {ex., 99,9% dos registros da origem presentes dentro do SLA}
-- {ex., Zero chaves primárias nulas em todos os modelos}
-
-### Requisitos de Lineage
-- {ex., Lineage em nível de coluna da origem ao mart}
-- {ex., Análise de impacto antes de mudanças no schema}
-
----
-
-## Premissas
-
-Premissas que, se erradas, poderiam invalidar o design:
-
-| ID | Premissa | Se Errada, Impacto | Validada? |
-|----|----------|--------------------|-----------|
-| A-001 | {ex., "O banco de dados suporta a carga esperada"} | {Precisaria de camada de cache} | [ ] |
-| A-002 | {ex., "Volume de requisições fica abaixo de 1000/hora"} | {Precisaria de rate limiting} | [ ] |
-| A-003 | {ex., "Usuários têm navegadores modernos"} | {Precisaria de polyfills para suporte legado} | [ ] |
-
-**Nota:** Valide premissas críticas antes da fase de Design. Premissas não validadas se tornam riscos.
-
----
-
-## Breakdown do Clarity Score
-
-| Elemento | Pontuação (0-3) | Notas |
-|----------|-----------------|-------|
-| Problema | {0-3} | {Por que esta pontuação} |
-| Usuários | {0-3} | {Por que esta pontuação} |
-| Goals | {0-3} | {Por que esta pontuação} |
-| Sucesso | {0-3} | {Por que esta pontuação} |
-| Escopo | {0-3} | {Por que esta pontuação} |
-| **Total** | **{X}/15** | |
-
-**Guia de Pontuação:**
-- 0 = Completamente ausente
-- 1 = Vago ou incompleto
-- 2 = Claro mas faltam detalhes
-- 3 = Crystal clear, acionável
-
-**Mínimo para prosseguir: 12/15**
-
----
-
-## Questões em Aberto
-
-{Liste quaisquer questões pendentes que precisam de resposta antes da fase de Design. Se não houver, declare "Nenhuma — pronto para o Design."}
-
----
-
-## Histórico de Revisões
-
-| Versão | Data | Autor | Mudanças |
-|--------|------|-------|---------|
-| 1.0 | {YYYY-MM-DD} | sdd-define | Versão inicial |
-
----
-
-## Próximo Passo
-
-**Pronto para:** ADR (Fase 2 — `@sdd-staff-engineer`) — a partir de `DEFINE_{FEATURE_NAME}.md`
+| 1.0 | {AAAA-MM-DD} | Versão inicial |
