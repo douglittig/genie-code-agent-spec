@@ -1,6 +1,6 @@
-"""sdd_md.py — leitura dos artefatos SDD em markdown, compartilhada pelos gates.
+"""md.py — leitura dos artefatos SDD em markdown, compartilhada pelos gates.
 
-Os gates (validate_define.py e os que vierem) leem os mesmos artefatos do mesmo
+Os gates (define e os que vierem) leem os mesmos artefatos do mesmo
 jeito: seções por título, tabelas, a linha de aprovação. Se cada gate tivesse a
 sua cópia dessas regras, um dia um exigiria o que o outro não lê. Por isso elas
 moram aqui.

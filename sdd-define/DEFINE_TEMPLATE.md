@@ -2,7 +2,7 @@
 
 > {Uma frase: o que esta feature entrega e para quem.}
 
-<!-- Preencha tudo; o validate_define.py avisa sobre qualquer {placeholder} que sobrar.
+<!-- Preencha tudo; o gate `python3 -m sdd_gates define` avisa sobre qualquer {placeholder} que sobrar.
      Seções marcadas (opcional) podem sair inteiras quando não se aplicam. -->
 
 ## Identificação

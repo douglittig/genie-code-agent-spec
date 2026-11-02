@@ -34,7 +34,7 @@
 
 | Fase | Status | Artefato | Gate | Concluída em |
 |------|--------|----------|------|--------------|
-| Define | {pendente \| concluída} | `docs/specs/DEFINE_{FEATURE}.md` | {validate_define ✅ + aprovado} | {YYYY-MM-DD} |
+| Define | {pendente \| concluída} | `docs/specs/DEFINE_{FEATURE}.md` | {gate define ✅ + aprovado} | {YYYY-MM-DD} |
 | ADR | {pendente \| concluída} | `docs/adr/ADR_{FEATURE}.md` | {decisões aprovadas} | {YYYY-MM-DD} |
 | Planejamento (PO) | {pendente \| concluída} | `docs/planning/STORIES_{FEATURE}.md` | {stories estimadas + criadas} | {YYYY-MM-DD} |
 | Design | {pendente \| concluída} | `docs/designs/DESIGN_{FEATURE}.md` | {File Manifest completo} | {YYYY-MM-DD} |
