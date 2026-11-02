@@ -14,8 +14,8 @@ description: |
 # Define — a spec de dados
 
 Resultado: `docs/specs/DEFINE_{FEATURE}.md` aprovado pelo usuário, e o state da feature criado.
-Template: [`DEFINE_TEMPLATE.md`](DEFINE_TEMPLATE.md). Gate: `python3 -m sdd_gates define` (pacote
-`sdd-gates`; instalação no `@sdd-workflow`, seção Gates).
+Template: [`DEFINE_TEMPLATE.md`](DEFINE_TEMPLATE.md). Gate: `sdd_gates define` (onde está e como
+rodar: `@sdd-workflow`, seção Gates; `<gates>` é a pasta dele).
 
 Antes de começar, o tamanho da feature já foi decidido no `@sdd-workflow`. Ele define o quanto
 preencher:
@@ -128,13 +128,12 @@ O gate esclarece o que foi pedido. Ele não inventa requisito novo.
 ## Passo 7 — Validar, apresentar e parar
 
 ```bash
-python3 -m sdd_gates define docs/specs/DEFINE_{FEATURE}.md
+PYTHONPATH=<gates> python3 -m sdd_gates define docs/specs/DEFINE_{FEATURE}.md
 ```
 
-Rode a partir da raiz do repo do projeto. Se o pacote não estiver instalado, instale antes
-(seção Gates do `@sdd-workflow`). Rode o gate em vez de ler o código dele: as mensagens dizem o
-que mudar. Exit diferente de 0 → corrija e rode de novo. Se não conseguir instalar nem executar,
-faça as mesmas checagens lendo o arquivo e **diga ao usuário que o gate não rodou**.
+Rode a partir da raiz do repo do projeto. Rode o gate em vez de ler o código dele: as mensagens
+dizem o que mudar. Exit diferente de 0 → corrija e rode de novo. Se não conseguir executar, faça
+as mesmas checagens lendo o arquivo e **diga ao usuário que o gate não rodou**.
 
 Com o validador verde, apresente o DEFINE com as perguntas em aberto e a sua recomendação para
 cada uma, e **pare**. É a primeira parada humana do contrato de execução.
@@ -150,7 +149,7 @@ Quando o usuário aprovar, grave na seção Aprovação, com as palavras dele:
 Nunca grave uma aprovação que ele não deu. Depois rode o gate do Build:
 
 ```bash
-python3 -m sdd_gates define docs/specs/DEFINE_{FEATURE}.md --aprovado
+PYTHONPATH=<gates> python3 -m sdd_gates define docs/specs/DEFINE_{FEATURE}.md --aprovado
 ```
 
 ## Passo 9 — State, Jira e fim de etapa

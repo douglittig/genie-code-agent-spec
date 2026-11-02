@@ -92,23 +92,29 @@ Na dúvida se uma ação sai do ambiente de desenvolvimento, trate como "exige o
 
 ## Gates (pacote `sdd-gates`)
 
-Um gate é um script que decide, por código, se a etapa pode avançar. Os gates ficam no pacote
-`sdd-gates`, **fora das skills**: o Genie Code não executa scripts dentro de `.assistant/skills`.
-Não tente contornar isso copiando código de lá.
+Um gate é um script que decide, por código, se a etapa pode avançar. O código dos gates fica num
+**segundo Git Folder deste mesmo repo, fora de `.assistant`**, chamado `sdd-gates`. Versão mínima
+exigida por estas skills: **0.1.0**.
 
-1. Confira se está instalado: `python3 -m sdd_gates --version`.
-2. Se não estiver, instale no compute do projeto (está liberado: é o ambiente de desenvolvimento):
-   ```bash
-   python3 -m pip install "git+https://github.com/douglittig/genie-code-agent-spec@main#subdirectory=gates"
-   ```
-3. Rode o gate a partir da raiz do repo do projeto, sempre com `python3 -m sdd_gates <gate>`.
+Duas coisas que o Genie Code bloqueia, e que você não deve tentar contornar:
+- executar scripts dentro de `.assistant/skills` (nem copiando o código de lá);
+- `pip install` direto do GitHub.
+
+1. **Ache a pasta dos gates** (`<gates>`): a do state da feature, se houver; senão tente
+   `/Workspace/Users/<usuário>/sdd-gates/gates` e depois `/Workspace/Shared/sdd-gates/gates`.
+   Não achou: pergunte ao usuário onde está o Git Folder `sdd-gates` (ou peça para ele criar,
+   README do repo, Passo 2b). Grave o caminho no state.
+2. **Confira a versão:** `PYTHONPATH=<gates> python3 -m sdd_gates --version`. Abaixo da mínima,
+   peça ao usuário um pull no Git Folder `sdd-gates`; não rode gate velho.
+3. **Rode o gate** a partir da raiz do repo do projeto:
+   `PYTHONPATH=<gates> python3 -m sdd_gates <gate> …`. Nada é instalado.
    Exit 0: passou. Exit 1: não passou, e a saída diz o que corrigir. Exit 2: erro de uso.
-4. Se não conseguir instalar nem executar, faça as checagens lendo o artefato, registre no state
-   que o gate não rodou e diga isso ao usuário. **Nunca grave "gate ✅" sem ter rodado o gate.**
+4. Se não conseguir executar, faça as checagens lendo o artefato, registre no state que o gate
+   não rodou e diga isso ao usuário. **Nunca grave "gate ✅" sem ter rodado o gate.**
 
 | Gate | Etapa | Comando |
 |---|---|---|
-| `define` | Define | `python3 -m sdd_gates define docs/specs/DEFINE_{FEATURE}.md` (com `--aprovado` antes do Build) |
+| `define` | Define | `PYTHONPATH=<gates> python3 -m sdd_gates define docs/specs/DEFINE_{FEATURE}.md` (com `--aprovado` antes do Build) |
 
 ---
 

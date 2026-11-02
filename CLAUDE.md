@@ -14,7 +14,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 <skill-name>/            # 50 skills na raiz (Databricks oficiais + SDD workflow + Python + Spark)
 docs/                    # Documentação de referência sobre features do Genie Code
 assets/                  # cópias locais de referência — gitignored (links no README, seção Referências)
-gates/                   # pacote sdd-gates: gates do SDD por código (python3 -m sdd_gates …)
+gates/                   # pacote sdd-gates: gates do SDD por código (no Databricks, rodado de um 2º Git Folder)
 THIRD_PARTY_NOTICES.md   # créditos e licenças de terceiros (AgentSpec — MIT; skills Databricks)
 .claude/                 # Claude Code CLI local — gitignored, exceto .claude/skills/ (run-genie-code-agent-spec: validador do repo)
 ```
@@ -73,7 +73,7 @@ O prefixo indica a origem da skill:
 
 Cada fase é uma **skill de primeira classe na raiz do repo** (padrão de ativos do Genie Code) — não há mais `agents/` nem `templates/` compartilhados. `sdd-workflow/SKILL.md` é só o orquestrador: descreve fases, gates e handoffs e roteia para a skill de cada fase. Cada skill de fase carrega **seu próprio template** ao lado do `SKILL.md` (ex.: `sdd-define/DEFINE_TEMPLATE.md` + `STATE_TEMPLATE.md`, `sdd-doc/JIRA_UPDATE_TEMPLATE.md`).
 
-**Gates fora das skills:** os scripts de gate moram no pacote `gates/` (`sdd-gates`), instalado no compute via `pip install git+…#subdirectory=gates`, e nunca dentro de uma pasta de skill. O Genie Code se recusa a executar scripts dentro de `.assistant/skills`. A skill diz quando rodar o gate (`python3 -m sdd_gates <gate>`); o pacote diz se passou.
+**Gates fora das skills:** os scripts de gate moram no pacote `gates/` (`sdd-gates`), nunca dentro de uma pasta de skill. O Genie Code se recusa a executar scripts dentro de `.assistant/skills` e a fazer `pip install` do GitHub, então no Databricks o repo é montado uma segunda vez como Git Folder `sdd-gates`, fora de `.assistant`, e o agente roda `PYTHONPATH=<sdd-gates>/gates python3 -m sdd_gates <gate>`. A skill diz quando rodar o gate e a versão mínima; o pacote diz se passou. Mudou o comportamento de um gate: suba `__version__` e a versão mínima no `sdd-workflow`.
 
 **Paradigma skills-first:** as skills `sdd-*` usam as skills `@databricks-*` curadas pelo time Databricks ao invés de KB domains.
 
