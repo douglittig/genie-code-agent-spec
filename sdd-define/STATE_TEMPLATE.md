@@ -2,18 +2,31 @@
 
 > Ledger de rastreabilidade da feature — **fonte única da verdade** do fluxo SDD.
 > Criado na fase Define, atualizado ao final de cada fase, arquivado no Ship.
-> Localização: `.claude/sdd/state/{FEATURE}.md`
+> Localização: `.sdd/features/{FEATURE}/state.md`
 
 ## Identidade
 
 | Atributo | Valor |
 |----------|-------|
 | **Feature** | {FEATURE_NAME} |
+| **Tamanho** | {Pequeno \| Médio \| Grande \| Complexo} — {motivo em uma linha} |
 | **Jira Key** | {PROJ-123 \| `pendente` se não informada} |
 | **Confluence URL** | {url da página SPEC \| `n/a`} |
 | **Fase Atual** | {Brainstorm \| Define \| ADR \| Design \| Build \| Ship \| Shipped} |
 | **Criado em** | {YYYY-MM-DD HH:MM UTC} |
 | **Atualizado em** | {YYYY-MM-DD HH:MM UTC} |
+
+---
+
+## Aprovações
+
+> As duas paradas humanas do contrato de execução (`@sdd-workflow`). Grave só a aprovação que o
+> usuário deu, com as palavras dele. A mesma linha vai também no artefato aprovado.
+
+| Etapa | Aprovado em | Palavras do usuário |
+|-------|-------------|---------------------|
+| Spec (Define) | {YYYY-MM-DD} | "{palavras}" |
+| Plano de tarefas | {YYYY-MM-DD \| n/a no tamanho Médio} | "{palavras}" |
 
 ---
 
@@ -26,8 +39,8 @@
 | ADR | {pendente \| concluída} | `docs/adr/ADR_{FEATURE}.md` | {decisões aprovadas} | {YYYY-MM-DD} |
 | Planejamento (PO) | {pendente \| concluída} | `docs/planning/STORIES_{FEATURE}.md` | {stories estimadas + criadas} | {YYYY-MM-DD} |
 | Design | {pendente \| concluída} | `docs/designs/DESIGN_{FEATURE}.md` | {File Manifest completo} | {YYYY-MM-DD} |
-| Build | {pendente \| concluída} | `.claude/sdd/reports/BUILD_REPORT_{FEATURE}.md` | {lint/testes ✅} | {YYYY-MM-DD} |
-| Ship | {pendente \| concluída} | `.claude/sdd/archive/{FEATURE}/SHIPPED_{DATE}.md` | {ticket fechado} | {YYYY-MM-DD} |
+| Build | {pendente \| concluída} | `.sdd/features/{FEATURE}/BUILD_REPORT.md` | {lint/testes ✅} | {YYYY-MM-DD} |
+| Ship | {pendente \| concluída} | `.sdd/archive/{FEATURE}/SHIPPED_{DATE}.md` | {ticket fechado} | {YYYY-MM-DD} |
 
 ---
 

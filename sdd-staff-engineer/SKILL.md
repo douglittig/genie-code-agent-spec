@@ -172,7 +172,7 @@ para registrar as decisões no ticket Jira (ver Capacidade 4).
    - Skills Databricks aprovadas (quais usar)
    - Skills Databricks descartadas (quais não usar e por quê)
    - Restrições arquiteturais vinculantes
-2. **Fim de fase — sdd-doc:** atualizar o state `.claude/sdd/state/{FEATURE}.md` (fase ADR =
+2. **Fim de fase — sdd-doc:** atualizar o state `.sdd/features/{FEATURE}/state.md` (fase ADR =
    `concluída`, caminho do ADR) e acionar a skill `@sdd-doc` para documentar no Jira:
    - Comentário: decisões-chave do ADR + restrições vinculantes + caminho do artefato
    - Transição: **mantém Em andamento**

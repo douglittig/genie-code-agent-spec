@@ -83,7 +83,7 @@
 | {goal} | MUST | Story 1, Story 3 |
 | {goal} | SHOULD | Story 2 |
 
-> Toda story criada no Jira é registrada também no state `.claude/sdd/state/{FEATURE}.md` (seção "Backlog Criado").
+> Toda story criada no Jira é registrada também no state `.sdd/features/{FEATURE}/state.md` (seção "Backlog Criado").
 
 ---
 

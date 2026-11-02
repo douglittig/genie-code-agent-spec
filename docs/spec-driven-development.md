@@ -22,7 +22,7 @@ Confluence (SPEC) → DEFINE → ADR → @sdd-po → DESIGN → BUILD → SHIP �
 ```
 
 A cada fim de fase o **sdd-doc** posta um comentário no ticket e transiciona o status. A chave do
-Jira é capturada no Define e guardada no ledger `.claude/sdd/state/{FEATURE}.md`.
+Jira é capturada no Define e guardada no ledger `.sdd/features/{FEATURE}/state.md`.
 
 ### Visão geral das etapas
 
@@ -49,7 +49,7 @@ Usar quando a ideia ainda está vaga. Para features bem definidas no Confluence,
 - Há múltiplas formas de implementar e você quer decidir antes de escrever spec
 - A SPEC no Confluence ainda não está madura
 
-**Artefato:** `.claude/sdd/features/BRAINSTORM_{FEATURE}.md`
+**Artefato:** `docs/specs/BRAINSTORM_{FEATURE}.md`
 
 **Gate de qualidade:** Mín. 3 perguntas, 2+ abordagens, YAGNI aplicado
 
@@ -61,7 +61,7 @@ O coração do SDD. Transforma a SPEC do Confluence em um documento estruturado 
 
 **Entrada:** Página do Confluence (via MCP) ou texto da SPEC
 
-**Saída:** `.claude/sdd/features/DEFINE_{FEATURE}.md`
+**Saída:** `docs/specs/DEFINE_{FEATURE}.md`
 
 **Seções obrigatórias:**
 
@@ -103,7 +103,7 @@ Transforma o DEFINE em plano técnico executável. Aqui acontece o **Agent Match
 
 **Entrada:** `DEFINE_{FEATURE}.md`
 
-**Saída:** `.claude/sdd/features/DESIGN_{FEATURE}.md`
+**Saída:** `docs/designs/DESIGN_{FEATURE}.md`
 
 **Seções obrigatórias:**
 
@@ -132,7 +132,7 @@ Executa a implementação seguindo o File Manifest. Para cada arquivo, invoca o 
 
 **Saída:**
 - Código dos arquivos listados no manifest
-- `.claude/sdd/reports/BUILD_REPORT_{FEATURE}.md`
+- `.sdd/features/{FEATURE}/BUILD_REPORT.md`
 
 **Atribuição no BUILD_REPORT:**
 
@@ -292,7 +292,7 @@ Após criar o PR, rodar o review dual — análise estática + revisão arquitet
 
 ## Artefatos SDD
 
-Todos os artefatos ficam em `.claude/sdd/`:
+Todos os artefatos ficam em `.sdd/`:
 
 ```
 docs/                            # artefatos versionados no repo do projeto
@@ -301,17 +301,13 @@ docs/                            # artefatos versionados no repo do projeto
 ├── planning/ STORIES_*.md   (@sdd-po)
 └── designs/  DESIGN_*.md
 
-.claude/sdd/
-├── state/                       # {FEATURE}.md — ledger de rastreabilidade (jira_key, fases, log Jira)
-├── reports/                     # BUILD_REPORT_{FEATURE}.md
+.sdd/               # estado e relatórios do fluxo (no repo do projeto)
+├── features/
+│   └── {FEATURE}/
+│       ├── state.md          # ledger: jira_key, fases, aprovações, log Jira
+│       └── BUILD_REPORT.md   # relatório do Build
 └── archive/
-    └── {FEATURE}/               # Ship (fechado)
-        ├── DEFINE_{FEATURE}.md
-        ├── ADR_{FEATURE}.md
-        ├── DESIGN_{FEATURE}.md
-        ├── BUILD_REPORT_{FEATURE}.md
-        ├── {FEATURE}.state.md
-        └── SHIPPED_{DATE}.md
+    └── {FEATURE}/            # docs + state + SHIPPED_{DATE}.md depois do Ship
 ```
 
 ---
@@ -372,7 +368,7 @@ Genie Code lê via MCP, gera `DEFINE_CLICK_EVENTS_PIPELINE.md`:
 ### Passo 2 — DESIGN
 
 ```
-"Crie o DESIGN para .claude/sdd/features/DEFINE_CLICK_EVENTS_PIPELINE.md"
+"Crie o DESIGN para docs/specs/DEFINE_CLICK_EVENTS_PIPELINE.md"
 ```
 
 File Manifest gerado:
@@ -388,7 +384,7 @@ File Manifest gerado:
 ### Passo 3 — BUILD
 
 ```
-"Execute o BUILD para .claude/sdd/features/DESIGN_CLICK_EVENTS_PIPELINE.md"
+"Execute o BUILD para docs/designs/DESIGN_CLICK_EVENTS_PIPELINE.md"
 ```
 
 Agente executa em paralelo os especialistas. BUILD_REPORT gerado com atribuição por arquivo.
@@ -407,7 +403,7 @@ Agente executa em paralelo os especialistas. BUILD_REPORT gerado com atribuiçã
 
 ```
 /review
-/ship .claude/sdd/features/DEFINE_CLICK_EVENTS_PIPELINE.md
+/ship docs/specs/DEFINE_CLICK_EVENTS_PIPELINE.md
 ```
 
 ---

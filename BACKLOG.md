@@ -59,7 +59,7 @@ Usar como base para próximas sessões de trabalho.
 
 **O que falta:**
 - Hooks determinísticos: pre-commit (segredos + bloqueio de push na `main`) e, no Claude Code, `PreToolUse` em `settings.json`. Complementa o item 4 (branch protection no provider).
-- Eval-gate por rubrica no Build — possivelmente evolução do `custom-test-generator` ou uma skill `custom-evals`. O ledger `.claude/sdd/state/` já registra a trajetória e pode servir de insumo.
+- Eval-gate por rubrica no Build — possivelmente evolução do `custom-test-generator` ou uma skill `custom-evals`. O ledger `.sdd/features/` já registra a trajetória e pode servir de insumo.
 - Anotar tier de modelo sugerido por fase/agente.
 
 **Referência:** [*The New SDLC With Vibe Coding*](https://www.kaggle.com/whitepaper-the-new-SDLC-with-vibe-coding) (pp. 26–30 harness, 14–15 evals, 42 model routing).

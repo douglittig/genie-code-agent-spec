@@ -190,10 +190,13 @@ projeto/
     ├── planning/   # STORIES_{FEATURE}.md  — saída da Fase 3 (@sdd-po)
     └── designs/    # DESIGN_{FEATURE}.md   — saída da Fase 4 (@sdd-design)
 
-.claude/sdd/        # estado e relatórios do fluxo (no repo do projeto)
-├── state/          # {FEATURE}.md  — ledger de rastreabilidade (jira_key, fases, log Jira)
-├── reports/        # BUILD_REPORT_{FEATURE}.md
-└── archive/        # {FEATURE}/ com todos os docs + state + SHIPPED_*.md
+.sdd/               # estado e relatórios do fluxo (no repo do projeto)
+├── features/
+│   └── {FEATURE}/
+│       ├── state.md          # ledger: jira_key, fases, aprovações, log Jira
+│       └── BUILD_REPORT.md   # relatório do Build
+└── archive/
+    └── {FEATURE}/            # docs + state + SHIPPED_{DATE}.md depois do Ship
 ```
 
 ### Documentação automática no Jira (@sdd-doc)
@@ -201,7 +204,7 @@ projeto/
 Ao final de **cada** fase, a skill `@sdd-doc` posta um comentário estruturado no ticket Jira (resumo +
 link do artefato + origem Confluence + gate) e **transiciona** o status (Define → Em andamento,
 Build → Em revisão, Ship → Concluído). A chave do ticket é capturada uma vez no Define e guardada
-no ledger `.claude/sdd/state/{FEATURE}.md`. Há **preview** antes de qualquer escrita; sem chave, o
+no ledger `.sdd/features/{FEATURE}/state.md`. Há **preview** antes de qualquer escrita; sem chave, o
 agente entra em modo pendente e não toca o Jira.
 
 > **Limite de 20 slots MCP — ok para a demo:** habilitando o *conjunto completo* de ferramentas,
@@ -319,7 +322,7 @@ ENTRADAS                                 NÓS
 | [5] Build | @sdd-build | — | código + `BUILD_REPORT_*.md` | Lint + testes ok, sem credenciais | PRONTO |
 | [6] Ship | @sdd-ship | Jira | `SHIPPED_*.md` + Jira fechado | Acceptance tests ok | PRONTO |
 | Iterate | @sdd-iterate | — | Artefato da fase atualizado | — | CROSS-CUTTING |
-| Doc | @sdd-doc | Jira | comentário + transição no ticket + `.claude/sdd/state/*` | — | CROSS-CUTTING (fim de fase) |
+| Doc | @sdd-doc | Jira | comentário + transição no ticket + `.sdd/features/*/state.md` | — | CROSS-CUTTING (fim de fase) |
 
 ### Delegações em Fase 4
 
@@ -402,7 +405,7 @@ Cada fase do workflow SDD é uma skill autocontida (SKILL.md + template próprio
 
 | Skill | Fase | Descrição |
 |-------|------|-----------|
-| [`sdd-workflow`](sdd-workflow/) | — | Orquestrador do workflow SDD: fases, gates, handoffs e Protocolo de Fim-de-Fase |
+| [`sdd-workflow`](sdd-workflow/) | — | Orquestrador: tamanho da feature (Pequeno → Complexo), contrato de execução, raio de ação no Databricks e fim de etapa |
 | [`sdd-brainstorm`](sdd-brainstorm/) | 0 | Exploração colaborativa de ideias, comparação de abordagens e YAGNI → `docs/specs/BRAINSTORM_*.md` |
 | [`sdd-define`](sdd-define/) | 1 | Extração de requisitos via MCP Confluence, Clarity Score e criação do state → `docs/specs/DEFINE_*.md` |
 | [`sdd-staff-engineer`](sdd-staff-engineer/) | 2 | Revisão de spec, discussão arquitetural e geração de ADR (`docs/adr/`) |
@@ -535,6 +538,8 @@ O workflow SDD deste repositório começou como uma adaptação do **[AgentSpec]
 | Clarity Score, File Manifest e os templates de artefato (BRAINSTORM, DEFINE, DESIGN, BUILD_REPORT, SHIPPED) | Define a partir do Confluence e documentação no Jira por fase via MCP (`sdd-doc`), dentro do limite de 20 ferramentas |
 | Code reviewer e gerador de testes | `sdd-staff-engineer` (ADR vinculante), `sdd-po` (Epic → Stories → Tasks), `sdd-dev-workflow` e o ledger de estado por feature |
 | | Delegação do Build às skills oficiais `@databricks-*`, com sync automático do upstream |
+
+O tamanho da feature (*auto-sizing*), o contrato de execução e o raio de ação do `sdd-workflow` foram adaptados do **[TLC Spec-Driven](https://github.com/tech-leads-club/agent-skills), de Felipe Rodrigues / Tech Leads Club** (CC-BY-4.0), com regras próprias para o Databricks.
 
 Os arquivos derivados e o aviso de licença estão em [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md).
 

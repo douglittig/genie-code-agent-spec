@@ -50,7 +50,7 @@ O prefixo indica a origem da skill:
 
 | Skill | Fase | Status | Propósito |
 |-------|------|--------|-----------|
-| `sdd-workflow` | — | **PRONTO** | Orquestrador: fases, gates, handoffs e Protocolo de Fim-de-Fase |
+| `sdd-workflow` | — | **PRONTO** | Orquestrador: tamanho da feature, contrato de execução, raio de ação no Databricks, fim de etapa |
 | `sdd-brainstorm` | 0 | **PRONTO** | Exploração de ideia, comparação de abordagens, YAGNI → `docs/specs/BRAINSTORM_*.md` |
 | `sdd-define` | 1 | **PRONTO** | Define via MCP Confluence → `docs/specs/DEFINE_*.md` (+ captura `jira_key` e cria o state) |
 | `sdd-staff-engineer` | 2 | **PRONTO** | Revisão de spec, decisão arquitetural → `docs/adr/ADR_*.md` |
@@ -69,9 +69,9 @@ Cada fase é uma **skill de primeira classe na raiz do repo** (padrão de ativos
 
 **Paradigma skills-first:** as skills `sdd-*` usam as skills `@databricks-*` curadas pelo time Databricks ao invés de KB domains.
 
-**sdd-doc + state:** a `@sdd-doc` é um hook transversal chamado ao final de **cada** fase — lê a `jira_key` do ledger `.claude/sdd/state/{FEATURE}.md` (criado no Define), monta um comentário a partir do seu `JIRA_UPDATE_TEMPLATE.md`, faz **preview** e então posta no Jira + transiciona o ticket (MCP: `jira_get_issue`, `jira_get_transitions`, `jira_add_comment`, `jira_transition_issue`). Sem `jira_key` — ou com MCP Jira indisponível — → modo pendente (não escreve).
+**sdd-doc + state:** a `@sdd-doc` é um hook transversal chamado ao final de **cada** fase — lê a `jira_key` do ledger `.sdd/features/{FEATURE}/state.md` (criado no Define), monta um comentário a partir do seu `JIRA_UPDATE_TEMPLATE.md`, faz **preview** e então posta no Jira + transiciona o ticket (MCP: `jira_get_issue`, `jira_get_transitions`, `jira_add_comment`, `jira_transition_issue`). Sem `jira_key` — ou com MCP Jira indisponível — → modo pendente (não escreve).
 
-**Artefatos SDD** (DEFINE, ADR, DESIGN, BUILD_REPORT, SHIPPED, state) são criados no repositório do projeto em `docs/specs/`, `docs/adr/`, `docs/designs/` e `.claude/sdd/`.
+**Artefatos SDD** (DEFINE, ADR, DESIGN, BUILD_REPORT, SHIPPED, state) são criados no repositório do projeto em `docs/specs/`, `docs/adr/`, `docs/designs/` e `.sdd/`.
 
 ## Harness & Guardrails
 
@@ -84,9 +84,9 @@ Este repositório **é** um harness. Mapa dos 6 componentes:
 | **Instructions & Rule Files** | `CLAUDE.md`, `AGENTS.md` e os `SKILL.md` das skills (incl. a família `sdd-*`) | ✅ |
 | **Tools** | MCP Confluence (`confluence_get_page`) + Jira (`jira_get_issue`, `jira_get_transitions`, `jira_add_comment`, `jira_transition_issue`, `jira_create_issue`) — limite de 20 ferramentas | ✅ |
 | **Sandbox / execução** | Genie Code Agent mode no workspace Databricks; compute definido no Contexto Técnico do DEFINE | ✅ |
-| **Orchestration** | 5 fases + Protocolo de Fim-de-Fase; handoffs Define→ADR→PO→Design→Build→Ship; delegação por File Manifest às `@databricks-*`; `sdd-doc` como hook transversal | ✅ |
+| **Orchestration** | Tamanho da feature (Pequeno → Complexo) escolhe as etapas + fim de etapa; handoffs Define→ADR→PO→Design→Build→Ship; delegação por File Manifest às `@databricks-*`; `sdd-doc` como hook transversal | ✅ |
 | **Guardrails / Hooks** | Gates de fase (tabela abaixo) — hoje **prompt-level** (checklists nos agentes), **não** hooks determinísticos | ⚠️ parcial |
-| **Observability** | Ledger `.claude/sdd/state/{FEATURE}.md` (trajetória das fases + log de ações no Jira), `BUILD_REPORT_*`, `SHIPPED_*`, archive | ⚠️ sem custo/latência/evals |
+| **Observability** | Ledger `.sdd/features/{FEATURE}/state.md` (trajetória das fases + log de ações no Jira), `BUILD_REPORT_*`, `SHIPPED_*`, archive | ⚠️ sem custo/latência/evals |
 
 ### Guardrails inegociáveis
 
@@ -102,6 +102,9 @@ Regras que o agente **nunca** deve esquecer — valem em qualquer fase:
 | Não editar skills `databricks-*` à mão (o sync sobrescreve) | Proveniência + `OWN_SKILLS` |
 | Clarity Score ≥ 12/15 antes de avançar do Define | Gate do Define |
 | ADR é vinculante — não reabrir decisões no Design/Build | `sdd-design` |
+| Aprovação da spec e do plano gravada com as palavras do usuário — nunca inventada | Contrato de execução (`sdd-workflow`) |
+| Raio de ação: aprovação libera só branch da feature e ambiente de desenvolvimento; deploy fora do dev, tabela de produção, grant e schedule pedem ok explícito | Contrato de execução (`sdd-workflow`) |
+| Teste nasce do critério de aceite; nunca enfraquecer, pular ou apagar teste para passar | Contrato de execução (`sdd-workflow`) |
 
 **Lacuna conhecida:** esses guardrails são *instruções*, não código determinístico. O paper é explícito que hooks existem justamente para "o que o agente nunca deveria esquecer mas sempre esquece". Fechar isso exige enforcement real (pre-commit, `PreToolUse`, branch protection) — ver [`BACKLOG.md`](BACKLOG.md) itens 4 e 7.
 
