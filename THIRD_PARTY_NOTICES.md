@@ -51,7 +51,7 @@ Adaptado do TLC Spec-Driven, com mudanças:
 
 - `sdd-workflow/SKILL.md`: tamanho da feature (*auto-sizing*), contrato de execução, raio de ação (*blast radius*, aqui com regras do Databricks) e retomada de sessão.
 - `sdd-define/SKILL.md`, `sdd-define/DEFINE_TEMPLATE.md`: critérios EARS (em PT-BR), rubrica de requisitos implícitos (reescrita para dados), gate de fechamento e áreas cinzentas.
-- `sdd-workflow/scripts/` e `sdd-define/scripts/`: a ideia de gates por script e de testar os gates por mutação; o código foi escrito do zero.
+- `gates/` (pacote `sdd-gates`): a ideia de gates por script e de testar os gates por mutação; o código foi escrito do zero.
 
 ---
 

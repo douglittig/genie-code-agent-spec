@@ -1,4 +1,4 @@
-"""validate_define.py — gate do Define, por código e não de memória.
+"""define.py — gate do Define, por código e não de memória.
 
 Roda ANTES de apresentar a spec ao usuário e de novo, com --aprovado, antes do
 Build. Lê só o DEFINE_*.md (markdown), nunca o código do projeto.
@@ -21,7 +21,7 @@ Avisos (exit 1 só com --estrito):
   - pergunta em aberto (antes da aprovação é normal; com --aprovado vira erro)
 
 Uso:
-  python3 <pasta-da-skill>/scripts/validate_define.py docs/specs/DEFINE_<FEATURE>.md [--aprovado] [--estrito]
+  python3 -m sdd_gates define docs/specs/DEFINE_<FEATURE>.md [--aprovado] [--estrito]
 
 Códigos de saída: 0 ok, 1 o DEFINE não passou, 2 erro de uso.
 """
@@ -31,8 +31,7 @@ import re
 import sys
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "sdd-workflow" / "scripts"))
-import sdd_md as md  # noqa: E402
+from . import md
 
 SECOES = [
     "Fontes",
@@ -81,7 +80,7 @@ def itens_de_lista(linhas):
 
 
 def valida(caminho, aprovado=False):
-    rel = md.Relatorio(f"validate_define {caminho.name}")
+    rel = md.Relatorio(f"sdd_gates define {caminho.name}")
     linhas = md.prepara(caminho.read_text(encoding="utf-8"))
 
     # 1. Seções obrigatórias
@@ -212,7 +211,7 @@ def valida(caminho, aprovado=False):
 
 
 def main(argv=None):
-    p = argparse.ArgumentParser(description="Gate do Define (DEFINE_*.md).")
+    p = argparse.ArgumentParser(prog="python3 -m sdd_gates define", description="Gate do Define (DEFINE_*.md).")
     p.add_argument("arquivo", help="caminho do DEFINE_<FEATURE>.md")
     p.add_argument("--aprovado", action="store_true", help="gate antes do Build: exige aprovação e nenhuma pergunta aberta")
     p.add_argument("--estrito", action="store_true", help="avisos também reprovam")

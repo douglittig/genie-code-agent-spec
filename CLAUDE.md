@@ -14,13 +14,14 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 <skill-name>/            # 50 skills na raiz (Databricks oficiais + SDD workflow + Python + Spark)
 docs/                    # Documentação de referência sobre features do Genie Code
 assets/                  # cópias locais de referência — gitignored (links no README, seção Referências)
+gates/                   # pacote sdd-gates: gates do SDD por código (python3 -m sdd_gates …)
 THIRD_PARTY_NOTICES.md   # créditos e licenças de terceiros (AgentSpec — MIT; skills Databricks)
 .claude/                 # Claude Code CLI local — gitignored, exceto .claude/skills/ (run-genie-code-agent-spec: validador do repo)
 ```
 
 > **Como usar no Genie Code:** carregue este repo como Git Folder em `Workspace/.assistant/skills/`. As skills ficam disponíveis automaticamente em Agent mode.
 
-> **Sem build/lint/test:** este é um repositório de conteúdo (Markdown + arquivos de referência), não uma aplicação. Não há `package.json`, `pyproject.toml` nem pipeline de CI — a "compilação" é o Genie Code/Claude Code lendo os `SKILL.md`. Validar uma mudança = revisar o Markdown e confirmar que o frontmatter está correto.
+> **Quase só conteúdo:** as skills são Markdown, e a "compilação" é o Genie Code/Claude Code lendo os `SKILL.md`. Validar uma skill = revisar o Markdown e rodar `python3 .claude/skills/run-genie-code-agent-spec/driver.py validate`. O único código é o pacote [`gates/`](gates/) (Python puro, sem dependências): mexeu num gate, num template que um gate lê ou numa fixture, rode `python3 -m sdd_gates selftest` a partir de `gates/` (ou com `pip install -e gates`). O CI roda o mesmo selftest em todo PR.
 
 > **Arquivos de instrução paralelos:** [`CLAUDE.md`](CLAUDE.md) (Claude Code) e [`AGENTS.md`](AGENTS.md) (Genie Code) cobrem o mesmo conteúdo para dois agentes. Ao editar um, **atualizar o outro** para mantê-los em sincronia. [`BACKLOG.md`](BACKLOG.md) rastreia trabalho adiado (placeholders corporativos, skills futuras) — consultar antes de começar trabalho novo em `sdd-dev-workflow`/`sdd-code-reviewer`.
 
@@ -57,7 +58,7 @@ O prefixo indica a origem da skill:
 | Skill | Fase | Status | Propósito |
 |-------|------|--------|-----------|
 | `sdd-workflow` | — | **PRONTO** | Orquestrador: tamanho da feature, contrato de execução, raio de ação no Databricks, fim de etapa |
-| `sdd-define` | 1 | **PRONTO** | Spec de dados testável (Confluence via MCP): critérios EARS, rubrica de requisitos implícitos, áreas cinzentas, gate `validate_define.py`, aprovação gravada → `docs/specs/DEFINE_*.md` (+ `jira_key` e state) |
+| `sdd-define` | 1 | **PRONTO** | Spec de dados testável (Confluence via MCP): critérios EARS, rubrica de requisitos implícitos, áreas cinzentas, gate `sdd_gates define`, aprovação gravada → `docs/specs/DEFINE_*.md` (+ `jira_key` e state) |
 | `sdd-staff-engineer` | 2 | **PRONTO** | Revisão de spec, decisão arquitetural → `docs/adr/ADR_*.md` |
 | `sdd-po` | 3 | **PRONTO** | Epic → Stories (Fibonacci) → Tasks no Jira → `docs/planning/STORIES_*.md` |
 | `sdd-design` | 4 | **PRONTO** | Arquitetura + File Manifest a partir do DEFINE/ADR → `docs/designs/DESIGN_*.md` |
@@ -71,6 +72,8 @@ O prefixo indica a origem da skill:
 ### Arquitetura do workflow SDD — skills autocontidas
 
 Cada fase é uma **skill de primeira classe na raiz do repo** (padrão de ativos do Genie Code) — não há mais `agents/` nem `templates/` compartilhados. `sdd-workflow/SKILL.md` é só o orquestrador: descreve fases, gates e handoffs e roteia para a skill de cada fase. Cada skill de fase carrega **seu próprio template** ao lado do `SKILL.md` (ex.: `sdd-define/DEFINE_TEMPLATE.md` + `STATE_TEMPLATE.md`, `sdd-doc/JIRA_UPDATE_TEMPLATE.md`).
+
+**Gates fora das skills:** os scripts de gate moram no pacote `gates/` (`sdd-gates`), instalado no compute via `pip install git+…#subdirectory=gates`, e nunca dentro de uma pasta de skill. O Genie Code se recusa a executar scripts dentro de `.assistant/skills`. A skill diz quando rodar o gate (`python3 -m sdd_gates <gate>`); o pacote diz se passou.
 
 **Paradigma skills-first:** as skills `sdd-*` usam as skills `@databricks-*` curadas pelo time Databricks ao invés de KB domains.
 
@@ -105,7 +108,7 @@ Regras que o agente **nunca** deve esquecer — valem em qualquer fase:
 | Operar somente na `jira_key` do state — nunca busca (`jira_search`) | `sdd-doc`, `sdd-po` |
 | Confluence: só `confluence_get_page` na URL dada — nunca `confluence_search` | `sdd-define` |
 | Não editar skills `databricks-*` à mão (o sync sobrescreve) | Proveniência + `OWN_SKILLS` |
-| `validate_define.py` verde e aprovação gravada antes de sair do Define; `--aprovado` antes do Build | Gate do Define (`sdd-define/scripts/`) |
+| `python3 -m sdd_gates define` verde e aprovação gravada antes de sair do Define; `--aprovado` antes do Build | Gate do Define (pacote `gates/`) |
 | ADR é vinculante — não reabrir decisões no Design/Build | `sdd-design` |
 | Aprovação da spec e do plano gravada com as palavras do usuário — nunca inventada | Contrato de execução (`sdd-workflow`) |
 | Raio de ação: aprovação libera só branch da feature e ambiente de desenvolvimento; deploy fora do dev, tabela de produção, grant e schedule pedem ok explícito | Contrato de execução (`sdd-workflow`) |

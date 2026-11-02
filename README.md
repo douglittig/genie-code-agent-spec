@@ -16,6 +16,8 @@ Repositório de skills, custom instructions e integrações MCP para Databricks 
 | Acesso de admin | Permissão para criar Git Folders em `Workspace/` |
 | Git provider configurado | GitHub, GitLab ou Bitbucket conectado ao workspace |
 | MCP por fase | Confluence (Define), Jira (sdd-doc ao fim de cada fase + Ship), Bitbucket (Fase 4) |
+| Compute para os gates | Serverless (environment 5 ou mais) ou cluster com DBR 17.0 ou mais, com acesso à internet para instalar o pacote `sdd-gates` do GitHub |
+| Git Folder do projeto | Criado com a opção **Use Git CLI** ligada. Os gates leem o git do projeto, e a opção não pode ser ligada depois numa pasta que já existe |
 
 ---
 
@@ -50,6 +52,8 @@ Workspace/
 
 > **Por que o nome importa:** O Genie Code procura skills em `Workspace/.assistant/skills/<skill-name>/SKILL.md`. Se o folder for nomeado diferente de `skills`, o caminho quebra. As skills estão na raiz deste repo — com o nome correto, cada skill fica exatamente onde o Genie Code espera.
 
+> **Só para você:** o mesmo procedimento em `/Users/<você>/.assistant/` instala as skills só para o seu usuário. É o jeito de testar antes de liberar para o workspace inteiro, que exige admin.
+
 ---
 
 ### Passo 2 — Verificar a instalação
@@ -69,6 +73,21 @@ Quais skills você tem disponíveis?
 ```
 
 O agente listará as skills carregadas do `Workspace/.assistant/skills/`.
+
+---
+
+### Passo 2b — Instalar os gates
+
+Os gates são scripts que decidem, por código, se uma etapa pode avançar (ex.: o Define só sai com a spec válida e aprovada). Eles ficam no pacote [`gates/`](gates/), **fora das skills**: o Genie Code não executa scripts que moram dentro de `.assistant/skills`.
+
+O próprio agente instala o pacote quando precisa, no compute do projeto. Para conferir na mão, numa célula ou no terminal web:
+
+```bash
+python3 -m pip install "git+https://github.com/douglittig/genie-code-agent-spec@main#subdirectory=gates"
+python3 -m sdd_gates selftest
+```
+
+`selftest: OK` quer dizer que os gates reprovam o que devem reprovar. No serverless, o pacote vale para a sessão do compute: numa sessão nova, o agente instala de novo.
 
 ---
 
@@ -99,7 +118,7 @@ O agente irá:
 1. Ler a página do Confluence via MCP
 2. Perguntar o que for decisão sua (escopo, comportamento do dado, desvio da página), com recomendação
 3. Escrever os critérios de aceite em EARS (`QUANDO … ENTÃO o pipeline DEVE …`) e passar pela rubrica de requisitos implícitos de dados
-4. Rodar o `validate_define.py` e gerar `docs/specs/DEFINE_{FEATURE}.md` no repositório do projeto
+4. Gerar `docs/specs/DEFINE_{FEATURE}.md` no repositório do projeto e rodar o gate `python3 -m sdd_gates define`
 5. Parar e esperar a sua aprovação, gravada com as suas palavras
 
 Com a spec aprovada, o agente sugere o próximo passo (conforme o tamanho da feature):
@@ -117,6 +136,7 @@ Para puxar atualizações deste repositório:
 1. No workspace, navegue até `Workspace/.assistant/skills/` (o Git Folder renomeado no Passo 1)
 2. Clique em **Pull** (ícone de atualização do Git Folder)
 3. As skills são recarregadas automaticamente na próxima sessão do Genie Code
+4. Reinstale os gates com `python3 -m pip install --force-reinstall --no-deps "git+https://github.com/douglittig/genie-code-agent-spec@main#subdirectory=gates"`
 
 ---
 
@@ -251,7 +271,7 @@ ENTRADAS                                 NÓS
                                          │  skill:  @sdd-define                │ OBRIGATÓRIO
                                          │  mcp:    Confluence (12 slots)      │
                                          │  output: docs/specs/DEFINE_*.md     │
-                                         │  gate:   validate_define + aprovação│
+                                         │  gate:   define + aprovação         │
                                          └───────────────────┬─────────────────┘
                                                              │
                                                              ▼
@@ -308,7 +328,7 @@ ENTRADAS                                 NÓS
 
 | Nó | Skill | MCP ativo | Output | Gate para avançar | Status |
 |----|-------|-----------|--------|-------------------|--------|
-| [1] Define | @sdd-define | Confluence | `docs/specs/DEFINE_*.md` | `validate_define.py` verde + aprovação gravada (ideia vaga: áreas cinzentas dentro do Define) | PRONTO |
+| [1] Define | @sdd-define | Confluence | `docs/specs/DEFINE_*.md` | gate `sdd_gates define` verde + aprovação gravada (ideia vaga: áreas cinzentas dentro do Define) | PRONTO |
 | [2] Arquitetura | @sdd-staff-engineer | — | `docs/adr/ADR_*.md` | ADR revisado e aceito | PRONTO |
 | [3] Planejamento | @sdd-po | Jira | `docs/planning/STORIES_*.md` + Stories/Tasks no Jira | Stories estimadas (Fibonacci) e criadas | PRONTO |
 | [4] Design | @sdd-design | — | `docs/designs/DESIGN_*.md` | File Manifest completo | PRONTO |
@@ -399,7 +419,7 @@ Cada fase do workflow SDD é uma skill autocontida (SKILL.md + template próprio
 | Skill | Fase | Descrição |
 |-------|------|-----------|
 | [`sdd-workflow`](sdd-workflow/) | — | Orquestrador: tamanho da feature (Pequeno → Complexo), contrato de execução, raio de ação no Databricks e fim de etapa |
-| [`sdd-define`](sdd-define/) | 1 | Spec de dados testável: critérios EARS, rubrica de requisitos implícitos, áreas cinzentas, gate `validate_define.py` e aprovação gravada → `docs/specs/DEFINE_*.md` |
+| [`sdd-define`](sdd-define/) | 1 | Spec de dados testável: critérios EARS, rubrica de requisitos implícitos, áreas cinzentas, gate `sdd_gates define` e aprovação gravada → `docs/specs/DEFINE_*.md` |
 | [`sdd-staff-engineer`](sdd-staff-engineer/) | 2 | Revisão de spec, discussão arquitetural e geração de ADR (`docs/adr/`) |
 | [`sdd-po`](sdd-po/) | 3 | Product Owner: quebra a feature em Epic → Stories (Fibonacci) → Tasks, cria no Jira via MCP e gera `docs/planning/STORIES_*.md` |
 | [`sdd-design`](sdd-design/) | 4 | Design técnico com File Manifest a partir do DEFINE/ADR → `docs/designs/DESIGN_*.md` |
@@ -506,6 +526,7 @@ Arquivos envolvidos:
 ```
 <skill-name>/                       # 50 skills na raiz (Databricks oficiais + SDD workflow + Python + Spark)
 docs/                               # Documentação de referência extraída de fontes Databricks
+gates/                              # pacote sdd-gates: gates do SDD (instalado no compute via pip)
 .github/workflows/ e scripts/       # CI — sync das skills Databricks (upstream)
 LICENSE-/NOTICE-databricks-agent-skills  # licença das skills upstream
 databricks-skills.lock              # Proveniência do último sync (versão + commit upstream)

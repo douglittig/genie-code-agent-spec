@@ -5,15 +5,17 @@ gate passa pela mesma disciplina que ele cobra: partimos de um artefato correto
 (a fixture, que precisa passar limpo), estragamos um ponto de cada vez e
 exigimos que o gate reprove com a mensagem certa.
 
-Também confere que o template ainda tem tudo o que o gate procura: se alguém
-mudar o template e esquecer o gate (ou o contrário), aparece aqui.
+Também confere que o template da skill ainda tem tudo o que o gate procura: se
+alguém mudar o template e esquecer o gate (ou o contrário), aparece aqui. Essa
+parte precisa do repo: no pacote instalado, passe --template ou rode do clone.
 
 Rode depois de mexer em qualquer gate, template ou fixture:
-  python3 <pasta-do-sdd-workflow>/scripts/selftest.py [-v]
+  python3 -m sdd_gates selftest [-v] [--template sdd-define/DEFINE_TEMPLATE.md]
 
 Códigos de saída: 0 tudo certo, 1 algum mutante sobreviveu ou a base quebrou.
 """
 
+import argparse
 import io
 import re
 import sys
@@ -21,15 +23,12 @@ import tempfile
 from contextlib import redirect_stdout
 from pathlib import Path
 
+from . import define
+
 AQUI = Path(__file__).resolve().parent
-SKILLS = AQUI.parents[1]
-sys.path.insert(0, str(AQUI))
-sys.path.insert(0, str(SKILLS / "sdd-define" / "scripts"))
-
-import validate_define  # noqa: E402
-
 FIXTURE_DEFINE = AQUI / "fixtures" / "DEFINE_PEDIDOS_DIARIOS.md"
-TEMPLATE_DEFINE = SKILLS / "sdd-define" / "DEFINE_TEMPLATE.md"
+# No clone do repo (ou instalação editável), o template fica dois níveis acima do pacote.
+TEMPLATE_NO_REPO = AQUI.parents[1] / "sdd-define" / "DEFINE_TEMPLATE.md"
 
 
 def roda_define(texto, *args):
@@ -39,7 +38,7 @@ def roda_define(texto, *args):
         arq.write_text(texto, encoding="utf-8")
         buf = io.StringIO()
         with redirect_stdout(buf):
-            codigo = validate_define.main([str(arq), *args])
+            codigo = define.main([str(arq), *args])
         return codigo, buf.getvalue()
 
 
@@ -113,11 +112,14 @@ MUTANTES_DEFINE = [
 ]
 
 
-def checa_template(verbose):
+def checa_template(template, verbose):
     """O template precisa ter cada seção e cada dimensão que o gate exige."""
-    texto = TEMPLATE_DEFINE.read_text(encoding="utf-8")
-    faltas = [f"seção '## {s}'" for s in validate_define.SECOES if not re.search(rf"^## {re.escape(s)}\b", texto, re.M)]
-    faltas += [f"dimensão '{d}'" for d in validate_define.DIMENSOES if f"| {d}" not in texto]
+    if template is None:
+        print("  aviso  template não checado: rode do clone do repo ou passe --template")
+        return True
+    texto = template.read_text(encoding="utf-8")
+    faltas = [f"seção '## {s}'" for s in define.SECOES if not re.search(rf"^## {re.escape(s)}\b", texto, re.M)]
+    faltas += [f"dimensão '{d}'" for d in define.DIMENSOES if f"| {d}" not in texto]
     for f in faltas:
         print(f"  FALHA  template sem {f}")
     if verbose and not faltas:
@@ -126,7 +128,14 @@ def checa_template(verbose):
 
 
 def main(argv=None):
-    verbose = "-v" in (argv or sys.argv[1:])
+    p = argparse.ArgumentParser(prog="python3 -m sdd_gates selftest", description="Testa os gates por mutação.")
+    p.add_argument("-v", "--verbose", action="store_true", help="mostra cada mutante")
+    p.add_argument("--template", type=Path, help="DEFINE_TEMPLATE.md da skill sdd-define")
+    a = p.parse_args(argv)
+    template = a.template or (TEMPLATE_NO_REPO if TEMPLATE_NO_REPO.is_file() else None)
+    if template is not None and not template.is_file():
+        print(f"template não encontrado: {template}", file=sys.stderr)
+        return 2
     ok = True
 
     base = FIXTURE_DEFINE.read_text(encoding="utf-8")
@@ -134,10 +143,10 @@ def main(argv=None):
     if codigo != 0:
         print("  FALHA  a fixture do DEFINE deveria passar limpa:\n" + saida)
         return 1
-    if verbose:
+    if a.verbose:
         print("  ok     fixture do DEFINE passa com --aprovado --estrito")
 
-    ok &= checa_template(verbose)
+    ok &= checa_template(template, a.verbose)
 
     for nome, estraga, args, esperado in MUTANTES_DEFINE:
         codigo, saida = roda_define(estraga(base), *args)
@@ -145,13 +154,9 @@ def main(argv=None):
         if not morto:
             ok = False
             print(f"  FALHA  mutante sobreviveu: {nome} (exit {codigo}; esperava '{esperado}')\n{saida}")
-        elif verbose:
+        elif a.verbose:
             print(f"  ok     {nome}")
 
     total = len(MUTANTES_DEFINE)
-    print(f"selftest: {'OK' if ok else 'FALHOU'} — {total} mutantes do validate_define")
+    print(f"selftest: {'OK' if ok else 'FALHOU'} — {total} mutantes do gate define")
     return 0 if ok else 1
-
-
-if __name__ == "__main__":
-    sys.exit(main())

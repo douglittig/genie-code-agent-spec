@@ -14,7 +14,8 @@ description: |
 # Define — a spec de dados
 
 Resultado: `docs/specs/DEFINE_{FEATURE}.md` aprovado pelo usuário, e o state da feature criado.
-Template: [`DEFINE_TEMPLATE.md`](DEFINE_TEMPLATE.md). Gate: `scripts/validate_define.py`.
+Template: [`DEFINE_TEMPLATE.md`](DEFINE_TEMPLATE.md). Gate: `python3 -m sdd_gates define` (pacote
+`sdd-gates`; instalação no `@sdd-workflow`, seção Gates).
 
 Antes de começar, o tamanho da feature já foi decidido no `@sdd-workflow`. Ele define o quanto
 preencher:
@@ -127,13 +128,13 @@ O gate esclarece o que foi pedido. Ele não inventa requisito novo.
 ## Passo 7 — Validar, apresentar e parar
 
 ```bash
-python3 <pasta-da-skill>/scripts/validate_define.py docs/specs/DEFINE_{FEATURE}.md
+python3 -m sdd_gates define docs/specs/DEFINE_{FEATURE}.md
 ```
 
-A pasta da skill é a deste `SKILL.md`: `/Workspace/.assistant/skills/sdd-define` no Genie Code
-(ou `/Workspace/Users/<você>/.assistant/skills/sdd-define`, se instalada só para você). Rode o
-script em vez de lê-lo: as mensagens dizem o que mudar. Exit diferente de 0 → corrija e rode de
-novo. Sem como executar código, faça as mesmas checagens lendo o arquivo e diga isso ao usuário.
+Rode a partir da raiz do repo do projeto. Se o pacote não estiver instalado, instale antes
+(seção Gates do `@sdd-workflow`). Rode o gate em vez de ler o código dele: as mensagens dizem o
+que mudar. Exit diferente de 0 → corrija e rode de novo. Se não conseguir instalar nem executar,
+faça as mesmas checagens lendo o arquivo e **diga ao usuário que o gate não rodou**.
 
 Com o validador verde, apresente o DEFINE com as perguntas em aberto e a sua recomendação para
 cada uma, e **pare**. É a primeira parada humana do contrato de execução.
@@ -149,7 +150,7 @@ Quando o usuário aprovar, grave na seção Aprovação, com as palavras dele:
 Nunca grave uma aprovação que ele não deu. Depois rode o gate do Build:
 
 ```bash
-python3 <pasta-da-skill>/scripts/validate_define.py docs/specs/DEFINE_{FEATURE}.md --aprovado
+python3 -m sdd_gates define docs/specs/DEFINE_{FEATURE}.md --aprovado
 ```
 
 ## Passo 9 — State, Jira e fim de etapa

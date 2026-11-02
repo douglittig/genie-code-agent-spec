@@ -1,0 +1,34 @@
+# sdd-gates
+
+Gates do Spec-Driven Development para o Genie Code no Databricks. Um gate decide **por código** se uma etapa do SDD pode avançar; a skill da etapa diz quando rodar cada um.
+
+Os gates ficam neste pacote, e não dentro das skills, porque o Genie Code não executa scripts que moram em `.assistant/skills`.
+
+## Instalar
+
+No compute do projeto (serverless ou cluster), pelo mesmo Python que vai rodar os gates:
+
+```bash
+python3 -m pip install "git+https://github.com/douglittig/genie-code-agent-spec@main#subdirectory=gates"
+```
+
+Só biblioteca padrão; sem dependências. Precisa de acesso à internet para baixar do GitHub.
+
+## Gates
+
+| Comando | Etapa | O que confere |
+|---|---|---|
+| `python3 -m sdd_gates define docs/specs/DEFINE_<FEATURE>.md` | Define | Seções, critérios EARS, rubrica de requisitos implícitos, suposições, rastreabilidade |
+| `python3 -m sdd_gates define … --aprovado` | antes do Build | O mesmo + aprovação gravada e nenhuma pergunta em aberto |
+| `python3 -m sdd_gates selftest` | — | Testa os próprios gates por mutação |
+
+Códigos de saída: `0` passou, `1` não passou (a saída diz o que corrigir), `2` erro de uso. `--estrito` faz os avisos também reprovarem.
+
+## Desenvolver
+
+```bash
+python3 -m pip install -e gates
+python3 -m sdd_gates selftest -v      # do clone, também confere o DEFINE_TEMPLATE.md da skill
+```
+
+Mexeu num gate, num template ou numa fixture: rode o `selftest`. Todo mutante tem que morrer.

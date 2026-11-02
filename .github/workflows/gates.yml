@@ -1,0 +1,38 @@
+name: gates
+
+# Testa o pacote sdd-gates por mutação: a fixture tem que passar limpa, e cada
+# defeito plantado tem que ser reprovado com a mensagem certa.
+
+on:
+  pull_request:
+    paths:
+      - "gates/**"
+      - "sdd-define/DEFINE_TEMPLATE.md"
+      - ".github/workflows/gates.yml"
+  push:
+    branches: [main]
+    paths:
+      - "gates/**"
+      - "sdd-define/DEFINE_TEMPLATE.md"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  selftest:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        # 3.12 = Python do serverless e do DBR 17; 3.10 = mínimo declarado no pacote
+        python: ["3.10", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Instala o pacote (como no Databricks, sem modo editável)
+        run: python -m pip install ./gates
+      - name: Selftest com o template da skill
+        working-directory: ${{ runner.temp }}
+        run: python -m sdd_gates selftest -v --template "$GITHUB_WORKSPACE/sdd-define/DEFINE_TEMPLATE.md"

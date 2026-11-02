@@ -90,11 +90,33 @@ Na dúvida se uma ação sai do ambiente de desenvolvimento, trate como "exige o
 
 ---
 
+## Gates (pacote `sdd-gates`)
+
+Um gate é um script que decide, por código, se a etapa pode avançar. Os gates ficam no pacote
+`sdd-gates`, **fora das skills**: o Genie Code não executa scripts dentro de `.assistant/skills`.
+Não tente contornar isso copiando código de lá.
+
+1. Confira se está instalado: `python3 -m sdd_gates --version`.
+2. Se não estiver, instale no compute do projeto (está liberado: é o ambiente de desenvolvimento):
+   ```bash
+   python3 -m pip install "git+https://github.com/douglittig/genie-code-agent-spec@main#subdirectory=gates"
+   ```
+3. Rode o gate a partir da raiz do repo do projeto, sempre com `python3 -m sdd_gates <gate>`.
+   Exit 0: passou. Exit 1: não passou, e a saída diz o que corrigir. Exit 2: erro de uso.
+4. Se não conseguir instalar nem executar, faça as checagens lendo o artefato, registre no state
+   que o gate não rodou e diga isso ao usuário. **Nunca grave "gate ✅" sem ter rodado o gate.**
+
+| Gate | Etapa | Comando |
+|---|---|---|
+| `define` | Define | `python3 -m sdd_gates define docs/specs/DEFINE_{FEATURE}.md` (com `--aprovado` antes do Build) |
+
+---
+
 ## Etapas e artefatos
 
 | Etapa | Skill | Artefato |
 |---|---|---|
-| Define | `@sdd-define` | `docs/specs/DEFINE_{FEATURE}.md` + `.sdd/features/{FEATURE}/state.md`; gate `validate_define.py` |
+| Define | `@sdd-define` | `docs/specs/DEFINE_{FEATURE}.md` + `.sdd/features/{FEATURE}/state.md`; gate `sdd_gates define` |
 | Arquitetura | `@sdd-staff-engineer` | `docs/adr/ADR_{FEATURE}.md` (vinculante para Design e Build) |
 | Planejamento | `@sdd-po` | `docs/planning/STORIES_{FEATURE}.md` + Stories e Tasks no Jira |
 | Design | `@sdd-design` | `docs/designs/DESIGN_{FEATURE}.md` |

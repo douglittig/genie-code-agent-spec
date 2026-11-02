@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "sdd-gates"
+version = "0.1.0"
+description = "Gates do Spec-Driven Development para o Genie Code no Databricks"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = []
+
+[project.scripts]
+sdd-gates = "sdd_gates.__main__:main"
+
+[project.urls]
+Repository = "https://github.com/douglittig/genie-code-agent-spec"
+
+[tool.setuptools]
+packages = ["sdd_gates"]
+
+[tool.setuptools.package-data]
+sdd_gates = ["fixtures/*.md"]
