@@ -54,8 +54,8 @@ O prefixo indica a origem da skill:
 | `sdd-workflow` | — | **PRONTO** | Orquestrador: tamanho da feature, contrato de execução, raio de ação no Databricks, fim de etapa |
 | `sdd-define` | 1 | **PRONTO** | Spec de dados testável (Confluence via MCP): critérios EARS, rubrica de requisitos implícitos, áreas cinzentas, gate `sdd_gates define`, aprovação gravada → `docs/specs/DEFINE_*.md` (+ `jira_key` e state) |
 | `sdd-staff-engineer` | 2 | **PRONTO** | Revisão de spec, decisão arquitetural → `docs/adr/ADR_*.md` |
-| `sdd-po` | 3 | **PRONTO** | Epic → Stories (Fibonacci) → Tasks no Jira → `docs/planning/STORIES_*.md` |
-| `sdd-design` | 4 | **PRONTO** | Arquitetura + File Manifest a partir do DEFINE/ADR → `docs/designs/DESIGN_*.md` |
+| `sdd-po` | 3 | **PRONTO** | Histórias (Fibonacci) → tasks atômicas com teste e gate → `docs/planning/TASKS_*.md` + gate `sdd_gates tasks`; Jira quando há épico |
+| `sdd-design` | 4 | **PRONTO** | Componentes ligados a critérios e tasks, reaproveitamento e decisões → `docs/designs/DESIGN_*.md` (conferido pelo gate `tasks`) |
 | `sdd-build` | 5 | **PRONTO** | Implementação delegando às `@databricks-*` → código + `BUILD_REPORT_*.md` |
 | `sdd-ship` | 6 | **PRONTO** | Archive + lições aprendidas + fechamento do ticket → `SHIPPED_*.md` |
 | `sdd-iterate` | cross | **PRONTO** | Mudanças mid-stream com análise de cascata |
@@ -86,7 +86,7 @@ Este repositório **é** um harness. Mapa dos 6 componentes:
 | **Instructions & Rule Files** | `CLAUDE.md`, `AGENTS.md` e os `SKILL.md` das skills (incl. a família `sdd-*`) | ✅ |
 | **Tools** | MCP Confluence (`confluence_get_page`) + Jira (`jira_get_issue`, `jira_get_transitions`, `jira_add_comment`, `jira_transition_issue`, `jira_create_issue`) — limite de 20 ferramentas | ✅ |
 | **Sandbox / execução** | Genie Code Agent mode no workspace Databricks; compute definido no Contexto Técnico do DEFINE | ✅ |
-| **Orchestration** | Tamanho da feature (Pequeno → Complexo) escolhe as etapas + fim de etapa; handoffs Define→ADR→PO→Design→Build→Ship; delegação por File Manifest às `@databricks-*`; `sdd-doc` como hook transversal | ✅ |
+| **Orchestration** | Tamanho da feature (Pequeno → Complexo) escolhe as etapas + fim de etapa; handoffs Define→ADR→PO→Design→Build→Ship; delegação às `@databricks-*` pela coluna "Constrói com" do DESIGN; `sdd-doc` como hook transversal | ✅ |
 | **Guardrails / Hooks** | Gates de fase (tabela abaixo) — hoje **prompt-level** (checklists nos agentes), **não** hooks determinísticos | ⚠️ parcial |
 | **Observability** | Ledger `.sdd/features/{FEATURE}/state.md` (trajetória das fases + log de ações no Jira), `BUILD_REPORT_*`, `SHIPPED_*`, archive | ⚠️ sem custo/latência/evals |
 

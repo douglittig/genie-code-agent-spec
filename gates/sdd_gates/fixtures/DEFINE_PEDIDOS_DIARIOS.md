@@ -149,7 +149,7 @@ Finanças fecha a receita diária a partir da tabela bruta de pedidos, que tem d
 
 ## Aprovação
 
-**Aprovado**: 2026-11-02 — usuário: "pode seguir com essa spec"
+**Aprovado**: 2026-11-02 — v1.0 — usuário: "pode seguir com essa spec"
 
 ## Histórico de revisões
 

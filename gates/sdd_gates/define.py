@@ -20,8 +20,9 @@ Erros (exit 1):
   - critério sem linha na Rastreabilidade, ou linha de rastreabilidade de critério inexistente
   - origem de critério que não aponta para pedido, Qn.m, Confluence, ticket, rubrica ou área cinzenta
   - Qn.m citado que não está no Registro; frase entre aspas que não está no pedido ou na linha Qn.m
-  - com --aprovado: sem linha **Aprovado** com as palavras do usuário, pergunta em aberto,
-    pergunta do Registro sem resposta, ou dimensão implícita sem destino
+  - com --aprovado: sem linha **Aprovado** com a versão e as palavras do usuário, aprovação de
+    uma versão que não é a última do Histórico de revisões, pergunta em aberto, pergunta do
+    Registro sem resposta, ou dimensão implícita sem destino
 Avisos (exit 1 só com --estrito):
   - {placeholder} do template que sobrou
   - critério com termo vago sem número (rápido, adequado, eficiente…)
@@ -151,7 +152,7 @@ def le_registro(linhas, rel, aprovado):
         rel.erro(f"'### Pedido original' vazio: cole o pedido do usuário, literal, como citação (> …), dentro de '## {REGISTRO}'")
     perguntas = {}
     for cab, dados in md.tabelas(reg):
-        cols = colunas(cab, ["ID", "Resposta"], REGISTRO, rel)
+        cols = md.colunas(cab, ["ID", "Resposta"], REGISTRO, rel)
         if cols is None:
             continue
         ci, cr = cols
@@ -168,17 +169,10 @@ def le_registro(linhas, rel, aprovado):
     return pedido, perguntas
 
 
-def colunas(cab, nomes, onde, rel):
-    """Índices das colunas que o gate lê. Se faltar alguma, é erro: tabela com cabeçalho
-    trocado não pode passar sem ser conferida. Devolve None nesse caso."""
-    idx = [md.coluna(cab, n) for n in nomes]
-    faltam = [n for n, i in zip(nomes, idx) if i is None]
-    if faltam:
-        rotulo = "a coluna" if len(faltam) == 1 else "as colunas"
-        rel.erro(f"{onde}: tabela sem {rotulo} {', '.join(repr(n) for n in faltam)}; "
-                 "use as colunas do template, sem renomear nem juntar")
-        return None
-    return idx
+def criterios_do_define(linhas):
+    """IDs R<n>.<m> dos critérios de aceite do DEFINE, na ordem em que aparecem."""
+    reqs = md.secao(linhas, "Requisitos", nivel=2) or []
+    return [c.group(1) for linha in reqs for c in [CRIT_RE.match(linha)] if c]
 
 
 def confere_qids(texto, perguntas, onde, rel):
@@ -238,7 +232,7 @@ def valida(caminho, aprovado=False):
     if impl is not None:
         vistos = {}
         for cab, dados in md.tabelas(impl):
-            cols = colunas(cab, ["Dimensão", "Como fica"], "Requisitos implícitos de dados", rel)
+            cols = md.colunas(cab, ["Dimensão", "Como fica"], "Requisitos implícitos de dados", rel)
             if cols is None:
                 continue
             cd, cc = cols
@@ -272,7 +266,7 @@ def valida(caminho, aprovado=False):
             rel.erro("Suposições: use a tabela do template (ID, Padrão escolhido, Motivo, Origem, "
                      "Se estiver errada) ou escreva 'Nenhuma.'")
     for cab, dados in md.tabelas(sup or []):
-        cols = colunas(cab, ["ID", "Padrão escolhido", "Motivo", "Origem"], "Suposições", rel)
+        cols = md.colunas(cab, ["ID", "Padrão escolhido", "Motivo", "Origem"], "Suposições", rel)
         if cols is None:
             continue
         cid, cp, cm, co = cols
@@ -297,7 +291,7 @@ def valida(caminho, aprovado=False):
     # 7. Diferenças em relação à fonte: cada uma aprovada pelo usuário
     dif = md.secao(linhas, "Diferenças em relação à fonte", nivel=2) or []
     for cab, dados in md.tabelas(dif):
-        cols = colunas(cab, ["O que a fonte diz", "Aprovado por"], "Diferenças em relação à fonte", rel)
+        cols = md.colunas(cab, ["O que a fonte diz", "Aprovado por"], "Diferenças em relação à fonte", rel)
         if cols is None:
             continue
         cf, ca = cols
@@ -311,7 +305,7 @@ def valida(caminho, aprovado=False):
     if ras is not None:
         origem = {}
         for cab, dados in md.tabelas(ras):
-            cols = colunas(cab, ["Critério", "Origem"], "Rastreabilidade", rel)
+            cols = md.colunas(cab, ["Critério", "Origem"], "Rastreabilidade", rel)
             if cols is None:
                 continue
             cc, co = cols
@@ -367,9 +361,7 @@ def valida(caminho, aprovado=False):
 
     # 11. Aprovação (só com --aprovado)
     if aprovado:
-        ap = md.secao(linhas, "Aprovação", nivel=2) or []
-        if not md.aprovacoes(ap):
-            rel.erro('sem aprovação: grave **Aprovado**: AAAA-MM-DD — usuário: "<palavras dele>" (só se o usuário aprovou)')
+        md.confere_aprovacao(linhas, rel, "a spec")
 
     # 12. Placeholders que sobraram
     for n in md.placeholders(linhas):

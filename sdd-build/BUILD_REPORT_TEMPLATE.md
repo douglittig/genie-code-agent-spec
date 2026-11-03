@@ -191,7 +191,7 @@
 
 **Checklist de Conclusão:**
 
-- [ ] Todas as tarefas do manifest concluídas
+- [ ] Todas as tasks do plano concluídas
 - [ ] Todas as verificações passaram
 - [ ] Todos os testes passaram
 - [ ] Sem problemas bloqueadores

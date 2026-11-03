@@ -118,7 +118,7 @@ aqui        de atualiz.   de rebuild
 
 | Mudança no DESIGN | Impacto no CÓDIGO |
 |-------------------|-------------------|
-| Novo arquivo no manifest | Criar novo arquivo |
+| Task nova no plano | Versão nova do TASKS e aprovação nova (`@sdd-po`) |
 | Arquivo removido | Deletar arquivo |
 | Padrão alterado | Atualizar arquivos afetados |
 | Mudança de arquitetura | Refactor significativo |

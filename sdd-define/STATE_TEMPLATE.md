@@ -12,8 +12,8 @@
 | **Tamanho** | {Pequeno \| Médio \| Grande \| Complexo} — {motivo em uma linha} |
 | **Jira Key** | {PROJ-123 \| `pendente` se não informada} |
 | **Confluence URL** | {url da página SPEC \| `n/a`} |
-| **Gates** | {caminho de `<gates>`, ex.: `/Workspace/Users/<usuário>/sdd-gates/gates`} — versão {0.2.1} |
-| **Fase Atual** | {Define \| ADR \| Design \| Build \| Ship \| Shipped} |
+| **Gates** | {caminho de `<gates>`, ex.: `/Workspace/Users/<usuário>/sdd-gates/gates`} — versão {0.3.0} |
+| **Fase Atual** | {Define \| ADR \| PO \| Design \| Build \| Ship \| Shipped} |
 | **Criado em** | {YYYY-MM-DD HH:MM UTC} |
 | **Atualizado em** | {YYYY-MM-DD HH:MM UTC} |
 
@@ -22,12 +22,13 @@
 ## Aprovações
 
 > As duas paradas humanas do contrato de execução (`@sdd-workflow`). Grave só a aprovação que o
-> usuário deu, com as palavras dele. A mesma linha vai também no artefato aprovado.
+> usuário deu, com a versão e as palavras dele. A mesma linha vai também no artefato aprovado.
+> Aprovação nova de uma versão nova: linha nova, a antiga fica.
 
-| Etapa | Aprovado em | Palavras do usuário |
-|-------|-------------|---------------------|
-| Spec (Define) | {YYYY-MM-DD} | "{palavras}" |
-| Plano de tarefas | {YYYY-MM-DD \| n/a no tamanho Médio} | "{palavras}" |
+| Etapa | Versão | Aprovado em | Palavras do usuário |
+|-------|--------|-------------|---------------------|
+| Spec (Define) | {v1.0} | {YYYY-MM-DD} | "{palavras}" |
+| Plano de tarefas (PO) | {v1.0 \| n/a no tamanho Médio} | {YYYY-MM-DD} | "{palavras}" |
 
 ---
 
@@ -37,21 +38,10 @@
 |------|--------|----------|------|--------------|
 | Define | {pendente \| concluída} | `docs/specs/DEFINE_{FEATURE}.md` | {última linha da saída do gate, como saiu, ex.: `sdd_gates define DEFINE_X.md: OK — 0 aviso(s)`; + aprovado} | {YYYY-MM-DD} |
 | ADR | {pendente \| concluída} | `docs/adr/ADR_{FEATURE}.md` | {decisões aprovadas} | {YYYY-MM-DD} |
-| Planejamento (PO) | {pendente \| concluída} | `docs/planning/STORIES_{FEATURE}.md` | {stories estimadas + criadas} | {YYYY-MM-DD} |
-| Design | {pendente \| concluída} | `docs/designs/DESIGN_{FEATURE}.md` | {File Manifest completo} | {YYYY-MM-DD} |
+| Planejamento (PO) | {pendente \| concluída} | `docs/planning/TASKS_{FEATURE}.md` | {última linha do gate `tasks --aprovado`, como saiu; + chaves criadas no Jira} | {YYYY-MM-DD} |
+| Design | {pendente \| concluída} | `docs/designs/DESIGN_{FEATURE}.md` | {última linha do gate `tasks`, rodado com o DESIGN pronto} | {YYYY-MM-DD} |
 | Build | {pendente \| concluída} | `.sdd/features/{FEATURE}/BUILD_REPORT.md` | {lint/testes ✅} | {YYYY-MM-DD} |
 | Ship | {pendente \| concluída} | `.sdd/archive/{FEATURE}/SHIPPED_{DATE}.md` | {ticket fechado} | {YYYY-MM-DD} |
-
----
-
-## Backlog Criado (sdd-po)
-
-> Preenchido pelo `@sdd-po` na Fase 3. Registra as Stories/Tasks criadas sob o Epic (`jira_key`).
-
-| Tipo | Jira | Resumo | Pontos | Parent |
-|------|------|--------|--------|--------|
-| Story | {STORY-KEY} | {título} | {Fibonacci} | {Epic} |
-| Task | {TASK-KEY} | {título} | — | {Story} |
 
 ---
 

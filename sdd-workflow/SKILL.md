@@ -30,9 +30,11 @@ Vale em toda feature, mesmo que nenhuma outra skill tenha sido aberta.
    turno com as perguntas.
    - Há duas paradas humanas: **aprovar a spec** e **aprovar o plano de tarefas** (no tamanho
      Médio, só a spec).
-   - Toda aprovação é gravada no artefato, com as palavras do usuário:
-     `**Aprovado**: AAAA-MM-DD — usuário: "<palavras dele>"`. Nunca grave uma aprovação que o
-     usuário não deu.
+   - Toda aprovação é gravada no artefato, com a versão aprovada e as palavras do usuário:
+     `**Aprovado**: AAAA-MM-DD — v<versão> — usuário: "<palavras dele>"`. Nunca grave uma
+     aprovação que o usuário não deu.
+   - Aprovação vale para uma versão. Mudou o artefato depois: versão nova no histórico, Status
+     "Em revisão" e aprovação nova. Os gates reprovam aprovação de versão antiga.
    - Toda pergunta vai para o arquivo da etapa **antes** de ser feita, e toda resposta do usuário
      **no mesmo turno**. O chat não sobrevive a uma sessão nova nem a um chat novo.
 2. **Teste nasce do critério de aceite** (*acceptance criterion*) e confere o resultado que a
@@ -63,7 +65,7 @@ que nasce no começo do Define (Passo 0 do `@sdd-define`).
 |---|---|---|
 | **Pequeno** | Corrigir um filtro, renomear coluna, ajustar uma query; ≤ 3 arquivos, cabe numa frase | Spec de uma linha no chat (critério + teste) → `@sdd-build` |
 | **Médio** | Tabela ou coluna derivada nova num pipeline que já existe; job novo com padrão conhecido; < 10 tarefas | `@sdd-define` (curto) → `@sdd-build` → `@sdd-ship` |
-| **Grande** | Pipeline novo, mudança no modelo de dados, vários componentes | `@sdd-define` → `@sdd-design` → `@sdd-po` (com Jira) → `@sdd-build` → `@sdd-ship`; `@sdd-staff-engineer` se houver decisão de arquitetura |
+| **Grande** | Pipeline novo, mudança no modelo de dados, vários componentes | `@sdd-define` → `@sdd-po` → `@sdd-design` → `@sdd-build` → `@sdd-ship`; `@sdd-staff-engineer` antes do PO se houver decisão de arquitetura |
 | **Complexo** | Domínio novo, migração, vários sistemas, requisito ambíguo | `@sdd-define` (com áreas cinzentas) → `@sdd-staff-engineer` → `@sdd-po` → `@sdd-design` → `@sdd-build` → `@sdd-ship` |
 
 **Regras:**
@@ -71,8 +73,12 @@ que nasce no começo do Define (Passo 0 do `@sdd-define`).
 - **Áreas cinzentas** (exploração de opções dentro do `@sdd-define`) só no Complexo, ou quando a ideia ainda é vaga.
 - **Staff Engineer (ADR)** quando há decisão de arquitetura: padrão novo, tecnologia nova, trade-off
   com consequência duradoura.
-- **PO** quando a feature vai para o Jira e tem mais de uma story.
-- **Design** quando há mais de um componente ou um padrão novo. Mudança direta não precisa.
+- **PO** sempre no Grande e no Complexo: quebra a feature em histórias com pontos e tasks
+  atômicas (`docs/planning/TASKS_{FEATURE}.md`). O plano é a segunda parada humana. O Jira entra
+  quando há `jira_key`.
+- **Design** sempre no Grande e no Complexo, depois do plano aprovado: diz como cada task vira um
+  componente no Databricks. Se precisar de task nova, o plano ganha versão nova e volta para
+  aprovação.
 - **Válvula de segurança:** o Build sempre começa listando os passos atômicos. Se a lista passar de
   5 passos, ou tiver dependências complicadas, **pare** e suba o tamanho: a etapa foi pulada por
   engano.
@@ -103,7 +109,7 @@ plataforma bloqueia o push para a `main`, mesmo com o ok do usuário.
 
 Um gate é um script que decide, por código, se a etapa pode avançar. O código dos gates fica num
 **segundo Git Folder deste mesmo repo, fora de `.assistant`**, chamado `sdd-gates`. Versão mínima
-exigida por estas skills: **0.2.1**.
+exigida por estas skills: **0.3.0**.
 
 Duas coisas que o Genie Code bloqueia, e que você não deve tentar contornar:
 - executar scripts dentro de `.assistant/skills` (nem copiando o código de lá);
@@ -125,7 +131,8 @@ Duas coisas que o Genie Code bloqueia, e que você não deve tentar contornar:
 
 | Gate | Etapa | Comando |
 |---|---|---|
-| `define` | Define | `PYTHONPATH=<gates> python3 -m sdd_gates define docs/specs/DEFINE_{FEATURE}.md` (com `--aprovado` antes do Build) |
+| `define` | Define | `PYTHONPATH=<gates> python3 -m sdd_gates define docs/specs/DEFINE_{FEATURE}.md` (com `--aprovado` antes do PO ou do Build) |
+| `tasks` | PO e Design | `PYTHONPATH=<gates> python3 -m sdd_gates tasks docs/planning/TASKS_{FEATURE}.md` (lê o DEFINE e, se existir, o DESIGN; com `--aprovado` antes do Build) |
 
 ---
 
@@ -135,8 +142,8 @@ Duas coisas que o Genie Code bloqueia, e que você não deve tentar contornar:
 |---|---|---|
 | Define | `@sdd-define` | `docs/specs/DEFINE_{FEATURE}.md` + `.sdd/features/{FEATURE}/state.md`; gate `sdd_gates define` |
 | Arquitetura | `@sdd-staff-engineer` | `docs/adr/ADR_{FEATURE}.md` (vinculante para Design e Build) |
-| Planejamento | `@sdd-po` | `docs/planning/STORIES_{FEATURE}.md` + Stories e Tasks no Jira |
-| Design | `@sdd-design` | `docs/designs/DESIGN_{FEATURE}.md` |
+| Planejamento | `@sdd-po` | `docs/planning/TASKS_{FEATURE}.md` (histórias + tasks) + Jira, se houver `jira_key`; gate `sdd_gates tasks` |
+| Design | `@sdd-design` | `docs/designs/DESIGN_{FEATURE}.md`; conferido pelo gate `sdd_gates tasks` |
 | Build | `@sdd-build` | código + `.sdd/features/{FEATURE}/BUILD_REPORT.md` |
 | Ship | `@sdd-ship` | `.sdd/archive/{FEATURE}/` + ticket fechado |
 
@@ -184,7 +191,7 @@ Tudo fica no repo do projeto (o Git Folder do projeto), nunca no Git Folder das 
 docs/                          # documentação da feature (revisada por humanos)
 ├── specs/      DEFINE_*.md
 ├── adr/        ADR_*.md
-├── planning/   STORIES_*.md
+├── planning/   TASKS_*.md
 └── designs/    DESIGN_*.md
 
 .sdd/                          # estado e evidências do fluxo
@@ -196,7 +203,7 @@ docs/                          # documentação da feature (revisada por humanos
     └── {FEATURE}/             # docs + state + SHIPPED_{DATA}.md depois do Ship
 ```
 
-**Crie os arquivos só quando a etapa produzir conteúdo.** Nunca crie `DESIGN` ou `STORIES` vazios
+**Crie os arquivos só quando a etapa produzir conteúdo.** Nunca crie `DESIGN` ou `TASKS` vazios
 de antemão: a ausência do arquivo é o estado certo de uma etapa pulada.
 
 ---

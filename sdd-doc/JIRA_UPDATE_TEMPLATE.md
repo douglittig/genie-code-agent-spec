@@ -15,7 +15,7 @@
 
 📄 Artefato: {caminho/no/repo/ARTEFATO_{FEATURE}.md}
 📐 Origem: {URL da página Confluence | n/a}
-✅ Gate: {resultado do gate — ex: "gate define ✅ + spec aprovada", "File Manifest completo", "lint + 8/8 testes ✅"}
+✅ Gate: {última linha do gate, como saiu — ex: "sdd_gates define DEFINE_X.md: OK — 0 aviso(s)", "lint + 8/8 testes ✅"}
 
 🔜 Próxima fase: {nome da próxima fase + agente responsável}
 
@@ -30,8 +30,8 @@
 |------|------------------|----------------|--------------|
 | **Define** | Spec de dados aprovada: {N} critérios EARS, rubrica fechada. | gate define ✅ + aprovação | ADR — `@sdd-staff-engineer` |
 | **ADR** | Decisões arquiteturais registradas e aprovadas. | {N} decisões / {M} domínios cobertos | Planejamento — `@sdd-po` |
-| **Planejamento (PO)** | Epic quebrado em Stories/Tasks no Jira. | {N} stories estimadas (Fibonacci) | Design — `@sdd-design` |
-| **Design** | Arquitetura e File Manifest definidos a partir do ADR. | File Manifest completo ({N} arquivos) | Build — `@sdd-build` |
+| **Planejamento (PO)** | Épico quebrado em {N} histórias ({P} pontos) e {M} tasks; plano aprovado. | `sdd_gates tasks TASKS_X.md: OK — 0 aviso(s)` | Design — `@sdd-design` |
+| **Design** | {N} componentes ligados às tasks do plano; decisões registradas. | `sdd_gates tasks TASKS_X.md: OK — 0 aviso(s)` (com o DESIGN) | Build — `@sdd-build` |
 | **Build** | Código implementado e verificado. | lint ✅ · {X}/{Y} testes ✅ | Ship — `@sdd-ship` |
 | **Ship** | Feature arquivada, lições capturadas, PR aberto. | Critérios de sucesso atendidos | — (Concluído) |
 | **Iterate** | Mudança de escopo registrada na fase {fase}. | impacto cascata avaliado | (retoma a fase impactada) |

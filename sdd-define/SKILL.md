@@ -83,6 +83,9 @@ plausível.
 
 - **Antes de perguntar,** grave cada pergunta, com a sua recomendação, numa linha `Qn.m` da rodada
   no Registro, com a resposta "aguardando".
+- **No chat, pergunte com o texto da linha,** copiado, com o ID. Nunca reformule a pergunta no
+  chat: a resposta vai para a linha do arquivo, e um "sim" a uma pergunta escrita de outro jeito
+  pode valer o contrário. Pergunta de sim ou não: deixe claro a que o "sim" diz sim.
 - **Quando ele responder,** copie a resposta literal na mesma linha, no mesmo turno.
 - **Resposta sem pergunta:** se o usuário responder a algo que não está nem no chat nem no
   Registro, diga isso **antes** de escrever qualquer coisa e peça a pergunta de volta. Nunca
@@ -176,13 +179,14 @@ cada uma, e **pare**. É a primeira parada humana do contrato de execução.
 
 ## Passo 8 — Gravar a aprovação
 
-Quando o usuário aprovar, grave na seção Aprovação, com as palavras dele:
+Quando o usuário aprovar, grave na seção Aprovação a versão aprovada e as palavras dele:
 
 ```markdown
-**Aprovado**: 2026-11-02 — usuário: "pode seguir com essa spec"
+**Aprovado**: 2026-11-02 — v1.2 — usuário: "pode seguir com essa spec"
 ```
 
-Nunca grave uma aprovação que ele não deu. Depois rode o gate do Build:
+A versão é a última do Histórico de revisões. Aprovar não cria versão nova. Nunca grave uma
+aprovação que ele não deu. Depois rode o gate com `--aprovado`:
 
 ```bash
 PYTHONPATH=<gates> python3 -m sdd_gates define docs/specs/DEFINE_{FEATURE}.md --aprovado
@@ -195,9 +199,11 @@ PYTHONPATH=<gates> python3 -m sdd_gates define docs/specs/DEFINE_{FEATURE}.md --
    aprovação e a linha de saída do gate `--aprovado`.
 3. Chame `@sdd-doc` (comentário no Jira + transição para Em andamento; ele faz preview antes).
 4. Proponha o próximo passo, conforme o tamanho: `@sdd-staff-engineer` (Complexo, ou decisão de
-   arquitetura), `@sdd-design` (Grande) ou `@sdd-build` (Médio).
+   arquitetura), `@sdd-po` (Grande) ou `@sdd-build` (Médio).
 
-Se a spec mudar depois de aprovada, use `@sdd-iterate`: mudança de spec pede aprovação nova.
+Se a spec mudar depois de aprovada: versão nova no Histórico de revisões, Status "Em revisão" e
+aprovação nova (`@sdd-iterate`). A aprovação antiga fica no arquivo como texto simples, sem o
+negrito. O gate `--aprovado` reprova aprovação de uma versão que não é a última.
 
 ---
 

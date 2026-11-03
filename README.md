@@ -169,8 +169,8 @@ O desenvolvimento de features segue 4 fases com configurações MCP distintas po
 │                                  MCP: Jira                      │
 │  Quem: Product Owner / Tech lead                                │
 │  Skill: @sdd-po                                                 │
-│  Output: docs/planning/STORIES_*.md + Stories/Tasks no Jira     │
-│          + @sdd-doc comenta o plano no Epic                     │
+│  Output: docs/planning/TASKS_*.md + histórias/tasks no Jira     │
+│          + @sdd-doc comenta o plano no épico                    │
 └────────────────────────────┬────────────────────────────────────┘
                              │
 ┌────────────────────────────▼────────────────────────────────────┐
@@ -210,7 +210,7 @@ projeto/
 └── docs/
     ├── specs/      # DEFINE_{FEATURE}.md   — saída da Fase 1
     ├── adr/        # ADR_{FEATURE}.md      — saída da Fase 2
-    ├── planning/   # STORIES_{FEATURE}.md  — saída da Fase 3 (@sdd-po)
+    ├── planning/   # TASKS_{FEATURE}.md    — saída da Fase 3 (@sdd-po)
     └── designs/    # DESIGN_{FEATURE}.md   — saída da Fase 4 (@sdd-design)
 
 .sdd/               # estado e relatórios do fluxo (no repo do projeto)
@@ -289,7 +289,7 @@ ENTRADAS                                 NÓS
                           ┌── [3] PLANEJAMENTO ────────────┐ OPCIONAL     │
                           │  skill:  @sdd-po               │              │
                           │  mcp:    Jira (14 slots)       │              │
-                          │  output: Epic + Stories + Tasks│              │
+                          │  output: TASKS_*.md (+ Jira)   │              │
                           └──────────────────┬─────────────┘              │
                                              └─────────────────────────▶  │
                                                             ▼
@@ -298,7 +298,7 @@ ENTRADAS                                 NÓS
                                          │  mcp:    —                          │
                                          │  input:  ADR_*.md (vinculante)      │
                                          │  output: docs/designs/DESIGN_*.md   │
-                                         │  gate:   File Manifest completo     │
+                                         │  gate:   sdd_gates tasks, c/ DESIGN │
                                          └───────────────────┬─────────────────┘
                                                              │
                               ┌──────────────────────────────┤ paralelo
@@ -333,8 +333,8 @@ ENTRADAS                                 NÓS
 |----|-------|-----------|--------|-------------------|--------|
 | [1] Define | @sdd-define | Confluence | `docs/specs/DEFINE_*.md` | gate `sdd_gates define` verde + aprovação gravada (ideia vaga: áreas cinzentas dentro do Define) | PRONTO |
 | [2] Arquitetura | @sdd-staff-engineer | — | `docs/adr/ADR_*.md` | ADR revisado e aceito | PRONTO |
-| [3] Planejamento | @sdd-po | Jira | `docs/planning/STORIES_*.md` + Stories/Tasks no Jira | Stories estimadas (Fibonacci) e criadas | PRONTO |
-| [4] Design | @sdd-design | — | `docs/designs/DESIGN_*.md` | File Manifest completo | PRONTO |
+| [3] Planejamento | @sdd-po | Jira | `docs/planning/TASKS_*.md` (histórias + tasks) + Jira, se houver épico | gate `sdd_gates tasks` verde + plano aprovado (todo critério com task, teste e gate) | PRONTO |
+| [4] Design | @sdd-design | — | `docs/designs/DESIGN_*.md` | gate `sdd_gates tasks` verde com o DESIGN (toda task num componente) | PRONTO |
 | [5] Build | @sdd-build | — | código + `BUILD_REPORT_*.md` | Lint + testes ok, sem credenciais | PRONTO |
 | [6] Ship | @sdd-ship | Jira | `SHIPPED_*.md` + Jira fechado | Acceptance tests ok | PRONTO |
 | Iterate | @sdd-iterate | — | Artefato da fase atualizado | — | CROSS-CUTTING |
@@ -347,7 +347,7 @@ Durante os nós [4] a [6], o orquestrador @sdd-workflow coordena com outras skil
 | Ação | Delegado para | Quando |
 |------|--------------|--------|
 | Criar branch git | @sdd-dev-workflow | Início do Design [4] |
-| Implementar cada arquivo | @databricks-* (mapeado no File Manifest) | Build [5] |
+| Implementar cada task | @databricks-* (coluna "Constrói com" do DESIGN) | Build [5] |
 | Commit + PR | @sdd-dev-workflow | Ship [6] |
 | Code review | @sdd-code-reviewer | Ship [6] — recomendado |
 
@@ -424,9 +424,9 @@ Cada fase do workflow SDD é uma skill autocontida (SKILL.md + template próprio
 | [`sdd-workflow`](sdd-workflow/) | — | Orquestrador: tamanho da feature (Pequeno → Complexo), contrato de execução, raio de ação no Databricks e fim de etapa |
 | [`sdd-define`](sdd-define/) | 1 | Spec de dados testável: critérios EARS, rubrica de requisitos implícitos, áreas cinzentas, gate `sdd_gates define` e aprovação gravada → `docs/specs/DEFINE_*.md` |
 | [`sdd-staff-engineer`](sdd-staff-engineer/) | 2 | Revisão de spec, discussão arquitetural e geração de ADR (`docs/adr/`) |
-| [`sdd-po`](sdd-po/) | 3 | Product Owner: quebra a feature em Epic → Stories (Fibonacci) → Tasks, cria no Jira via MCP e gera `docs/planning/STORIES_*.md` |
-| [`sdd-design`](sdd-design/) | 4 | Design técnico com File Manifest a partir do DEFINE/ADR → `docs/designs/DESIGN_*.md` |
-| [`sdd-build`](sdd-build/) | 5 | Implementação do File Manifest delegando às skills `@databricks-*` → código + `BUILD_REPORT_*.md` |
+| [`sdd-po`](sdd-po/) | 3 | Product Owner: quebra a feature em histórias (fatias verticais, pontos Fibonacci) e tasks atômicas com teste e gate, gate `sdd_gates tasks` e aprovação gravada → `docs/planning/TASKS_*.md`; cria no Jira via MCP quando há épico |
+| [`sdd-design`](sdd-design/) | 4 | Como cada task vira componente no Databricks: reaproveitamento, componentes ligados a critérios e tasks, skill `@databricks-*` de cada um e decisões → `docs/designs/DESIGN_*.md` |
+| [`sdd-build`](sdd-build/) | 5 | Implementação das tasks do plano, na ordem, delegando às skills `@databricks-*` → código + `BUILD_REPORT_*.md` |
 | [`sdd-ship`](sdd-ship/) | 6 | Archive da feature, lições aprendidas e fechamento do ticket → `SHIPPED_*.md` |
 | [`sdd-iterate`](sdd-iterate/) | cross | Mudanças mid-stream em documentos SDD com análise de cascata |
 | [`sdd-doc`](sdd-doc/) | cross | Hook de fim de fase: comentário + transição no ticket Jira via MCP |
@@ -555,7 +555,7 @@ O workflow SDD deste repositório começou como uma adaptação do **[AgentSpec]
 | Code reviewer e gerador de testes | `sdd-staff-engineer` (ADR vinculante), `sdd-po` (Epic → Stories → Tasks), `sdd-dev-workflow` e o ledger de estado por feature |
 | | Delegação do Build às skills oficiais `@databricks-*`, com sync automático do upstream |
 
-O tamanho da feature (*auto-sizing*), o contrato de execução e o raio de ação do `sdd-workflow`, e os critérios EARS, a rubrica de requisitos implícitos e o gate por script do `sdd-define`, foram adaptados do **[TLC Spec-Driven](https://github.com/tech-leads-club/agent-skills), de Felipe Rodrigues / Tech Leads Club** (CC-BY-4.0), com regras próprias para o Databricks.
+O tamanho da feature (*auto-sizing*), o contrato de execução e o raio de ação do `sdd-workflow`, os critérios EARS, a rubrica de requisitos implícitos e o gate por script do `sdd-define`, as tasks atômicas com teste e gate do `sdd-po` e o reaproveitamento, os componentes e as decisões do `sdd-design` foram adaptados do **[TLC Spec-Driven](https://github.com/tech-leads-club/agent-skills), de Felipe Rodrigues / Tech Leads Club** (CC-BY-4.0), com regras próprias para o Databricks.
 
 Os arquivos derivados e o aviso de licença estão em [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md).
 

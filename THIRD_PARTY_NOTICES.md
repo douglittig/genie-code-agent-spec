@@ -10,7 +10,6 @@ O workflow de Spec-Driven Development deste repositório nasceu de uma adaptaç�
 
 Arquivos derivados do AgentSpec:
 
-- `sdd-design/SKILL.md`, `sdd-design/DESIGN_TEMPLATE.md`
 - `sdd-build/SKILL.md`, `sdd-build/BUILD_REPORT_TEMPLATE.md`
 - `sdd-ship/SKILL.md`, `sdd-ship/SHIPPED_TEMPLATE.md`
 - `sdd-iterate/SKILL.md`
@@ -51,7 +50,9 @@ Adaptado do TLC Spec-Driven, com mudanças:
 
 - `sdd-workflow/SKILL.md`: tamanho da feature (*auto-sizing*), contrato de execução, raio de ação (*blast radius*, aqui com regras do Databricks) e retomada de sessão.
 - `sdd-define/SKILL.md`, `sdd-define/DEFINE_TEMPLATE.md`: critérios EARS (em PT-BR), rubrica de requisitos implícitos (reescrita para dados), gate de fechamento e áreas cinzentas.
-- `gates/` (pacote `sdd-gates`): a ideia de gates por script e de testar os gates por mutação; o código foi escrito do zero.
+- `sdd-po/SKILL.md`, `sdd-po/TASKS_TEMPLATE.md`: task atômica com teste e gate, dependência que só aponta para trás e o plano conferido por script antes da aprovação.
+- `sdd-design/SKILL.md`, `sdd-design/DESIGN_TEMPLATE.md`: análise do que já existe para reaproveitar, componentes e decisões técnicas com o motivo, reescritos para componentes do Databricks.
+- `gates/` (pacote `sdd-gates`): a ideia de gates por script, do gate do plano de tarefas e de testar os gates por mutação; o código foi escrito do zero.
 
 ---
 
