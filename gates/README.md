@@ -28,7 +28,7 @@ Só biblioteca padrão; sem dependências. Para distribuir por Volume do Unity C
 
 | Comando | Etapa | O que confere |
 |---|---|---|
-| `python3 -m sdd_gates define docs/specs/DEFINE_<FEATURE>.md` | Define | Seções, registro literal do pedido e das respostas (`Qn.m`), critérios EARS, rubrica de requisitos implícitos, origem das suposições, rastreabilidade com a frase citada conferida na fonte |
+| `python3 -m sdd_gates define docs/specs/DEFINE_<FEATURE>.md` | Define | Seções, registro literal do pedido e das respostas (`Qn.m`), critérios EARS, rubrica de requisitos implícitos, origem das suposições, rastreabilidade com a frase citada conferida na fonte. Tabela com coluna do template renomeada ou faltando é erro, não tabela ignorada |
 | `python3 -m sdd_gates define … --aprovado` | antes do Build | O mesmo + aprovação gravada, nenhuma pergunta em aberto (nem no registro) e toda dimensão da rubrica com destino |
 | `python3 -m sdd_gates selftest` | — | Testa os próprios gates por mutação |
 
