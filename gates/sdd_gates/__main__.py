@@ -1,6 +1,7 @@
 """Linha de comando: python3 -m sdd_gates <gate> [argumentos].
 
   define     gate do Define (DEFINE_*.md)
+  tasks      gate do plano de tarefas (TASKS_*.md)
   selftest   testa os gates por mutação
 
 Códigos de saída: 0 ok, 1 não passou, 2 erro de uso.
@@ -8,10 +9,11 @@ Códigos de saída: 0 ok, 1 não passou, 2 erro de uso.
 
 import sys
 
-from . import __version__, define, selftest
+from . import __version__, define, selftest, tasks
 
 GATES = {
     "define": define.main,
+    "tasks": tasks.main,
     "selftest": selftest.main,
 }
 

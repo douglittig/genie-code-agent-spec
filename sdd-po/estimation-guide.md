@@ -1,8 +1,8 @@
 # Estimation Guide — Calibração Fibonacci do Time
 
 > **Preencher antes de usar.** Este guia calibra como o time traduz complexidade em pontos.
-> Sem calibração, pontos viram números sem significado. O `sdd-po` lê este arquivo na
-> Capacidade 2 (Estimativa Fibonacci).
+> Sem calibração, pontos viram números sem significado. O `sdd-po` lê este arquivo no
+> Passo 2 (Pontos).
 
 ---
 
@@ -42,7 +42,7 @@ Use **apenas** valores Fibonacci: `1, 2, 3, 5, 8, 13`. Quanto maior, maior a inc
 
 ```text
 [ ] A Story é uma fatia vertical (entrega valor observável)
-[ ] Tem critérios de aceite vindos dos acceptance tests do DEFINE
+[ ] Os critérios de aceite do DEFINE que ela cobre estão claros
 [ ] A unidade deployável correspondente no ADR está clara
 [ ] As dependências externas estão identificadas
 ```
@@ -55,7 +55,7 @@ Use **apenas** valores Fibonacci: `1, 2, 3, 5, 8, 13`. Quanto maior, maior a inc
 [ ] Código implementado conforme o DESIGN
 [ ] Testes (unit + qualidade de dados) passando
 [ ] Sem credenciais hardcoded
-[ ] Acceptance tests do DEFINE verificados
+[ ] Critérios de aceite do DEFINE provados pelos testes das tasks
 [ ] Ticket atualizado pelo sdd-doc
 ```
 

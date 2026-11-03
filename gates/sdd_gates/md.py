@@ -11,10 +11,14 @@ Python puro (só biblioteca padrão). Nunca lê o código do projeto, só markdo
 import re
 import unicodedata
 
-# `**Aprovado**: 2026-11-02 — usuário: "pode seguir"` (aceita - ou — e aspas retas ou curvas)
+# `**Aprovado**: 2026-11-02 — v1.2 — usuário: "pode seguir"` (aceita - ou — e aspas retas ou
+# curvas). A versão é opcional para a regex, mas o gate exige: aprovação vale para uma versão.
 APROVACAO_RE = re.compile(
-    r'\*\*Aprovado\*\*:\s*(\d{4}-\d{2}-\d{2})\s*[—–-]\s*usu[aá]rio:\s*["“](.+?)["”]'
+    r'\*\*Aprovado\*\*:\s*(\d{4}-\d{2}-\d{2})\s*[—–-]\s*'
+    r'(?:v(\d+(?:\.\d+)*)\s*[—–-]\s*)?usu[aá]rio:\s*["“](.+?)["”]'
 )
+VERSAO_RE = re.compile(r"\bv?(\d+(?:\.\d+)*)\b")
+FORMATO_APROVACAO = '**Aprovado**: AAAA-MM-DD — v<versão> — usuário: "<palavras dele>"'
 PLACEHOLDER_RE = re.compile(r"\{[^{}\n]{1,80}\}")
 
 
@@ -123,8 +127,65 @@ def vazia(celula):
 
 
 def aprovacoes(linhas):
-    """Lista de (data, palavras do usuário) das linhas de aprovação."""
+    """Lista de (data, versão ou None, palavras do usuário) das linhas de aprovação."""
     return [m.groups() for linha in linhas for m in [APROVACAO_RE.search(linha)] if m]
+
+
+def ultima_versao(linhas):
+    """Última versão da tabela do 'Histórico de revisões' (sem o 'v'); None se não houver."""
+    hist = secao(linhas, "Histórico de revisões", nivel=2) or []
+    versao = None
+    for cab, dados in tabelas(hist):
+        cv = coluna(cab, "Versao")
+        if cv is None:
+            continue
+        for row in dados:
+            m = VERSAO_RE.search(row[cv]) if cv < len(row) else None
+            if m:
+                versao = m.group(1)
+    return versao
+
+
+def ultima_aprovacao(linhas):
+    """(data, versão, palavras) da última linha **Aprovado** da seção Aprovação; None se não há."""
+    lista = aprovacoes(secao(linhas, "Aprovação", nivel=2) or [])
+    return lista[-1] if lista else None
+
+
+def confere_aprovacao(linhas, rel, artefato="o artefato"):
+    """Aprovação gravada com as palavras do usuário e para a última versão do histórico.
+
+    Aprovar não cria versão. Se o artefato mudou depois (versão nova no histórico), a
+    aprovação antiga não vale para ele. Devolve a versão aprovada, ou None.
+    """
+    ap = ultima_aprovacao(linhas)
+    if ap is None:
+        rel.erro(f"sem aprovação: grave {FORMATO_APROVACAO} (só se o usuário aprovou)")
+        return None
+    _, versao, _ = ap
+    if not versao:
+        rel.erro(f"aprovação sem a versão aprovada: grave {FORMATO_APROVACAO}")
+        return None
+    ultima = ultima_versao(linhas)
+    if ultima is None:
+        rel.erro("'Histórico de revisões' sem versão: a aprovação precisa apontar para a última versão")
+    elif versao != ultima:
+        rel.erro(f"a aprovação é da v{versao}, mas a última versão no Histórico de revisões é {ultima}: "
+                 f"{artefato} mudou depois de aprovado e precisa de aprovação nova (aprovar não cria versão)")
+    return versao
+
+
+def colunas(cab, nomes, onde, rel):
+    """Índices das colunas que o gate lê. Se faltar alguma, é erro: tabela com cabeçalho
+    trocado não pode passar sem ser conferida. Devolve None nesse caso."""
+    idx = [coluna(cab, n) for n in nomes]
+    faltam = [n for n, i in zip(nomes, idx) if i is None]
+    if faltam:
+        rotulo = "a coluna" if len(faltam) == 1 else "as colunas"
+        rel.erro(f"{onde}: tabela sem {rotulo} {', '.join(repr(n) for n in faltam)}; "
+                 "use as colunas do template, sem renomear nem juntar")
+        return None
+    return idx
 
 
 def placeholders(linhas):

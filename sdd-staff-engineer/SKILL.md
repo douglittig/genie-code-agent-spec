@@ -27,7 +27,7 @@ description: |
 ```
 Fase 1: @sdd-define          → docs/specs/DEFINE_{FEATURE}.md  (+ captura jira_key no state)
 Fase 2: @sdd-staff-engineer  → docs/adr/ADR_{FEATURE}.md        ← ESTA SKILL
-Fase 3: @sdd-po              → Stories (Fibonacci) + Tasks no Jira
+Fase 3: @sdd-po              → docs/planning/TASKS_{FEATURE}.md: histórias (Fibonacci) + tasks; Jira se houver jira_key
 Fase 4: @sdd-design          → docs/designs/DESIGN_{FEATURE}.md (usa o ADR como verdade)
          └─ a cada fim de fase, a skill @sdd-doc documenta no Jira (comentário + transição)
 ```

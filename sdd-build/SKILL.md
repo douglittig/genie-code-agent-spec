@@ -33,16 +33,16 @@ description: |
 │                                                                      │
 │  1. CARREGAMENTO DO DESIGN (fonte da verdade para implementação)    │
 │     └─ Ler: docs/designs/DESIGN_{FEATURE}.md                        │
-│     └─ Extrair: File manifest, padrões de código, atribuições       │
+│     └─ Extrair: componentes, tasks e coluna "Constrói com"         │
 │     └─ Carregar SKILL.md das skills Databricks especificadas        │
 │                                                                      │
 │  2. VALIDAÇÃO COM SKILLS DATABRICKS (antes de escrever código)      │
 │     └─ Ler: {skill}/SKILL.md → Verificar padrões     │
 │     └─ Comparar: Padrões do DESIGN vs skill → Garantir alinhamento  │
 │                                                                      │
-│  3. EXECUÇÃO (por arquivo do manifest)                              │
-│     ├─ @skill-databricks no manifest → Ler skill + gerar arquivo    │
-│     └─ (geral) no manifest   → Executar diretamente dos padrões     │
+│  3. EXECUÇÃO (por task do plano, na ordem)                          │
+│     ├─ @skill-databricks no DESIGN → Ler skill + gerar arquivo      │
+│     └─ sem skill no DESIGN   → Executar seguindo o padrão do repo   │
 │                                                                      │
 │  4. ATRIBUIÇÃO DE CONFIANÇA                                          │
 │     ├─ Skill Databricks + padrão no CB → 0.95 → Executar            │
@@ -56,7 +56,7 @@ description: |
 ### Fluxo de Decisão de Execução
 
 ```text
-Tem @skill-databricks no manifest?
+O componente da task tem @skill-databricks em "Constrói com" no DESIGN?
 ├─ SIM → Carregar skill
 │        • Ler: {skill}/SKILL.md
 │        • Seguir: padrões de código da skill
@@ -74,13 +74,15 @@ Tem @skill-databricks no manifest?
 
 ### Capacidade 1: Extração de Tarefas
 
-**Gatilhos:** Documento DESIGN carregado
+**Gatilhos:** Plano de tarefas aprovado (Grande e Complexo) ou spec aprovada (Médio)
 
 **Processo:**
 
-1. Parsear o File Manifest do DESIGN
-2. Identificar dependências entre arquivos
-3. Ordenar tarefas: config primeiro → utilities → handlers → testes
+1. Grande e Complexo: as tasks vêm de `docs/planning/TASKS_{FEATURE}.md`, na ordem do plano,
+   com o componente de cada uma no `docs/designs/DESIGN_{FEATURE}.md`. Antes, rode
+   `sdd_gates tasks docs/planning/TASKS_{FEATURE}.md --aprovado` (`@sdd-workflow`, seção Gates).
+2. Médio: liste os passos atômicos a partir dos critérios do DEFINE
+3. Siga as dependências: uma task só começa depois das que ela cita em "Depende de"
 
 **Output:**
 
@@ -95,11 +97,11 @@ Tem @skill-databricks no manifest?
 
 ### Capacidade 2: Delegação de Agentes
 
-**Gatilhos:** Arquivo tem @nome-do-agente no manifest
+**Gatilhos:** Componente tem @skill-databricks em "Constrói com" no DESIGN
 
 **Processo:**
 
-1. Extrair nome do agente do manifest
+1. Extrair a skill da coluna "Constrói com" do DESIGN
 2. Carregar SKILL.md da skill Databricks indicada
 3. Extrair padrões e exemplos da skill
 4. Gerar o arquivo seguindo os padrões da skill
@@ -147,7 +149,7 @@ falta de ferramenta.
 
 1. Detectar artefatos DE no DESIGN (modelos dbt, arquivos SQL, DAGs, Spark jobs)
 2. Rodar ferramentas de verificação específicas DE
-3. Delegar para agentes DE conforme especificado no manifest
+3. Delegar para a skill @databricks-* da coluna "Constrói com" do DESIGN
 
 **Comandos de Verificação DE:**
 
@@ -185,7 +187,7 @@ python -c "from pyspark.sql import SparkSession; exec(open('{arquivo}').read())"
 
 ```text
 CHECKLIST PRÉ-VOO
-├─ [ ] Todos os arquivos do manifest criados
+├─ [ ] Todas as tasks do plano concluídas, cada uma com o gate verde
 ├─ [ ] Cada arquivo verificado (lint, types, testes)
 ├─ [ ] Atribuição de agente registrada no BUILD_REPORT
 ├─ [ ] Sem segredos ou credenciais hardcoded

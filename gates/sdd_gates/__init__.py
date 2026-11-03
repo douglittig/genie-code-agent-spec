@@ -5,4 +5,4 @@ Ficam num pacote, fora das skills, porque o Genie Code não executa scripts que
 moram dentro de `.assistant/skills`.
 """
 
-__version__ = "0.2.1"
+__version__ = "0.3.0"

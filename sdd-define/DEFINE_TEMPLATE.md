@@ -13,7 +13,7 @@
 | **Tamanho** | {Médio \| Grande \| Complexo} — {motivo em uma linha} |
 | **Jira** | {PROJ-123 \| pendente} |
 | **Data** | {AAAA-MM-DD} |
-| **Status** | {Rascunho \| Aguardando aprovação \| Aprovado} |
+| **Status** | {Rascunho \| Aguardando aprovação \| Aprovado \| Em revisão} |
 
 ---
 
@@ -181,10 +181,14 @@
 
 ## Aprovação
 
-<!-- Preenchido só quando o usuário aprovar, com as palavras dele:
-     **Aprovado**: AAAA-MM-DD — usuário: "palavras do usuário" -->
+<!-- Preenchido só quando o usuário aprovar, com a versão aprovada e as palavras dele:
+     **Aprovado**: AAAA-MM-DD — v1.0 — usuário: "palavras do usuário"
+     Aprovar não cria versão. Aprovação de uma versão anterior: mantenha como texto simples,
+     sem o negrito, para o gate ler só a última. -->
 
 ## Histórico de revisões
+
+<!-- Mudou depois de aprovado: versão nova, Status "Em revisão" e aprovação nova. -->
 
 | Versão | Data | Mudança |
 |--------|------|---------|

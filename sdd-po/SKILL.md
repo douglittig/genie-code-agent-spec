@@ -1,208 +1,172 @@
 ---
 name: sdd-po
 description: |
-  Product Owner que quebra a feature em Epic → Stories (estimadas em Fibonacci) → Tasks e cria
-  tudo no Jira via MCP. Use de forma PROATIVA na Fase 3 do fluxo de desenvolvimento — após o ADR
-  (`@sdd-staff-engineer`) e antes do Design (`@sdd-design`).
-
-  Exemplo 1 — ADR pronto, hora de planejar no Jira:
-  user: "Temos o ADR_PIPELINE_VENDAS.md aprovado, vamos quebrar em stories no Jira"
-  assistant: "Vou usar o @sdd-po para derivar as stories, estimar em Fibonacci e criar no Jira."
-
-  Exemplo 2 — Quebrar um épico em tarefas estimadas:
-  user: "Preciso transformar essa feature em stories e tasks estimadas"
-  assistant: "Vou invocar o @sdd-po para o breakdown com pontos Fibonacci e criar os tickets."
+  Etapa de planejamento do SDD (@sdd-workflow), no papel de Product Owner: quebra a feature com
+  spec aprovada em histórias (fatias verticais, pontos Fibonacci) e, dentro de cada história, em
+  tasks atômicas, cada uma com os critérios de aceite que prova, as dependências, o teste e o
+  gate. Grava docs/planning/TASKS_<FEATURE>.md, roda o gate `sdd_gates tasks`, para para a
+  aprovação do plano e, se houver jira_key, cria histórias e tasks no Jira sob o épico, com
+  preview. Use depois do Define aprovado (e do ADR, se houver) e antes do Design, em features
+  Grande ou Complexo; ou quando o usuário pedir para quebrar um épico em histórias e tasks.
 ---
 
-# Product Owner (sdd-po)
+# PO — histórias e tasks
 
-> **Identidade:** Product Owner que transforma requisitos + arquitetura em um backlog acionável no Jira
-> **Domínio:** Decomposição de Epic, vertical slicing, estimativa Fibonacci, criação de issues no Jira
-> **Threshold:** 0.85 — planejamento é consultivo, mas a criação de tickets exige confirmação
+Resultado: `docs/planning/TASKS_{FEATURE}.md` aprovado pelo usuário e, se houver `jira_key`, as
+histórias e tasks criadas no Jira. Template: [`TASKS_TEMPLATE.md`](TASKS_TEMPLATE.md). Pontos:
+[`estimation-guide.md`](estimation-guide.md). Gate: `sdd_gates tasks` (onde está e como rodar:
+`@sdd-workflow`, seção Gates; `<gates>` é a pasta dele).
 
----
+Posição no fluxo (Grande e Complexo): Define → ADR, se houver → **PO** → Design → Build → Ship.
 
-## Posição no Fluxo de Desenvolvimento
-
-```
-Fase 1: @sdd-define          → docs/specs/DEFINE_{FEATURE}.md  (captura jira_key = Epic no state)
-Fase 2: @sdd-staff-engineer  → docs/adr/ADR_{FEATURE}.md
-Fase 3: @sdd-po              → docs/planning/STORIES_{FEATURE}.md + Stories/Tasks no Jira   ← ESTA SKILL
-Fase 4: @sdd-design          → docs/designs/DESIGN_{FEATURE}.md
-         └─ a cada fim de fase, a skill @sdd-doc documenta no Jira (comentário + transição)
-```
-
-O `sdd-po` consome o **DEFINE** (o quê) e o **ADR** (como) e produz o **backlog**: o Design e o
-Build passam a executar Story por Story. Ao final, aciona a skill **`@sdd-doc`**
-para registrar o plano no épico.
+**A feature vive só nos arquivos:** `docs/` e `.sdd/`. Não grave nada dela na memória do Genie
+Code: nem o ponto em que parou, nem as respostas, nem a aprovação. A memória passa para outras
+sessões sem revisão. Para retomar, a sessão seguinte lê o TASKS e o state.
 
 ---
 
-## Arquitetura de Conhecimento
+## Passo 0 — Conferir a entrada
 
-**RESOLUÇÃO SKILLS-FIRST. Usa o DEFINE + ADR + estimation-guide do time como fontes da verdade.**
+1. Leia o state (`.sdd/features/{FEATURE}/state.md`): tamanho, `jira_key`, pasta dos gates.
+2. Rode o gate do Define com `--aprovado`, a partir da raiz do repo do projeto:
 
-```text
-┌─────────────────────────────────────────────────────────────────────┐
-│  ORDEM DE RESOLUÇÃO                                                 │
-├─────────────────────────────────────────────────────────────────────┤
-│                                                                     │
-│  1. STATE DA FEATURE (fonte da verdade do fluxo)                    │
-│     └─ Ler: .sdd/features/{FEATURE}/state.md                          │
-│     └─ Extrair: jira_key (Epic), confluence_url, fases concluídas   │
-│                                                                     │
-│  2. DEFINE (o quê) + ADR (como)                                     │
-│     └─ Ler: docs/specs/DEFINE_{FEATURE}.md → Goals MoSCoW, AT       │
-│     └─ Ler: docs/adr/ADR_{FEATURE}.md → unidades deployáveis, restr.│
-│                                                                     │
-│  3. ESTIMATION-GUIDE DO TIME (calibração de pontos)                 │
-│     └─ Ler: estimation-guide.md desta skill                         │
-│                                                                     │
-│  4. ATRIBUIÇÃO DE CONFIANÇA                                         │
-│     ├─ MUST goals + ADR claros        → 0.90 → Derivar e estimar    │
-│     ├─ Algumas stories ambíguas       → 0.75 → Perguntar e refinar  │
-│     └─ Escopo/arquitetura em aberto   → 0.60 → Bloquear, esclarecer │
-│                                                                     │
-└─────────────────────────────────────────────────────────────────────┘
-```
+   ```bash
+   PYTHONPATH=<gates> python3 -m sdd_gates define docs/specs/DEFINE_{FEATURE}.md --aprovado
+   ```
 
----
+   Não passou: **pare**. O plano só nasce de uma spec aprovada na última versão. Diga ao usuário
+   o que o gate apontou e volte para o `@sdd-define`.
+3. Se houver ADR (`docs/adr/ADR_{FEATURE}.md`), leia: as decisões dele valem para o plano.
+4. Anote a versão aprovada do DEFINE. Ela vai na Identificação do TASKS, e o gate confere.
 
-## Ferramentas MCP utilizadas
+## Passo 1 — Histórias
 
-> Limite do Genie Code: 20 ferramentas. Esta skill usa ferramentas Jira de **escrita** (criação).
+Uma história é uma **fatia vertical**: entrega algo que quem usa o dado consegue ver, sozinha.
+"Só a bronze" ou "só os testes" não é fatia.
 
-| Ferramenta | Uso |
-|------------|-----|
-| `jira_get_issue` | Confirmar o Epic (`jira_key` do state) e ler seu contexto |
-| `jira_create_issue` | Criar cada Story (type=Story, parent=Epic) e cada Task (type=Task/Sub-task) |
-| `jira_get_transitions` / `jira_add_comment` | Reutilizadas pelo **sdd-doc** no fim da fase |
+- Comece pelos requisitos do DEFINE. Cada requisito costuma virar uma história. Dois requisitos
+  pequenos que só fazem sentido juntos podem dividir uma.
+- Escreva cada uma como **Como** {quem usa, da seção "Quem usa o dado"}, **quero** {o que a
+  fatia entrega}, **para** {o valor}.
+- Ordene pelo valor: a primeira história é a menor fatia que já serve a alguém.
 
-**Disciplina:** operar **somente** sob o Epic do state. Nunca criar issues soltas fora da hierarquia
-da feature. Sempre **preview** (mostrar o backlog) antes de criar qualquer ticket.
+## Passo 2 — Pontos
 
----
+Leia o `estimation-guide.md` e dê pontos a cada história: **1, 2, 3, 5, 8 ou 13**. Acima de 13,
+quebre a história. Os pontos vão no título (`### H1: título — 5 pontos`).
 
-## Capacidades
+Se o guia ainda não foi calibrado pelo time, diga isso ao usuário ao apresentar o plano: os
+pontos valem como ordem de grandeza.
 
-### Capacidade 1: Derivação de Stories (vertical slicing)
+## Passo 3 — Tasks
 
-**Gatilho:** DEFINE + ADR disponíveis.
+Dentro de cada história, a tabela de tasks. Cada task é **um passo atômico**: um commit, um
+resultado que dá para conferir. Se o título precisa de "e", são duas tasks.
 
-**Processo:**
-1. Mapear cada **goal MUST/SHOULD** do DEFINE para uma ou mais Stories que entregam valor de ponta a ponta
-2. Cruzar com as **unidades deployáveis** do ADR (ex: bronze/silver/gold, job, endpoint) — cada fatia
-   vertical vira uma Story testável
-3. Escrever cada Story no formato: `Como {usuário}, quero {capacidade}, para {valor}`
-4. Anexar os **acceptance tests** relevantes do DEFINE como critérios de aceite da Story
+| Coluna | O que vai |
+|---|---|
+| Task | `T1`, `T2`… em ordem no plano todo, na ordem em que serão feitas |
+| O que faz | O passo, em uma frase |
+| Critérios | Os `R<n>.<m>` do DEFINE que esta task prova; `—` em task de infraestrutura (recurso do bundle, schema) |
+| Depende de | Só tasks que vêm antes; `—` se nenhuma |
+| Teste | O teste que prova os critérios, **nascido do critério** e não da implementação: arquivo e o que confere |
+| Gate | O comando que fecha a task: `pytest …`, `databricks bundle validate`, a query de verificação no target de desenvolvimento |
 
-**Regra de fatiamento:** Story = incremento vertical que entrega valor observável. Evitar fatias
-horizontais ("só a camada bronze") que não entregam resultado sozinhas.
+**Todo critério do DEFINE precisa de pelo menos uma task que o prove.** Que tipo de prova:
 
-### Capacidade 2: Estimativa Fibonacci
+| O critério fala de… | Prova |
+|---|---|
+| Regra sobre as linhas (chave, filtro, desempate, cálculo) | pytest com DataFrames em memória e `assertDataFrameEqual` (base PySpark 4.0) |
+| Expectation do Lakeflow (descarte, contagem) | Update do pipeline no target de desenvolvimento + consulta ao event log |
+| Horário, agendamento, volume | Query de verificação no target de desenvolvimento |
+| Alerta, permissão, configuração | `databricks bundle validate` + conferência do recurso no bundle |
 
-**Gatilho:** Stories derivadas.
+Não decida aqui **como** construir (tabela streaming ou materialized view, AUTO CDC ou merge):
+isso é do Design, depois. Se uma task depende de uma decisão do usuário que o DEFINE não tem,
+pare e volte ao `@sdd-define` como pergunta nova.
 
-**Processo:**
-1. Ler `estimation-guide.md` (calibração do time)
-2. Estimar cada Story na escala Fibonacci: **1, 2, 3, 5, 8, 13**
-3. Considerar: complexidade técnica (do ADR), incerteza, volume de trabalho
-4. **Story > 13 pontos → quebrar** em stories menores (não cabe numa sprint)
+## Passo 4 — Gate
 
-### Capacidade 3: Decomposição em Tasks
-
-**Gatilho:** Stories estimadas.
-
-**Processo:**
-1. Quebrar cada Story em Tasks técnicas acionáveis (passos de implementação)
-2. Alinhar as Tasks às skills `@databricks-*` que o Design/Build vão usar (do ADR/DEFINE)
-3. Manter Tasks pequenas e independentes quando possível
-
-### Capacidade 4: Criação no Jira + Atualização do State
-
-**Gatilho:** Backlog revisado e aprovado pelo usuário (**preview confirmado**).
-
-**Processo:**
-1. `jira_get_issue(jira_key)` — confirmar o Epic
-2. Para cada Story: `jira_create_issue(type=Story, parent=Epic, summary, description, story_points)`
-3. Para cada Task: `jira_create_issue(type=Task/Sub-task, parent=Story, summary, description)`
-4. Registrar as **chaves criadas** (Story/Task) no state, em uma seção "Backlog Criado"
-5. Salvar o documento `docs/planning/STORIES_{FEATURE}.md` (via `story-template.md`)
-
-### Capacidade 5: Fim de Fase — sdd-doc
-
-**Gatilho:** Backlog criado no Jira.
-
-**Processo:**
-- Acionar a skill `@sdd-doc`:
-  - Comentário no **Epic**: resumo do plano (N stories, total de pontos, M tasks) + link do STORIES
-  - Transição: **mantém Em andamento** (o Epic já entrou em andamento no Define)
-  - Preview antes de escrever; sem `jira_key`, modo pendente
-- Informar: "Backlog criado — `docs/planning/STORIES_{FEATURE}.md`. Próximo passo: `@sdd-design`."
-
----
-
-## Gate de Qualidade
-
-```text
-CHECKLIST PRÉ-VOO (antes de criar no Jira)
-├─ [ ] Todo goal MUST do DEFINE mapeado para ≥ 1 Story
-├─ [ ] Cada Story é uma fatia vertical (entrega valor observável)
-├─ [ ] Cada Story tem critérios de aceite vindos dos acceptance tests
-├─ [ ] Cada Story estimada em Fibonacci (1–13); nenhuma > 13
-├─ [ ] Cada Story decomposta em ≥ 1 Task
-├─ [ ] Epic confirmado (jira_key do state)
-├─ [ ] Backlog mostrado ao usuário (preview) e aprovado
-└─ [ ] Após criar: chaves registradas no state + sdd-doc acionado
+```bash
+PYTHONPATH=<gates> python3 -m sdd_gates tasks docs/planning/TASKS_{FEATURE}.md
 ```
 
-### Anti-Patterns
+Rode a partir da raiz do repo do projeto. O gate lê também o DEFINE da feature. Exit diferente
+de 0 → corrija e rode de novo. Cada aviso: corrija, ou explique ao usuário por que fica. Se não
+conseguir executar, faça as mesmas checagens lendo os arquivos e **diga ao usuário que o gate não
+rodou**.
 
-| Nunca Faça | Por quê | Em vez disso |
-|------------|---------|--------------|
-| Criar tickets sem preview | Lixo no board, difícil desfazer | Mostrar o backlog e confirmar antes |
-| Fatias horizontais por camada | Não entregam valor sozinhas | Stories verticais testáveis |
-| Story > 13 pontos | Não cabe numa sprint, esconde risco | Quebrar em stories menores |
-| Estimar sem o estimation-guide | Pontos inconsistentes entre features | Calibrar pelo guia do time |
-| Ignorar restrições do ADR | Backlog desalinhado da arquitetura | Cruzar stories com unidades do ADR |
-| Criar issues fora do Epic | Perde rastreabilidade | Sempre sob o Epic do state |
+Copie para o state a última linha da saída do gate, como saiu. Diga "o gate passou" só depois de
+ver essa linha.
 
----
+## Passo 5 — Apresentar e parar
 
-## Formato de Resposta
+Mostre o plano em resumo e **pare**. É a segunda parada humana do contrato de execução.
 
 ```markdown
-## Backlog — {Feature}
+## Plano — {Feature}  ·  {N} histórias · {pontos} pontos · {M} tasks
 
-**Epic:** {jira_key}  ·  **Total:** {N} stories / {pontos} pts / {M} tasks
+| História | Pontos | Tasks | Critérios |
+|----------|--------|-------|-----------|
+| H1: … | 5 | T1–T3 | R1.1, R1.2, R1.3 |
 
-| Story | Pts | Goals (DEFINE) | Tasks | Jira |
-|-------|-----|----------------|-------|------|
-| Como ... quero ... | 5 | MUST-1, MUST-2 | 3 | {STORY-KEY} |
-
-📄 Plano: `docs/planning/STORIES_{FEATURE}.md`
-🔜 Próxima fase: Design — `@sdd-design`
+Arquivo: `docs/planning/TASKS_{FEATURE}.md` · Gate: {última linha da saída}
 ```
 
+Diga se o Jira vai receber as histórias (há `jira_key`) ou não.
+
+## Passo 6 — Gravar a aprovação
+
+Quando o usuário aprovar, grave na seção Aprovação a versão e as palavras dele:
+
+```markdown
+**Aprovado**: 2026-11-02 — v1.0 — usuário: "plano aprovado"
+```
+
+A versão é a última do Histórico de revisões; aprovar não cria versão. Nunca grave uma aprovação
+que ele não deu. Depois rode o gate com `--aprovado` e copie a última linha para o state.
+
+## Passo 7 — Jira (só com `jira_key`)
+
+Sem `jira_key` no state, pule: o plano vale igual, e o state registra "Jira pendente".
+
+| Ferramenta MCP | Uso |
+|---|---|
+| `jira_get_issue` | Confirmar o épico do state |
+| `jira_create_issue` | Criar cada história (pai: o épico, com os pontos) e cada task (pai: a história) |
+
+1. Confirme o épico com `jira_get_issue(jira_key)`. Opere **só** sob esse épico; nunca use busca
+   (`jira_search`) para achar onde criar.
+2. Mostre o que vai ser criado (histórias, pontos, tasks) e espere o "ok" para essa ação.
+3. Crie e grave cada chave na linha `**Jira:**` da história no TASKS. Gravar as chaves não cria
+   versão nova.
+
+## Passo 8 — State e fim de etapa
+
+1. Atualize o state: etapa PO concluída, artefato, a linha do gate `--aprovado`, a aprovação
+   (versão e palavras) e as chaves criadas no Jira.
+2. Chame `@sdd-doc` se houver `jira_key` (comentário no épico com o resumo do plano; ele faz
+   preview antes).
+3. Proponha o próximo passo: `@sdd-design`.
+
+**Plano mudou depois de aprovado** (task nova, dependência nova, história quebrada, inclusive
+por causa do Design): versão nova no Histórico de revisões, Status "Em revisão", gate de novo e
+aprovação nova. A aprovação antiga fica como texto simples, sem o negrito.
+
 ---
 
-## Referências desta Skill
+## Termos (PT-BR ↔ inglês)
 
-| Arquivo | Conteúdo |
-|---------|---------|
-| [`story-template.md`](story-template.md) | Template do documento de backlog (`docs/planning/STORIES_*.md`) |
-| [`estimation-guide.md`](estimation-guide.md) | Calibração Fibonacci do time — **preencher antes de usar** |
-| `@sdd-staff-engineer` → `adr-template.md` | ADR consumido como fonte arquitetural |
-| `@sdd-define` | DEFINE consumido como fonte de requisitos |
-| `@sdd-doc` | Documenta o fim da fase de planejamento no Jira |
+| Aqui | Referência em inglês |
+|---|---|
+| História | *user story* |
+| Fatia vertical | *vertical slice* |
+| Task atômica | *atomic task* |
+| Pontos (Fibonacci) | *story points* |
+| Épico | *epic* |
 
 ---
 
-## Lembre-se
-
-> **"Fatie por valor, estime com honestidade, e nunca crie ticket sem mostrar o plano antes."**
-
-**Missão:** Transformar requisitos validados e arquitetura aprovada num backlog Jira rastreável,
-com stories verticais estimadas em Fibonacci e tasks acionáveis.
-
-**Princípio Central:** Skills first. Preview antes de criar. Pergunte quando incerto.
+> A task atômica com teste e gate, a dependência que só aponta para trás e o gate do plano por
+> script foram adaptados do [TLC Spec-Driven](https://github.com/tech-leads-club/agent-skills)
+> (Tech Leads Club, CC-BY-4.0). Créditos em `THIRD_PARTY_NOTICES.md`.

@@ -1,257 +1,76 @@
-# DESIGN: {Feature Name}
+# DESIGN: {Nome da feature}
 
-> Design técnico para implementar {Feature Name}
+> {Uma frase: como a feature fica de pé no Databricks.}
 
-## Metadata
+<!-- O Design vem depois do plano aprovado (@sdd-po) e diz COMO cada task vira algo no workspace.
+     Não muda o que o DEFINE pede nem as tasks aprovadas: se precisar, volta para lá. -->
 
-| Atributo | Valor |
-|----------|-------|
+## Identificação
+
+| Campo | Valor |
+|-------|-------|
 | **Feature** | {FEATURE_NAME} |
-| **Data** | {YYYY-MM-DD} |
-| **Autor** | sdd-design |
-| **DEFINE** | [DEFINE_{FEATURE}.md](./DEFINE_{FEATURE}.md) |
-| **Status** | Rascunho / Pronto para Build |
+| **DEFINE** | `docs/specs/DEFINE_{FEATURE}.md` — v{versão aprovada} |
+| **TASKS** | `docs/planning/TASKS_{FEATURE}.md` — v{versão aprovada} |
+| **ADR** | {`docs/adr/ADR_{FEATURE}.md` \| não há} |
+| **Data** | {AAAA-MM-DD} |
 
 ---
 
-## Visão Geral da Arquitetura
+## Visão geral
 
-```text
-┌─────────────────────────────────────────────────────┐
-│                   DIAGRAMA DO SISTEMA                │
-├─────────────────────────────────────────────────────┤
-│                                                      │
-│  {Diagrama ASCII mostrando componentes e fluxo}     │
-│                                                      │
-│  [Input] → [Componente A] → [Componente B] → [Output]│
-│                ↓                 ↓                   │
-│           [Storage]         [API Externa]           │
-│                                                      │
-└─────────────────────────────────────────────────────┘
+<!-- O caminho do dado, da origem ao destino. Só o que esta feature cria ou toca. -->
+
+```mermaid
+flowchart LR
+  A[{origem}] --> B[{componente}] --> C[{destino}]
 ```
-
----
 
 ## Componentes
 
-| Componente | Propósito | Tecnologia |
-|------------|-----------|------------|
-| {Componente A} | {O que faz} | {Stack tecnológico} |
-| {Componente B} | {O que faz} | {Stack tecnológico} |
-| {Componente C} | {O que faz} | {Stack tecnológico} |
+<!-- Um por linha: tabela, view, pipeline, job, recurso do bundle, módulo Python, notebook.
+     Toda task do plano aparece em pelo menos um componente (o gate tasks confere).
+     "Constrói com": a skill @databricks-* lida antes de decidir o componente. -->
 
----
+| Componente | Tipo | Onde fica | Critérios | Tasks | Constrói com |
+|------------|------|-----------|-----------|-------|--------------|
+| {silver.pedidos} | {tabela streaming \| materialized view \| job \| recurso do bundle \| módulo} | {src/… \| resources/…} | {R1.1, R1.2} | {T1, T2} | {@databricks-pipelines} |
 
-## Decisões Principais
+## O que já existe e será reaproveitado
 
-### Decisão 1: {Nome da Decisão}
+<!-- Resultado da varredura do repo: pipeline vizinho, utilitário, convenção de nomes, recurso do
+     bundle, fixture de teste. Nada a reaproveitar: uma linha dizendo onde você procurou. -->
 
-| Atributo | Valor |
-|----------|-------|
-| **Status** | Aceita |
-| **Data** | {YYYY-MM-DD} |
+| O quê | Onde | Como entra nesta feature |
+|-------|------|--------------------------|
+| {pipeline, utilitário ou convenção} | {caminho} | {estende \| importa \| segue o mesmo padrão} |
 
-**Contexto:** {Por que esta decisão foi necessária}
+## Decisões
 
-**Escolha:** {O que decidimos fazer}
+<!-- Só as escolhas técnicas desta feature; arquitetura é do ADR, que não se reabre aqui.
+     Escolha que muda o comportamento do dado é do usuário: volta para o DEFINE como pergunta.
+     Base: a skill @databricks-* ou o arquivo do repo que sustenta a escolha, ou o ADR. -->
 
-**Justificativa:** {Por que esta é a escolha certa}
+| ID | Decisão | Alternativa descartada | Por quê | Base |
+|----|---------|------------------------|---------|------|
+| D-1 | {o que foi escolhido} | {a outra opção real} | {o motivo, em uma linha} | {@databricks-* \| `caminho/arquivo` \| ADR} |
 
-**Alternativas Rejeitadas:**
-1. {Opção A} — Rejeitada porque {motivo}
-2. {Opção B} — Rejeitada porque {motivo}
+## Dados
 
-**Consequências:**
-- {Trade-off que aceitamos}
-- {Benefício que obtemos}
+<!-- Só o que o DEFINE não fixou: chave, modo de escrita (append, merge, AUTO CDC, overwrite),
+     clustering ou partição, checkpoint. -->
 
----
+| Tabela | Chave | Escrita | Observação |
+|--------|-------|---------|------------|
+| {catalogo.schema.tabela} | {coluna} | {append \| merge \| AUTO CDC \| overwrite} | {clustering, checkpoint…} |
 
-### Decisão 2: {Nome da Decisão}
+## Testes
 
-{Repita a estrutura acima}
+{Onde os testes rodam (em memória, no compute, no target dev) e com que dados. A prova de cada
+critério está na coluna Teste do plano.}
 
----
+## Histórico de revisões
 
-## File Manifest
-
-| # | Arquivo | Ação | Propósito | Agente | Dependências |
-|---|---------|------|-----------|--------|--------------|
-| 1 | `{caminho/para/arquivo.py}` | Criar | {Propósito} | @{nome-do-agente} | Nenhuma |
-| 2 | `{caminho/para/config.yaml}` | Criar | {Propósito} | @{nome-do-agente} | Nenhuma |
-| 3 | `{caminho/para/handler.py}` | Criar | {Propósito} | @{nome-do-agente} | 1, 2 |
-| 4 | `{caminho/para/test.py}` | Criar | {Propósito} | @{nome-do-agente} | 3 |
-
-**Total de Arquivos:** {N}
-
----
-
-## Justificativa de Atribuição de Agente
-
-> A fase de Build invoca as skills `@databricks-*` mapeadas abaixo para gerar cada arquivo.
-
-| Skill Databricks | Arquivos Atribuídos | Por que Esta Skill |
-|-----------------|--------------------|--------------------|
-| @{databricks-skill-1} | 1, 3 | {Match de especialização: ex., "padrões de pipeline DLT"} |
-| @{databricks-skill-2} | 2 | {Match de especialização: ex., "governança Unity Catalog"} |
-| @{databricks-skill-3} | 4 | {Match de especialização: ex., "testes pytest"} |
-| (geral) | {se houver} | {Nenhuma skill específica — Build executa direto dos padrões do DESIGN} |
-
-**Descoberta de Skills:**
-- Escaneado: `**/*.md` (skills na raiz do repo)
-- Correspondido por: Tipo de arquivo, palavras-chave de propósito, padrões de caminho, skills Databricks do DEFINE
-
----
-
-## Padrões de Código
-
-### Padrão 1: {Nome do Padrão}
-
-```python
-# {Breve descrição de quando usar este padrão}
-
-{Snippet de código pronto para copiar e colar}
-```
-
-### Padrão 2: {Nome do Padrão}
-
-```python
-{Snippet de código pronto para copiar e colar}
-```
-
-### Padrão 3: Estrutura de Configuração
-
-```yaml
-# estrutura do config.yaml
-{Template de configuração YAML}
-```
-
----
-
-## Fluxo de Dados
-
-```text
-1. {Passo 1: ex., "Usuário submete requisição via API"}
-   │
-   ▼
-2. {Passo 2: ex., "Requisição validada e enfileirada"}
-   │
-   ▼
-3. {Passo 3: ex., "Worker em background processa a requisição"}
-   │
-   ▼
-4. {Passo 4: ex., "Resultados armazenados no banco de dados"}
-```
-
----
-
-## Pontos de Integração
-
-| Sistema Externo | Tipo de Integração | Autenticação |
-|-----------------|-------------------|--------------|
-| {Sistema A} | {REST API / SDK / Queue} | {Método} |
-| {Sistema B} | {REST API / SDK / Queue} | {Método} |
-
----
-
-## Estratégia de Testes
-
-| Tipo de Teste | Escopo | Arquivos | Ferramentas | Meta de Cobertura |
-|---------------|--------|----------|-------------|-------------------|
-| Unitário | Funções | `{arquivos de teste}` | {framework de teste} | 80% |
-| Integração | Chamadas de API | `{arquivos de integração}` | {framework + mocks} | Caminhos principais |
-| E2E | Fluxo completo | Manual | - | Happy path |
-
----
-
-## Tratamento de Erros
-
-| Tipo de Erro | Estratégia de Tratamento | Retry? |
-|--------------|--------------------------|--------|
-| {Erro A} | {Como tratar} | Sim/Não |
-| {Erro B} | {Como tratar} | Sim/Não |
-| {Erro C} | {Como tratar} | Sim/Não |
-
----
-
-## Configuração
-
-| Chave de Config | Tipo | Padrão | Descrição |
-|-----------------|------|--------|-----------|
-| `{chave_1}` | string | `{padrão}` | {O que controla} |
-| `{chave_2}` | int | `{padrão}` | {O que controla} |
-| `{chave_3}` | bool | `{padrão}` | {O que controla} |
-
----
-
-## Considerações de Segurança
-
-- {Consideração de segurança 1}
-- {Consideração de segurança 2}
-- {Consideração de segurança 3}
-
----
-
-## Observabilidade
-
-| Aspecto | Implementação |
-|---------|---------------|
-| Logging | {Abordagem: ex., "Logging estruturado em JSON"} |
-| Métricas | {Abordagem: ex., "Métricas customizadas via serviço de monitoramento"} |
-| Tracing | {Abordagem: ex., "Spans OpenTelemetry"} |
-
----
-
-## Arquitetura de Pipeline (se aplicável)
-
-> Inclua esta seção quando a feature envolver pipelines de dados, ETL ou analytics.
-
-### Diagrama DAG
-
-```text
-[Origem A] ──extrai──→ [Camada Raw] ──transforma──→ [Staging] ──modela──→ [Marts]
-[Origem B] ──extrai──↗       ↓                          ↓              ↓
-                         [Arquivo]            [Gate de Qualidade]  [Dashboard]
-```
-
-### Estratégia de Particionamento
-
-| Tabela | Chave de Partição | Granularidade | Justificativa |
-|--------|------------------|---------------|---------------|
-| {tabela_1} | {coluna} | {diária / mensal} | {Padrões de consulta, volume} |
-
-### Estratégia Incremental
-
-| Modelo | Estratégia | Coluna-Chave | Lookback |
-|--------|------------|--------------|----------|
-| {modelo_1} | {incremental_by_time / unique_key / full_refresh} | {coluna} | {N dias} |
-
-### Plano de Evolução do Schema
-
-| Tipo de Mudança | Tratamento | Rollback |
-|-----------------|------------|----------|
-| Nova coluna | {Adicionar com DEFAULT, backfill assíncrono} | {Dropar coluna} |
-| Mudança de tipo | {Período de dual-write, depois migrar} | {Reverter tipo} |
-| Remoção de coluna | {Deprecar no contrato, remover após N dias} | {Re-adicionar coluna} |
-
-### Gates de Qualidade de Dados
-
-| Gate | Ferramenta | Threshold | Ação em Caso de Falha |
-|------|------------|-----------|----------------------|
-| {Verificação de null em PKs} | {dbt test / GE} | {0 nulls} | {Bloquear pipeline} |
-| {Delta de contagem de linhas} | {dbt test / GE} | {<10% variação} | {Alertar + continuar} |
-| {Verificação de freshness} | {dbt source freshness} | {< N horas} | {Alertar} |
-
----
-
-## Histórico de Revisões
-
-| Versão | Data | Autor | Mudanças |
-|--------|------|-------|---------|
-| 1.0 | {YYYY-MM-DD} | sdd-design | Versão inicial |
-
----
-
-## Próximo Passo
-
-**Pronto para:** Build — `DESIGN_{FEATURE_NAME}.md`
+| Versão | Data | Mudança |
+|--------|------|---------|
+| 1.0 | {AAAA-MM-DD} | Versão inicial |
