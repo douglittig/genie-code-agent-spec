@@ -157,7 +157,8 @@
 <!-- Só vira suposição o que o código resolve ou o que o usuário delegou ("você decide").
      Decisão do usuário é pergunta, não suposição. Sem suposições: escreva "Nenhuma."
      Origem, uma destas três: código: <caminho do arquivo que mostra o padrão> |
-     usuário delegou (Qn.m) | usuário não quis discutir (Qn.m). -->
+     usuário delegou (Qn.m) | usuário não quis discutir (Qn.m).
+     Use as colunas como estão: o gate reprova tabela com coluna renomeada ou faltando. -->
 
 | ID | Padrão escolhido | Motivo | Origem | Se estiver errada |
 |----|------------------|--------|--------|-------------------|

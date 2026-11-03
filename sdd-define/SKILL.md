@@ -27,6 +27,10 @@ preencher:
 | Grande | Tudo, incluindo contrato de dados e contexto técnico |
 | Complexo | Tudo + **áreas cinzentas** (passo 4) |
 
+**A feature vive só nos arquivos:** `docs/specs/` e `.sdd/`. Não grave nada dela na memória do
+Genie Code: nem o ponto em que parou, nem as respostas, nem a aprovação. A memória passa para
+outras sessões sem revisão. Para retomar, a sessão seguinte lê o DEFINE e o state.
+
 ---
 
 ## Passo 0 — Achar o projeto e abrir o rascunho
@@ -137,10 +141,12 @@ critério, "fora do escopo", uma suposição (`S-n`) ou "não se aplica: motivo"
 Antes de apresentar, confira os cinco pontos e corrija no próprio arquivo:
 
 1. **Sem ambiguidade:** todo critério tem uma única leitura e um resultado definido pela spec.
-   Se não tem, pergunte, divida ou vire suposição explícita.
+   Se não tem, pergunte numa rodada nova do Registro ou divida o critério.
 2. **Decisão do usuário é pergunta:** escopo, comportamento do dado e desvio da fonte são
    perguntados, com a sua recomendação. Só vira suposição o que o código resolve ou o que o
-   usuário delegou ("você decide").
+   usuário delegou ("você decide"). Uma escolha sua que ninguém delegou, inclusive o jeito de
+   interpretar uma resposta dele, vira pergunta. "Aprovado com as sugestões" cobre só as
+   recomendações que já estavam escritas no Registro.
 3. **Área cinzenta recusada vira suposição**, com origem "usuário não quis discutir". Nunca some.
 4. **O pedido, frase a frase:** releia o pedido original e a página do Confluence, uma frase por
    vez. Cada frase cai num critério (`pedido: "trecho"` na Rastreabilidade), num item de Fora do

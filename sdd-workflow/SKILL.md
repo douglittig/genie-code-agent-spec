@@ -103,7 +103,7 @@ plataforma bloqueia o push para a `main`, mesmo com o ok do usuário.
 
 Um gate é um script que decide, por código, se a etapa pode avançar. O código dos gates fica num
 **segundo Git Folder deste mesmo repo, fora de `.assistant`**, chamado `sdd-gates`. Versão mínima
-exigida por estas skills: **0.2.0**.
+exigida por estas skills: **0.2.1**.
 
 Duas coisas que o Genie Code bloqueia, e que você não deve tentar contornar:
 - executar scripts dentro de `.assistant/skills` (nem copiando o código de lá);

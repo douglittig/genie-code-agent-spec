@@ -10,6 +10,9 @@ Erros (exit 1):
   - nenhum critério de aceite, ID malformado ou repetido, critério fora do requisito dele
   - critério sem DEVE (ou SHALL): não é testável no formato EARS
   - dimensão de requisito implícito ausente, vazia ou apontando para critério ou Qn.m inexistente
+  - tabela sem uma coluna do template (Registro, rubrica, Suposições, Diferenças,
+    Rastreabilidade): o gate não pula tabela com cabeçalho trocado
+  - Suposições fora de tabela (lista ou texto) que não seja "Nenhuma."
   - suposição sem "Padrão escolhido" ou sem "Motivo"
   - suposição com origem fora das três aceitas; "código" sem o caminho do arquivo;
     "usuário delegou" ou "não quis discutir" sem o Qn.m ou a frase do usuário
@@ -148,9 +151,10 @@ def le_registro(linhas, rel, aprovado):
         rel.erro(f"'### Pedido original' vazio: cole o pedido do usuário, literal, como citação (> …), dentro de '## {REGISTRO}'")
     perguntas = {}
     for cab, dados in md.tabelas(reg):
-        ci, cr = md.coluna(cab, "ID"), md.coluna(cab, "Resposta")
-        if ci is None:
+        cols = colunas(cab, ["ID", "Resposta"], REGISTRO, rel)
+        if cols is None:
             continue
+        ci, cr = cols
         for row in dados:
             qid = row[ci].strip("* ").upper() if ci < len(row) else ""
             if not QID_RE.fullmatch(qid):
@@ -158,10 +162,23 @@ def le_registro(linhas, rel, aprovado):
             if qid in perguntas:
                 rel.erro(f"Registro: {qid} repetido")
             perguntas[qid] = " | ".join(row)
-            resposta = row[cr] if cr is not None and cr < len(row) else ""
+            resposta = row[cr] if cr < len(row) else ""
             if md.vazia(resposta) or md.PLACEHOLDER_RE.search(resposta) or md.normaliza(resposta).startswith("aguardando"):
                 (rel.erro if aprovado else rel.aviso)(f"Registro: {qid} sem resposta do usuário")
     return pedido, perguntas
+
+
+def colunas(cab, nomes, onde, rel):
+    """Índices das colunas que o gate lê. Se faltar alguma, é erro: tabela com cabeçalho
+    trocado não pode passar sem ser conferida. Devolve None nesse caso."""
+    idx = [md.coluna(cab, n) for n in nomes]
+    faltam = [n for n, i in zip(nomes, idx) if i is None]
+    if faltam:
+        rotulo = "a coluna" if len(faltam) == 1 else "as colunas"
+        rel.erro(f"{onde}: tabela sem {rotulo} {', '.join(repr(n) for n in faltam)}; "
+                 "use as colunas do template, sem renomear nem juntar")
+        return None
+    return idx
 
 
 def confere_qids(texto, perguntas, onde, rel):
@@ -221,9 +238,10 @@ def valida(caminho, aprovado=False):
     if impl is not None:
         vistos = {}
         for cab, dados in md.tabelas(impl):
-            cd, cc = md.coluna(cab, "Dimens"), md.coluna(cab, "Como fica")
-            if cd is None or cc is None:
+            cols = colunas(cab, ["Dimensão", "Como fica"], "Requisitos implícitos de dados", rel)
+            if cols is None:
                 continue
+            cd, cc = cols
             for row in dados:
                 if len(row) > max(cd, cc):
                     vistos[md.normaliza(row[cd])] = row[cc]
@@ -247,21 +265,24 @@ def valida(caminho, aprovado=False):
                 (rel.erro if aprovado else rel.aviso)(f"requisitos implícitos: '{dim}' {motivo}")
 
     # 6. Suposições: padrão, motivo e uma origem verificável
-    sup = md.secao(linhas, "Suposições", nivel=2) or []
-    for cab, dados in md.tabelas(sup):
-        cid, cp, cm, co = (md.coluna(cab, "ID"), md.coluna(cab, "Padrao escolhido"),
-                           md.coluna(cab, "Motivo"), md.coluna(cab, "Origem"))
-        if cp is None or cm is None:
+    sup = md.secao(linhas, "Suposições", nivel=2)
+    if sup is not None and not md.tabelas(sup):
+        soltas = [l for l in texto_solto(sup) if not md.normaliza(l).strip("-*_ ").startswith("nenhuma")]
+        if soltas or not texto_solto(sup):
+            rel.erro("Suposições: use a tabela do template (ID, Padrão escolhido, Motivo, Origem, "
+                     "Se estiver errada) ou escreva 'Nenhuma.'")
+    for cab, dados in md.tabelas(sup or []):
+        cols = colunas(cab, ["ID", "Padrão escolhido", "Motivo", "Origem"], "Suposições", rel)
+        if cols is None:
             continue
+        cid, cp, cm, co = cols
         for row in dados:
-            nome = row[cid] if cid is not None and cid < len(row) else "?"
+            nome = row[cid] if cid < len(row) else "?"
             if cp >= len(row) or md.vazia(row[cp]):
                 rel.erro(f"suposição {nome} sem 'Padrão escolhido'")
             if cm >= len(row) or md.vazia(row[cm]):
                 rel.erro(f"suposição {nome} sem 'Motivo'")
-            if co is None or co >= len(row):
-                continue
-            origem = row[co]
+            origem = row[co] if co < len(row) else ""
             origem_n = md.normaliza(origem)
             tipo = next((o for o in ORIGENS_SUPOSICAO if origem_n.startswith(o)), None)
             if tipo is None:
@@ -276,12 +297,13 @@ def valida(caminho, aprovado=False):
     # 7. Diferenças em relação à fonte: cada uma aprovada pelo usuário
     dif = md.secao(linhas, "Diferenças em relação à fonte", nivel=2) or []
     for cab, dados in md.tabelas(dif):
-        ca = md.coluna(cab, "Aprovado por")
-        if ca is None:
+        cols = colunas(cab, ["O que a fonte diz", "Aprovado por"], "Diferenças em relação à fonte", rel)
+        if cols is None:
             continue
+        cf, ca = cols
         for row in dados:
             if ca >= len(row) or md.vazia(row[ca]):
-                rel.erro(f"diferença em relação à fonte sem 'Aprovado por': {row[0][:60]}")
+                rel.erro(f"diferença em relação à fonte sem 'Aprovado por': {row[cf][:60] if cf < len(row) else '?'}")
 
     # 8. Rastreabilidade: um para um com os critérios, e cada origem verificável
     ras = md.secao(linhas, "Rastreabilidade", nivel=2)
@@ -289,9 +311,10 @@ def valida(caminho, aprovado=False):
     if ras is not None:
         origem = {}
         for cab, dados in md.tabelas(ras):
-            cc, co = md.coluna(cab, "Criterio"), md.coluna(cab, "Origem")
-            if cc is None or co is None:
+            cols = colunas(cab, ["Critério", "Origem"], "Rastreabilidade", rel)
+            if cols is None:
                 continue
+            cc, co = cols
             for row in dados:
                 if len(row) > max(cc, co):
                     origem[row[cc].strip("* ")] = row[co]

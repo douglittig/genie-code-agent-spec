@@ -12,7 +12,7 @@
 | **Tamanho** | {Pequeno \| Médio \| Grande \| Complexo} — {motivo em uma linha} |
 | **Jira Key** | {PROJ-123 \| `pendente` se não informada} |
 | **Confluence URL** | {url da página SPEC \| `n/a`} |
-| **Gates** | {caminho de `<gates>`, ex.: `/Workspace/Users/<usuário>/sdd-gates/gates`} — versão {0.2.0} |
+| **Gates** | {caminho de `<gates>`, ex.: `/Workspace/Users/<usuário>/sdd-gates/gates`} — versão {0.2.1} |
 | **Fase Atual** | {Define \| ADR \| Design \| Build \| Ship \| Shipped} |
 | **Criado em** | {YYYY-MM-DD HH:MM UTC} |
 | **Atualizado em** | {YYYY-MM-DD HH:MM UTC} |
