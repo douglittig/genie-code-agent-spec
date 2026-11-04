@@ -333,8 +333,8 @@ ENTRADAS                                 NÓS
 |----|-------|-----------|--------|-------------------|--------|
 | [1] Define | @sdd-define | Confluence | `docs/specs/DEFINE_*.md` | gate `sdd_gates define` verde + aprovação gravada (ideia vaga: áreas cinzentas dentro do Define) | PRONTO |
 | [2] Arquitetura | @sdd-staff-engineer | — | `docs/adr/ADR_*.md` | ADR revisado e aceito | PRONTO |
-| [3] Planejamento | @sdd-po | Jira | `docs/planning/TASKS_*.md` (histórias + tasks) + Jira, se houver épico | gate `sdd_gates tasks` verde + plano aprovado (todo critério com task, teste e gate) | PRONTO |
-| [4] Design | @sdd-design | — | `docs/designs/DESIGN_*.md` | gate `sdd_gates tasks` verde com o DESIGN (toda task num componente) | PRONTO |
+| [3] Planejamento | @sdd-po | Jira | `docs/planning/TASKS_*.md` (matriz de testes, gates, histórias + tasks, provas) + Jira, se houver épico | gate `sdd_gates tasks` verde + plano aprovado (todo critério com task, teste e prova) | PRONTO |
+| [4] Design | @sdd-design | — | `docs/designs/DESIGN_*.md` | gate `sdd_gates tasks` verde com o DESIGN (abordagem confirmada, toda task num componente) | PRONTO |
 | [5] Build | @sdd-build | — | código + `BUILD_REPORT_*.md` | Lint + testes ok, sem credenciais | PRONTO |
 | [6] Ship | @sdd-ship | Jira | `SHIPPED_*.md` + Jira fechado | Acceptance tests ok | PRONTO |
 | Iterate | @sdd-iterate | — | Artefato da fase atualizado | — | CROSS-CUTTING |
@@ -424,8 +424,8 @@ Cada fase do workflow SDD é uma skill autocontida (SKILL.md + template próprio
 | [`sdd-workflow`](sdd-workflow/) | — | Orquestrador: tamanho da feature (Pequeno → Complexo), contrato de execução, raio de ação no Databricks e fim de etapa |
 | [`sdd-define`](sdd-define/) | 1 | Spec de dados testável: critérios EARS, rubrica de requisitos implícitos, áreas cinzentas, gate `sdd_gates define` e aprovação gravada → `docs/specs/DEFINE_*.md` |
 | [`sdd-staff-engineer`](sdd-staff-engineer/) | 2 | Revisão de spec, discussão arquitetural e geração de ADR (`docs/adr/`) |
-| [`sdd-po`](sdd-po/) | 3 | Product Owner: quebra a feature em histórias (fatias verticais, pontos Fibonacci) e tasks atômicas com teste e gate, gate `sdd_gates tasks` e aprovação gravada → `docs/planning/TASKS_*.md`; cria no Jira via MCP quando há épico |
-| [`sdd-design`](sdd-design/) | 4 | Como cada task vira componente no Databricks: reaproveitamento, componentes ligados a critérios e tasks, skill `@databricks-*` de cada um e decisões → `docs/designs/DESIGN_*.md` |
+| [`sdd-po`](sdd-po/) | 3 | Product Owner: matriz de testes e níveis de gate a partir do repo, histórias (fatias verticais, pontos Fibonacci), tasks atômicas com teste e nível de gate, uma prova por critério, gate `sdd_gates tasks` e aprovação gravada → `docs/planning/TASKS_*.md`; cria no Jira via MCP quando há épico |
+| [`sdd-design`](sdd-design/) | 4 | Como cada task vira componente no Databricks: abordagens confirmadas pelo usuário, reaproveitamento, componentes ligados a critérios e tasks, onde cada regra roda para o teste alcançar, riscos, dado ruim, skill `@databricks-*` de cada componente e decisões → `docs/designs/DESIGN_*.md` |
 | [`sdd-build`](sdd-build/) | 5 | Implementação das tasks do plano, na ordem, delegando às skills `@databricks-*` → código + `BUILD_REPORT_*.md` |
 | [`sdd-ship`](sdd-ship/) | 6 | Archive da feature, lições aprendidas e fechamento do ticket → `SHIPPED_*.md` |
 | [`sdd-iterate`](sdd-iterate/) | cross | Mudanças mid-stream em documentos SDD com análise de cascata |
@@ -433,7 +433,6 @@ Cada fase do workflow SDD é uma skill autocontida (SKILL.md + template próprio
 | [`sdd-dev-workflow`](sdd-dev-workflow/) | 4+ | Fluxo de desenvolvimento seguro: discussão → branch → código → validação → auto-review → PR → merge |
 | [`sdd-code-reviewer`](sdd-code-reviewer/) | 4+ | Review de segurança, qualidade de código, performance e boas práticas para projetos Databricks e Python |
 | [`databricks-python-dev`](databricks-python-dev/) | 4+ | Padrões de desenvolvimento Python: uv, type hints, Ruff, Pyright e pytest — *congelada* (ai-dev-kit v0.1.14; não existe no repo oficial) |
-| [`custom-test-generator`](custom-test-generator/) | 4+ | Geração de testes unitários pytest, testes de integração e fixtures para código Python e data engineering |
 
 ---
 
@@ -505,7 +504,7 @@ O prefixo da pasta indica a origem: **`databricks-*`** = upstream (não editar),
 |--------|--------|---------------|
 | **Upstream** (`databricks-agent-skills`) | `databricks-*`, `spark-python-data-source` | ❌ Não — o sync sobrescreve. Contribua no upstream. |
 | **Congelada** (ai-dev-kit v0.1.14) | `databricks-python-dev` | ⚠️ Pode — o sync não toca mais (`FROZEN_SKILLS`). |
-| **Nossas** (`sdd-*`, `custom-*` e `TEMPLATE`) | `sdd-workflow`, `sdd-define`, `sdd-design`, `sdd-build`, `sdd-ship`, `sdd-iterate`, `sdd-doc`, `sdd-staff-engineer`, `sdd-po`, `sdd-dev-workflow`, `sdd-code-reviewer`, `custom-test-generator` | ✅ Sim — o sync nunca as toca (`OWN_SKILLS`). |
+| **Nossas** (`sdd-*`, `custom-*` e `TEMPLATE`) | `sdd-workflow`, `sdd-define`, `sdd-design`, `sdd-build`, `sdd-ship`, `sdd-iterate`, `sdd-doc`, `sdd-staff-engineer`, `sdd-po`, `sdd-dev-workflow`, `sdd-code-reviewer` | ✅ Sim — o sync nunca as toca (`OWN_SKILLS`). |
 
 ### Licença das skills Databricks
 

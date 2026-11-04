@@ -33,7 +33,7 @@ O índice completo das skills está no **[README.md](README.md)**, organizado po
 
 ### Proveniência: skills upstream vs. skills próprias
 
-> **Origem do workflow SDD:** as fases `sdd-design/build/ship/iterate`, seus templates, `sdd-code-reviewer` e `custom-test-generator` derivam do [AgentSpec](https://github.com/luanmorenommaciel/agentspec), de Luan Moreno (MIT). Ao editar esses arquivos, manter o crédito em [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md); ao reescrever um deles do zero, atualizar a lista de arquivos derivados lá.
+> **Origem do workflow SDD:** as fases `sdd-design/build/ship/iterate`, seus templates e `sdd-code-reviewer` derivam do [AgentSpec](https://github.com/luanmorenommaciel/agentspec), de Luan Moreno (MIT). Ao editar esses arquivos, manter o crédito em [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md); ao reescrever um deles do zero, atualizar a lista de arquivos derivados lá.
 
 O prefixo indica a origem da skill:
 
@@ -45,7 +45,7 @@ O prefixo indica a origem da skill:
 - **Versão fixada:** última release do upstream, registrada em `databricks-skills.lock` (versão, commit e lista de skills sincronizadas).
 - **Origem das pastas upstream:** `skills/` do repo oficial. Exceção: **`spark-python-data-source`** vem de `experimental/` (`EXTRA_SKILLS`).
 - **Upstream renomeou uma skill?** O PR do sync mostra a pasta antiga apagada e a nova criada. Antes do merge, trocar as referências `@databricks-*` nas skills `sdd-*` e rodar o validador.
-- **Skills NOSSAS, editáveis** (prefixos `sdd-` e `custom-`, salvaguardadas em `OWN_SKILLS`): `sdd-workflow`, `sdd-define`, `sdd-design`, `sdd-build`, `sdd-ship`, `sdd-iterate`, `sdd-doc`, `sdd-staff-engineer`, `sdd-po`, `sdd-dev-workflow`, `sdd-code-reviewer`, `custom-test-generator`. O workflow nunca as sobrescreve.
+- **Skills NOSSAS, editáveis** (prefixos `sdd-` e `custom-`, salvaguardadas em `OWN_SKILLS`): `sdd-workflow`, `sdd-define`, `sdd-design`, `sdd-build`, `sdd-ship`, `sdd-iterate`, `sdd-doc`, `sdd-staff-engineer`, `sdd-po`, `sdd-dev-workflow`, `sdd-code-reviewer`. O workflow nunca as sobrescreve. O guia de testes (o antigo `custom-test-generator`) virou `sdd-workflow/PROVAS.md`.
 
 ### Skills de Workflow (família `sdd-*`)
 
@@ -54,8 +54,8 @@ O prefixo indica a origem da skill:
 | `sdd-workflow` | — | **PRONTO** | Orquestrador: tamanho da feature, contrato de execução, raio de ação no Databricks, fim de etapa |
 | `sdd-define` | 1 | **PRONTO** | Spec de dados testável (Confluence via MCP): critérios EARS, rubrica de requisitos implícitos, áreas cinzentas, gate `sdd_gates define`, aprovação gravada → `docs/specs/DEFINE_*.md` (+ `jira_key` e state) |
 | `sdd-staff-engineer` | 2 | **PRONTO** | Revisão de spec, decisão arquitetural → `docs/adr/ADR_*.md` |
-| `sdd-po` | 3 | **PRONTO** | Histórias (Fibonacci) → tasks atômicas com teste e gate → `docs/planning/TASKS_*.md` + gate `sdd_gates tasks`; Jira quando há épico |
-| `sdd-design` | 4 | **PRONTO** | Componentes ligados a critérios e tasks, reaproveitamento e decisões → `docs/designs/DESIGN_*.md` (conferido pelo gate `tasks`) |
+| `sdd-po` | 3 | **PRONTO** | Matriz de testes e níveis de gate → histórias (Fibonacci) → tasks atômicas com teste e nível de gate → uma prova por critério → `docs/planning/TASKS_*.md` + gate `sdd_gates tasks`; Jira quando há épico |
+| `sdd-design` | 4 | **PRONTO** | Abordagens confirmadas, componentes ligados a critérios e tasks, onde a regra roda, riscos, dado ruim, reaproveitamento e decisões → `docs/designs/DESIGN_*.md` (conferido pelo gate `tasks`) |
 | `sdd-build` | 5 | **PRONTO** | Implementação delegando às `@databricks-*` → código + `BUILD_REPORT_*.md` |
 | `sdd-ship` | 6 | **PRONTO** | Archive + lições aprendidas + fechamento do ticket → `SHIPPED_*.md` |
 | `sdd-iterate` | cross | **PRONTO** | Mudanças mid-stream com análise de cascata |

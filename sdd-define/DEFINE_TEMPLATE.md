@@ -179,6 +179,26 @@
 
 ---
 
+## Provas (só no tamanho Médio)
+
+<!-- No Médio não há plano de tarefas: as provas ficam aqui e são aprovadas com a spec. No Grande
+     e no Complexo, apague esta seção inteira (as provas vão no TASKS, pelo @sdd-po).
+     Uma prova por critério: uma afirmação observável, com o valor, citando o critério, e na linha
+     de baixo o que a decide:
+       Prova: run <nome> | <a linha que o teste imprime ao passar, com PASSED>
+       Prova: `<comando sozinho>`        (prova solta: o código de saída decide)
+       Prova: passeio — <o que a consulta no dev mostra>
+     **Build**: os comandos de build, lint e validação do repo, entre crases; repo sem build:
+     "nenhum — motivo". Guia de cada tipo de prova: sdd-workflow/PROVAS.md. -->
+
+**Build**: {`databricks bundle validate -t dev` | nenhum — motivo}
+**Run unit**: {`PYTHONDONTWRITEBYTECODE=1 python3 -m pytest tests/unit -v -p no:cacheprovider`}
+
+**P1** — {afirmação observável, com o valor} ({R1.1})
+Prova: {run unit | tests/unit/test_x.py::test_r1_1_o_que_confere PASSED}
+
+---
+
 ## Aprovação
 
 <!-- Preenchido só quando o usuário aprovar, com a versão aprovada e as palavras dele:

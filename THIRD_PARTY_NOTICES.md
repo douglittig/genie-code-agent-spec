@@ -14,7 +14,6 @@ Arquivos derivados do AgentSpec:
 - `sdd-ship/SKILL.md`, `sdd-ship/SHIPPED_TEMPLATE.md`
 - `sdd-iterate/SKILL.md`
 - `sdd-code-reviewer/SKILL.md`
-- `custom-test-generator/SKILL.md`
 
 ```
 MIT License
@@ -50,9 +49,10 @@ Adaptado do TLC Spec-Driven, com mudanças:
 
 - `sdd-workflow/SKILL.md`: tamanho da feature (*auto-sizing*), contrato de execução, raio de ação (*blast radius*, aqui com regras do Databricks) e retomada de sessão.
 - `sdd-define/SKILL.md`, `sdd-define/DEFINE_TEMPLATE.md`: critérios EARS (em PT-BR), rubrica de requisitos implícitos (reescrita para dados), gate de fechamento e áreas cinzentas.
-- `sdd-po/SKILL.md`, `sdd-po/TASKS_TEMPLATE.md`: task atômica com teste e gate, dependência que só aponta para trás e o plano conferido por script antes da aprovação.
-- `sdd-design/SKILL.md`, `sdd-design/DESIGN_TEMPLATE.md`: análise do que já existe para reaproveitar, componentes e decisões técnicas com o motivo, reescritos para componentes do Databricks.
-- `gates/` (pacote `sdd-gates`): a ideia de gates por script, do gate do plano de tarefas e de testar os gates por mutação; o código foi escrito do zero.
+- `sdd-po/SKILL.md`, `sdd-po/TASKS_TEMPLATE.md`: task atômica com teste e gate, dependência que só aponta para trás, matriz de testes (*Test Coverage Matrix*), níveis de gate (*Gate Check Commands*), uma prova por critério (*Checks*) e o plano conferido por script antes da aprovação.
+- `sdd-design/SKILL.md`, `sdd-design/DESIGN_TEMPLATE.md`: abordagens confirmadas antes dos componentes, análise do que já existe para reaproveitar, regra numa camada que o teste alcança (*where the rules run*), riscos com mitigação, estratégia de erro, componentes e decisões técnicas com o motivo, reescritos para componentes do Databricks.
+- `sdd-workflow/PROVAS.md`: formato de prova por critério (`Run`, linha esperada com marcador de passou, prova solta, `Build`), matriz de testes padrão e antipadrões de teste, reescritos para PySpark e bundles. Substitui o `custom-test-generator`, que era derivado do AgentSpec.
+- `gates/` (pacote `sdd-gates`): a ideia de gates por script, do gate do plano de tarefas, do `--executar` (aprovações e build verde antes da primeira task) e de testar os gates por mutação. O código foi escrito do zero; as expressões que leem as linhas `Build`, `Run` e `Prova` seguem o formato das linhas `Build`, `Run` e `Proof` do TLC.
 
 ---
 

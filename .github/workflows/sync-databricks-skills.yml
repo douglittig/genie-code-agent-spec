@@ -49,7 +49,7 @@ env:
   # ai-dev-kit v0.1.14). O sync não sobrescreve nem apaga.
   FROZEN_SKILLS: "databricks-python-dev"
   # Skills NOSSAS (prefixos sdd- e custom-) — nunca devem ser sobrescritas pelo sync.
-  OWN_SKILLS: "sdd-workflow sdd-define sdd-design sdd-build sdd-ship sdd-iterate sdd-doc sdd-staff-engineer sdd-po sdd-dev-workflow sdd-code-reviewer custom-test-generator"
+  OWN_SKILLS: "sdd-workflow sdd-define sdd-design sdd-build sdd-ship sdd-iterate sdd-doc sdd-staff-engineer sdd-po sdd-dev-workflow sdd-code-reviewer"
 
 jobs:
   sync:

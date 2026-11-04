@@ -24,7 +24,7 @@ import tempfile
 from contextlib import redirect_stdout
 from pathlib import Path
 
-from . import define, tasks
+from . import define, md, tasks
 
 AQUI = Path(__file__).resolve().parent
 FIXTURES = AQUI / "fixtures"
@@ -193,6 +193,66 @@ MUTANTES_DEFINE = [
     ("placeholder esquecido (estrito)",
      lambda t: troca(t, "Finanças fecha a receita diária", "{Quem tem o problema} fecha a receita diária"),
      ["--estrito"], "placeholder"),
+    ("Provas num DEFINE Grande (estrito)",
+     lambda t: troca(t, "## Aprovação", PROVAS_MEDIO + "\n## Aprovação"),
+     ["--estrito"], "num DEFINE grande"),
+    ("--executar num DEFINE Grande",
+     lambda t: t,
+     ["--executar"], "vale só para o tamanho Médio"),
+    ("Identificação sem Tamanho (estrito)",
+     lambda t: re.sub(r"^\| \*\*Tamanho\*\* \|.*\n", "", t, count=1, flags=re.M),
+     ["--estrito"], "sem 'Tamanho'"),
+]
+
+# Uma prova por critério do DEFINE de exemplo (R1.1–R2.3), para a variante Média.
+PROVAS_MEDIO = """## Provas
+
+**Build**: `python3 -c "print('build ok')"`
+**Run unit**: `PYTHONDONTWRITEBYTECODE=1 python3 -m pytest tests/unit -v -p no:cacheprovider`
+
+**P1** — Dois eventos do mesmo `pedido_id` viram uma linha, a de maior `atualizado_em` (R1.1)
+Prova: run unit | tests/unit/test_dedup.py::test_r1_1_fica_o_evento_mais_recente PASSED
+
+**P2** — No máximo uma linha por `pedido_id` (R1.2)
+Prova: run unit | tests/unit/test_dedup.py::test_r1_2_uma_linha_por_pedido PASSED
+
+**P3** — Rodar duas vezes sobre a mesma partição deixa a mesma contagem (R1.3)
+Prova: run unit | tests/unit/test_dedup.py::test_r1_3_reprocessa_mesma_particao PASSED
+
+**P4** — `valor_total` nulo ou negativo some, e o event log do update no `dev` conta o descarte (R2.1)
+Prova: `python3 tests/integracao/confere_descarte.py --target dev`
+
+**P5** — Evento do dia anterior até 02h entra na carga das 05h (R2.2)
+Prova: run unit | tests/unit/test_janela.py::test_r2_2_ate_02h_entra_na_carga PASSED
+
+**P6** — O update das 05h no `dev` termina antes das 06h30 (R2.3)
+Prova: `python3 tests/integracao/confere_horario.py --target dev --ate 06:30`
+"""
+
+
+def define_medio(texto):
+    """O DEFINE de exemplo no tamanho Médio: mesma spec, com a seção Provas."""
+    t = re.sub(r"^\| \*\*Tamanho\*\* \|.*$", "| **Tamanho** | Médio — tabela nova num pipeline que já existe |",
+               texto, count=1, flags=re.M)
+    return troca(t, "## Aprovação", PROVAS_MEDIO + "\n## Aprovação")
+
+
+MUTANTES_DEFINE_MEDIO = [
+    ("Médio sem Provas",
+     lambda t: remove_secao(t, "Provas"),
+     [], "no tamanho Médio, a spec leva a seção '## Provas'"),
+    ("Médio com critério sem prova",
+     lambda t: re.sub(r"^\*\*P5\*\*.*\nProva:.*\n", "", t, flags=re.M),
+     [], "critério R2.2 do DEFINE sem prova"),
+    ("Médio com run sem a linha Run",
+     lambda t: troca(t, "Prova: run unit | tests/unit/test_janela.py", "Prova: run integ | tests/unit/test_janela.py"),
+     [], "sem a linha **Run integ**"),
+    ("Médio --executar com o build vermelho",
+     lambda t: re.sub(r"^\*\*Build\*\*:.*$", '**Build**: `python3 -c "raise SystemExit(3)"`', t, count=1, flags=re.M),
+     ["--executar"], "build vermelho antes de qualquer mudança"),
+    ("Médio --executar sem aprovação",
+     lambda t: troca(t, '**Aprovado**: 2026-11-02 — v1.0 — usuário: "pode seguir com essa spec"', ""),
+     ["--executar"], "sem aprovação"),
 ]
 
 
@@ -214,7 +274,7 @@ MUTANTES_TASKS = [
      lambda t: troca(t, "— 5 pontos", "— 21 pontos"),
      [], "quebre a história"),
     ("história sem task", "tasks",
-     lambda t: troca(t, "---\n\n## Aprovação", "### H3: Extra — 2 pontos\n\n**Como** Finanças, **quero** mais, **para** testar.\n\n---\n\n## Aprovação"),
+     lambda t: troca(t, "---\n\n## Provas", "### H3: Extra — 2 pontos\n\n**Como** Finanças, **quero** mais, **para** testar.\n\n---\n\n## Provas"),
      [], "H3 sem task"),
     ("tabela de tasks com coluna trocada", "tasks",
      lambda t: troca(t, "| Teste | Gate |", "| Prova | Gate |"),
@@ -229,10 +289,10 @@ MUTANTES_TASKS = [
      lambda t: troca(t, "| Garante que reprocessar a mesma partição não muda a contagem |", "|  |"),
      [], "task T3 sem 'O que faz'"),
     ("task com critério sem teste", "tasks",
-     lambda t: troca(t, "`tests/test_dedup.py::test_reprocessa_mesma_particao`", "—"),
+     lambda t: troca(t, "`tests/unit/test_dedup.py::test_r1_3_reprocessa_mesma_particao`", "—"),
      [], "task T3 cobre R1.3 e não diz o teste"),
     ("task sem gate", "tasks",
-     lambda t: troca(t, "| `pytest tests/test_janela.py` |", "| — |"),
+     lambda t: troca(t, "fica para o dia seguinte | rápido |", "fica para o dia seguinte | — |"),
      [], "task T5 sem 'Gate'"),
     ("task cita critério que não existe", "tasks",
      lambda t: troca(t, "| R1.3 | T2 |", "| R1.3, R3.1 | T2 |"),
@@ -276,10 +336,153 @@ MUTANTES_TASKS = [
     ("task fora de todo componente (estrito)", "design",
      lambda t: troca(t, "| T2, T3, T5 |", "| T2, T3 |"),
      ["--estrito"], "task T5 não aparece em nenhum componente"),
+    ("sem a seção Provas", "tasks",
+     lambda t: remove_secao(t, "Provas"),
+     [], "falta a seção '## Provas'"),
+    ("sem a seção Gates", "tasks",
+     lambda t: remove_secao(t, "Gates"),
+     [], "falta a seção '## Gates'"),
+    ("sem a Matriz de testes", "tasks",
+     lambda t: remove_secao(t, "Matriz de testes"),
+     [], "falta a seção '## Matriz de testes'"),
+    ("matriz com coluna trocada", "tasks",
+     lambda t: troca(t, "| Camada | Teste | Profundidade | Onde | Nível |", "| Camada | Teste | Profundidade | Local | Nível |"),
+     [], "Matriz de testes: tabela sem a coluna 'Onde'"),
+    ("matriz vazia", "tasks",
+     lambda t: re.sub(r"^\| (Regras de pedidos|Pipeline Lakeflow|Recurso do bundle).*\n", "", t, flags=re.M),
+     [], "Matriz de testes vazia"),
+    ("matriz com nível que não existe", "tasks",
+     lambda t: troca(t, "| `tests/unit/` | rápido |", "| `tests/unit/` | lento |"),
+     [], "com nível 'lento'"),
+    ("Gates sem o nível build", "tasks",
+     lambda t: re.sub(r"^\| build \| Última task.*\n", "", t, count=1, flags=re.M),
+     [], "falta o nível 'build'"),
+    ("Gates com nível inventado", "tasks",
+     lambda t: troca(t, "| completo | Task com integração", "| médio | Task com integração"),
+     [], "nível 'médio' não existe"),
+    ("task usa nível sem comando", "tasks",
+     lambda t: troca(t, "| `python3 -m pytest tests/unit tests/integracao -q -p no:cacheprovider` |", "| nenhum — sem integração neste repo |"),
+     [], "usa o nível 'completo', que não tem comando"),
+    ("gate da task com comando no lugar do nível", "tasks",
+     lambda t: troca(t, "fica para o dia seguinte | rápido |", "fica para o dia seguinte | `pytest tests/unit/test_janela.py` |"),
+     [], "não é um nível da seção Gates"),
+    ("critério do DEFINE sem prova", "tasks",
+     lambda t: re.sub(r"^\*\*P5\*\*.*\nProva:.*\n", "", t, flags=re.M),
+     [], "critério R2.2 do DEFINE sem prova"),
+    ("prova cita critério que não existe", "tasks",
+     lambda t: troca(t, "o das 02h01, não (R2.2)", "o das 02h01, não (R2.2, R9.9)"),
+     [], "prova P5 cita R9.9"),
+    ("prova sem critério", "tasks",
+     lambda t: troca(t, "uma linha por `pedido_id` (R1.2)", "uma linha por `pedido_id`"),
+     [], "prova P2 não cita o critério"),
+    ("prova sem a linha Prova", "tasks",
+     lambda t: troca(t, "Prova: run unit | tests/unit/test_dedup.py::test_r1_2_uma_linha_por_pedido PASSED\n", ""),
+     [], "prova P2 sem 'Prova:'"),
+    ("run sem a linha Run", "tasks",
+     lambda t: troca(t, "Prova: run unit | tests/unit/test_janela.py", "Prova: run integ | tests/unit/test_janela.py"),
+     [], "sem a linha **Run integ**"),
+    ("run sem a linha esperada", "tasks",
+     lambda t: troca(t, "run unit | tests/unit/test_janela.py::test_r2_2_ate_02h_entra_na_carga PASSED", "run unit |"),
+     [], "sem a linha que o teste imprime"),
+    ("linha esperada sem marcador de passou", "tasks",
+     lambda t: troca(t, "test_r2_2_ate_02h_entra_na_carga PASSED", "test_r2_2_ate_02h_entra_na_carga"),
+     [], "não tem o marcador de passou"),
+    ("prova em formato desconhecido", "tasks",
+     lambda t: troca(t, "Prova: `python3 tests/integracao/confere_horario.py --target dev --ate 06:30`", "Prova: rodar a query de horário no dev"),
+     [], "não é 'run <nome>"),
+    ("sem a linha Build", "tasks",
+     lambda t: re.sub(r"^\*\*Build\*\*:.*\n", "", t, count=1, flags=re.M),
+     [], "falta a linha '**Build**:'"),
+    ("Build 'nenhum' sem o motivo", "tasks",
+     lambda t: re.sub(r"^\*\*Build\*\*:.*$", "**Build**: nenhum", t, count=1, flags=re.M),
+     [], "sem o motivo"),
+    ("Build sem crases", "tasks",
+     lambda t: re.sub(r"^\*\*Build\*\*:.*$", "**Build**: databricks bundle validate -t dev", t, count=1, flags=re.M),
+     [], "sem comando entre crases"),
+    ("Run sem comando entre crases", "tasks",
+     lambda t: re.sub(r"^\*\*Run unit\*\*:.*$", "**Run unit**: pytest", t, count=1, flags=re.M),
+     [], "Run unit sem o comando entre crases"),
+    ("--executar sem aprovação", "tasks",
+     lambda t: troca(t, '**Aprovado**: 2026-11-02 — v1.0 — usuário: "plano aprovado, pode criar no Jira"', ""),
+     ["--executar"], "sem aprovação"),
+    ("--executar sem o DESIGN", "design",
+     lambda t: None,
+     ["--executar"], "falta o DESIGN"),
+    ("--executar com o build vermelho", "tasks",
+     lambda t: re.sub(r"^\*\*Build\*\*:.*$", '**Build**: `python3 -c "raise SystemExit(3)"`', t, count=1, flags=re.M),
+     ["--executar"], "build vermelho antes de qualquer mudança"),
+    ("DESIGN sem Abordagens", "design",
+     lambda t: remove_secao(t, "Abordagens"),
+     [], "DESIGN sem a seção '## Abordagens'"),
+    ("DESIGN com uma abordagem só", "design",
+     lambda t: re.sub(r"^\| A2 \|.*\n", "", t, count=1, flags=re.M),
+     [], "apresente 2 ou 3 abordagens"),
+    ("abordagem sem a confirmação do usuário", "design",
+     lambda t: re.sub(r"^\*\*Confirmada\*\*:.*\n", "", t, count=1, flags=re.M),
+     [], "sem a confirmação do usuário"),
+    ("confirmação sem as palavras do usuário", "design",
+     lambda t: troca(t, '**Confirmada**: A1 — usuário: "vai de view, com a regra testável"', "**Confirmada**: A1"),
+     [], "sem a confirmação do usuário"),
+    ("confirmação de abordagem que não existe", "design",
+     lambda t: troca(t, "**Confirmada**: A1", "**Confirmada**: A3"),
+     [], "a confirmação cita A3"),
+    ("componentes sem a coluna Onde fica", "design",
+     lambda t: troca(t, "| Componente | Tipo | Onde fica |", "| Componente | Tipo | Local |"),
+     [], "DESIGN › Componentes: tabela sem a coluna 'Onde fica'"),
+    ("task em componentes de lugares diferentes (estrito)", "design",
+     lambda t: troca(t, "| R2.1 | T4 |", "| R2.1 | T4, T2 |"),
+     ["--estrito"], "task T2 cai em componentes de lugares diferentes"),
+    ("DESIGN sem Onde a regra roda", "design",
+     lambda t: remove_secao(t, "Onde a regra roda"),
+     [], "DESIGN sem a seção '## Onde a regra roda'"),
+    ("regra cita critério que não existe", "design",
+     lambda t: troca(t, "| R2.2 | `src/pedidos/regras.py::dentro_da_janela`", "| R2.9 | `src/pedidos/regras.py::dentro_da_janela`"),
+     [], "Onde a regra roda: cita R2.9"),
+    ("regra sem dizer onde roda", "design",
+     lambda t: troca(t, "| `src/pedidos/regras.py::dentro_da_janela` |", "|  |"),
+     [], "sem dizer onde a regra roda"),
+    ("risco sem mitigação", "design",
+     lambda t: troca(t, "| R1.3 testa reprocessar a mesma partição; empate vira pergunta ao usuário se aparecer |", "|  |"),
+     [], "sem mitigação"),
+    ("riscos vazios", "design",
+     lambda t: re.sub(r"(^## Riscos e pontos de atenção\n).*?(?=^## )", "\\1\n", t, count=1, flags=re.M | re.S),
+     [], "Riscos e pontos de atenção: vazio"),
+    ("dado ruim sem tratamento", "design",
+     lambda t: troca(t, "| Expectation descarta e conta (R2.1) |", "|  |"),
+     [], "sem tratamento"),
+    ("DESIGN sem Dado ruim e falhas", "design",
+     lambda t: remove_secao(t, "Dado ruim e falhas"),
+     [], "DESIGN sem a seção '## Dado ruim e falhas'"),
+    ("última task da história fora do build (estrito)", "tasks",
+     lambda t: troca(t, "test_r1_3_reprocessa_mesma_particao` | build |", "test_r1_3_reprocessa_mesma_particao` | rápido |"),
+     ["--estrito"], "a última task (T3) não roda o nível build"),
+    ("Run que nenhuma prova usa (estrito)", "tasks",
+     lambda t: troca(t, "**Run unit**:", "**Run extra**: `pytest tests/extra -v`\n**Run unit**:"),
+     ["--estrito"], "Run extra não é usado"),
     ("história sem 'Como … quero … para' (estrito)", "tasks",
      lambda t: troca(t, "**Como** Finanças, **quero** uma linha por pedido em `silver.pedidos`, **para** fechar a receita sem corrigir duplicados à mão.\n", ""),
      ["--estrito"], "H1 sem 'Como"),
 ]
+
+
+def faltas_de_colunas(linhas, secao, colunas, artefato):
+    """Colunas que o gate lê e que a primeira tabela da seção do template não tem."""
+    tabs = md.tabelas(md.secao(linhas, secao, nivel=2) or [])
+    if not tabs:
+        return [f"{artefato} › {secao}: sem a tabela do template"]
+    cab = tabs[0][0]
+    return [f"{artefato} › {secao}: sem a coluna '{c}'" for c in colunas if md.coluna(cab, c) is None]
+
+
+def faltas_de_provas(linhas, artefato):
+    """O template mostra o formato das provas: Build, Run, P<n> e Prova (fora dos comentários)."""
+    sec = md.secao(linhas, "Provas", nivel=2) or []
+    faltas = []
+    for nome, rx in (("**Build**:", md.BUILD_RE), ("**Run <nome>**:", md.RUN_RE),
+                     ("**P1** —", md.PROVA_ID_RE), ("Prova:", md.PROVA_RE)):
+        if not any(rx.match(l.strip()) for l in sec):
+            faltas.append(f"{artefato} › Provas: sem o exemplo da linha {nome}")
+    return faltas
 
 
 def checa_templates(repo, template_define, verbose):
@@ -299,22 +502,33 @@ def checa_templates(repo, template_define, verbose):
             continue
         texto = caminho.read_text(encoding="utf-8")
         tem_secao = lambda s: re.search(rf"^## {re.escape(s)}\b", texto, re.M)
+        linhas = md.prepara(texto)
         if tipo == "define":
             faltas += [f"DEFINE sem a seção '## {s}'" for s in define.SECOES if not tem_secao(s)]
             faltas += [f"DEFINE sem a dimensão '{d}'" for d in define.DIMENSOES if f"| {d}" not in texto]
             if not re.search(r"^### Pedido original\b", texto, re.M):
                 faltas.append("DEFINE sem '### Pedido original' dentro do Registro")
+            if not tem_secao("Provas"):
+                faltas.append("DEFINE sem a seção '## Provas' (a do tamanho Médio)")
+            faltas += faltas_de_provas(linhas, "DEFINE")
         elif tipo == "tasks":
             faltas += [f"TASKS sem a seção '## {s}'" for s in tasks.SECOES if not tem_secao(s)]
             if "| " + " | ".join(tasks.COLUNAS_TASK) + " |" not in texto:
                 faltas.append("TASKS sem o cabeçalho da tabela de tasks: | " + " | ".join(tasks.COLUNAS_TASK) + " |")
             if not tasks.HISTORIA_RE.search("\n".join(l for l in texto.splitlines() if l.startswith("### H"))):
                 faltas.append("TASKS sem um exemplo de história '### H1: …'")
+            faltas += faltas_de_colunas(linhas, "Matriz de testes", tasks.COLUNAS_MATRIZ, "TASKS")
+            faltas += faltas_de_colunas(linhas, "Gates", tasks.COLUNAS_GATES, "TASKS")
+            faltas += faltas_de_provas(linhas, "TASKS")
         elif tipo == "design":
-            if not tem_secao("Componentes"):
-                faltas.append("DESIGN sem a seção '## Componentes'")
-            cab = next((l for l in texto.splitlines() if l.startswith("| Componente |")), "")
-            faltas += [f"DESIGN › Componentes sem a coluna '{c}'" for c in tasks.COLUNAS_COMPONENTE if f"| {c} |" not in cab + "|"]
+            faltas += [f"DESIGN sem a seção '## {s}'" for s in tasks.SECOES_DESIGN if not tem_secao(s)]
+            for sec, cols in (("Abordagens", tasks.COLUNAS_ABORDAGEM), ("Componentes", tasks.COLUNAS_COMPONENTE),
+                              ("Onde a regra roda", tasks.COLUNAS_REGRA),
+                              ("Riscos e pontos de atenção", tasks.COLUNAS_RISCO),
+                              ("Dado ruim e falhas", tasks.COLUNAS_DADO_RUIM)):
+                faltas += faltas_de_colunas(linhas, sec, cols, "DESIGN")
+            if not any(l.lstrip().startswith("**Confirmada**:") for l in linhas):
+                faltas.append("DESIGN sem o exemplo da linha '**Confirmada**: A<n> — usuário: \"…\"'")
     for f in faltas:
         print(f"  FALHA  template: {f}")
     if verbose and not faltas:
@@ -360,12 +574,27 @@ def main(argv=None):
     if codigo != 0:
         print("  FALHA  as fixtures do TASKS e do DESIGN deveriam passar limpas:\n" + saida)
         return 1
+    medio = define_medio(base["define"])
+    tasks_com_build = re.sub(r"^\*\*Build\*\*:.*$", '**Build**: `python3 -c "print(\'build ok\')"`',
+                             base["tasks"], count=1, flags=re.M)
+    positivos = [
+        ("o TASKS com --executar (Build: nenhum)", roda_tasks(base, "--executar", "--estrito")),
+        ("o TASKS com --executar rodando o build", roda_tasks({**base, "tasks": tasks_com_build}, "--executar", "--estrito")),
+        ("o DEFINE Médio com --aprovado", roda_define(medio, "--aprovado", "--estrito")),
+        ("o DEFINE Médio com --executar rodando o build", roda_define(medio, "--executar", "--estrito")),
+    ]
+    for nome, (codigo, saida) in positivos:
+        if codigo != 0:
+            print(f"  FALHA  {nome} deveria passar limpo:\n" + saida)
+            return 1
     if a.verbose:
-        print("  ok     fixtures do DEFINE, TASKS e DESIGN passam com --aprovado --estrito")
+        print("  ok     fixtures do DEFINE (Grande e Médio), TASKS e DESIGN passam com --aprovado e --executar")
 
     ok = checa_templates(repo, a.template, a.verbose)
     ok &= roda_mutantes("define", MUTANTES_DEFINE,
                         lambda estraga, args: roda_define(estraga(base["define"]), *args), a.verbose)
+    ok &= roda_mutantes("define (Médio)", MUTANTES_DEFINE_MEDIO,
+                        lambda estraga, args: roda_define(estraga(medio), *args), a.verbose)
 
     def roda_um_tasks(alvo_estraga, args):
         alvo, estraga = alvo_estraga
@@ -376,9 +605,10 @@ def main(argv=None):
     ok &= roda_mutantes("tasks", [(n, (alvo, f), args, esp) for n, alvo, f, args, esp in MUTANTES_TASKS],
                         roda_um_tasks, a.verbose)
 
-    total = len(MUTANTES_DEFINE) + len(MUTANTES_TASKS)
+    n_define = len(MUTANTES_DEFINE) + len(MUTANTES_DEFINE_MEDIO)
+    total = n_define + len(MUTANTES_TASKS)
     print(f"selftest: {'OK' if ok else 'FALHOU'} — {total} mutantes "
-          f"({len(MUTANTES_DEFINE)} do gate define, {len(MUTANTES_TASKS)} do gate tasks)")
+          f"({n_define} do gate define, {len(MUTANTES_TASKS)} do gate tasks)")
     return 0 if ok else 1
 
 
