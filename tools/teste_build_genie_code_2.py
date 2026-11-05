@@ -282,6 +282,7 @@ print(json.dumps(resultado, indent=2, ensure_ascii=False, default=str))
 
 # COMMAND ----------
 
+# DBTITLE 1,Testes com o Genie Code, rodada 2
 # MAGIC %md
 # MAGIC ## Testes com o Genie Code (Agent mode), rodada 2
 # MAGIC
@@ -309,3 +310,38 @@ print(json.dumps(resultado, indent=2, ensure_ascii=False, default=str))
 # MAGIC **H (pendente da rodada 1):** o `sleep 600`, se ainda não rodou.
 # MAGIC
 # MAGIC **Limpeza:** apague a pasta `/Workspace/Users/<você>/sondagem-build` quando terminar as duas rodadas. Se rodou o K, confira que o job `[dev …] sondagem_deploy_job` não ficou no workspace.
+# MAGIC
+# MAGIC ---
+# MAGIC
+# MAGIC ### Resultados (05/11/2026 UTC, Genie Code Agent mode, cluster clássico `1012-142245-i6uz92nv`, DBR 17.3)
+# MAGIC
+# MAGIC Shell do agente: cwd `/Workspace/Users/<você>`, Python 3.12.3 em `/local_disk0/.ephemeral_nfs/envs/pythonEnv-5754fd95-…`.
+# MAGIC
+# MAGIC **I. O que o shell do agente tem**
+# MAGIC * I.1: `DATABRICKS_CLUSTER_LIBS_PYTHON_ROOT_DIR`, `DATABRICKS_CLUSTER_LIBS_ROOT_DIR`, `DATABRICKS_CLUSTER_LIBS_R_ROOT_DIR`, `DATABRICKS_HOST`, `DATABRICKS_INSTANCE_ID`, `DATABRICKS_LIBS_NFS_ROOT_DIR`, `DATABRICKS_LIBS_NFS_ROOT_PATH`, `DATABRICKS_ROOT_VIRTUALENV_ENV`, `DATABRICKS_RUNTIME_VERSION`, `DATABRICKS_TOKEN`, `DEFAULT_DATABRICKS_ROOT_VIRTUALENV_ENV`, `ENABLE_DATABRICKS_CLI`, `PYSPARK_GATEWAY_PORT`, `PYSPARK_GATEWAY_SECRET`, `PYSPARK_PYTHON`, `SPARK_AUTH_SOCKET_TIMEOUT`, `SPARK_BUFFER_SIZE`, `SPARK_CONF_DIR`, `SPARK_CONNECT_MODE_ENABLED`, `SPARK_DIST_CLASSPATH`, `SPARK_ENV_LOADED`, `SPARK_HOME`, `SPARK_LOCAL_DIRS`, `SPARK_LOCAL_IP`, `SPARK_PUBLIC_DNS`, `SPARK_REMOTE`, `SPARK_SCALA_VERSION`, `SPARK_WORKER_MEMORY`.
+# MAGIC * I.2: `['SPARK_REMOTE']`.
+# MAGIC * Comparação com a célula 2 (kernel): as 16 variáveis `SPARK*`/`PYSPARK*` são as mesmas nos dois. A célula 2 não lista as `DATABRICKS_*` do kernel; no shell do agente aparecem `DATABRICKS_HOST` e `DATABRICKS_TOKEN` (credencial já no ambiente, valores não impressos).
+# MAGIC
+# MAGIC **J. pytest com Spark, sem as variáveis do Spark Connect** (`sem_connect: removidas SPARK_CONNECT_MODE_ENABLED, SPARK_REMOTE` nos três)
+# MAGIC
+# MAGIC | # | Variante | Exit | Tempo | Linhas | Erro |
+# MAGIC | --- | --- | --- | --- | --- | --- |
+# MAGIC | J.1 | `e_local`, `local[1]` | 1 | 7 s | `test_passa ERROR`, `test_falha ERROR` | `Py4JSecurityException: Constructor public org.apache.spark.SparkConf(boolean) is not whitelisted` (o subprocesso herda `PYSPARK_GATEWAY_PORT/SECRET` e cai no gateway Py4J do cluster, que tem whitelist) |
+# MAGIC | J.2 | `f_connect`, `DATABRICKS_SERVERLESS_COMPUTE_ID=auto` | 1 | 16 s | `test_passa PASSED`, `test_falha FAILED` (`DIFFERENT_ROWS`) | nenhum: **serve** |
+# MAGIC | J.3 | `f_connect`, `DATABRICKS_CLUSTER_ID=1012-142245-i6uz92nv` | 1 | 13 s | `test_passa ERROR`, `test_falha ERROR` | `KeyError: 'SPARK_REMOTE'`: `DatabricksSession._from_sdkconfig` → `validate_session_with_sdk` → `WorkspaceClient` → `_make_dbutils` → `databricks.sdk.runtime` → `dbruntime/UserNamespaceInitializer.getOrCreate`, que lê `SPARK_REMOTE` |
+# MAGIC
+# MAGIC Variações extras (fora do roteiro, para isolar a causa):
+# MAGIC * J.1 também sem `PYSPARK_GATEWAY_PORT/SECRET`: ERROR, `PermissionError: [Errno 13] Permission denied: '/databricks/spark/./bin/spark-submit'`. Spark local não serve neste cluster.
+# MAGIC * J.3 também sem `DATABRICKS_RUNTIME_VERSION`: mesmo `KeyError: 'SPARK_REMOTE'`.
+# MAGIC * `databricks-connect` não aparece no `importlib.metadata` do pythonEnv do agente; o `DatabricksSession` usado vem de `/databricks/spark/python/databricks/connect`.
+# MAGIC
+# MAGIC **K. Deploy no dev:** não rodou. A ferramenta de execução do agente **bloqueou** `bundle deploy -t dev` e `bundle destroy -t dev --auto-approve` antes de rodar, por exigir autorização explícita do usuário para deploy/destroy. Ou seja: pede aprovação, e o pedido "rode os testes" não bastou. Nenhum job foi criado.
+# MAGIC
+# MAGIC **L. SDK sem as variáveis:** exit 1, 10 s, `KeyError: 'SPARK_REMOTE'` em `UDSChannelBuilder(os.environ["SPARK_REMOTE"])` (mesma cadeia do J.3, via `WorkspaceClient` → `databricks.sdk.runtime`). Esperado `True`: **não serve**. Também falha com `DATABRICKS_AUTH_TYPE=pat` e sem `DATABRICKS_RUNTIME_VERSION`.
+# MAGIC
+# MAGIC **H (pendente da rodada 1):** `sleep 600` não rodou. A ferramenta do agente **bloqueou** o comando por ocupar o ambiente 10 min ocioso. Continua pendente; um teste longo real (não um `sleep`) pode ter outro tratamento.
+# MAGIC
+# MAGIC **Conclusões para o gate `provas` no clássico**
+# MAGIC * Única variante de pytest com Spark que serviu em subprocesso: Databricks Connect com serverless (J.2).
+# MAGIC * No clássico, tirar `SPARK_REMOTE` quebra tanto o Databricks Connect para o cluster (J.3) quanto o SDK (L): o `WorkspaceClient` no runtime importa `databricks.sdk.runtime`, que exige `SPARK_REMOTE`. Mantê-lo dá `INVALID_CONNECT_URL` (rodada 1).
+# MAGIC * Deploy/destroy e esperas longas pelo agente dependem de autorização explícita do usuário no pedido.
