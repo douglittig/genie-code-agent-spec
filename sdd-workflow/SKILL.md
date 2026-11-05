@@ -91,7 +91,7 @@ Aprovar a spec e o plano libera **só o que é local ou do ambiente de desenvolv
 
 | Liberado pela aprovação | Exige um "ok" explícito, para aquela ação |
 |---|---|
-| Editar código, testes e docs na branch da feature | `git push`, inclusive da branch da feature; force-push, merge, abrir PR |
+| Editar código, testes e docs na branch da feature | `git push` da branch da feature: um "ok" por lote do Build, pedido no fim do lote; push para a `main`, force-push, merge, abrir PR |
 | Commit na branch da feature (com o Git CLI do Git Folder, o commit fica local; o push é outra ação) | `databricks bundle deploy`, `bundle run` e `bundle destroy` em **qualquer** target, inclusive o de desenvolvimento. A ferramenta de execução do Genie Code bloqueia o deploy sem a autorização explícita do usuário |
 | Rodar testes no compute (inclusive a sessão do Databricks Connect no serverless que os testes abrem) | Escrever, alterar ou apagar tabela fora do schema de desenvolvimento |
 | `databricks bundle validate` | `DROP`, `TRUNCATE` ou `DELETE` em tabela que esta feature não criou |
