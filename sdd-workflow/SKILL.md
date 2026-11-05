@@ -91,14 +91,21 @@ Aprovar a spec e o plano libera **só o que é local ou do ambiente de desenvolv
 
 | Liberado pela aprovação | Exige um "ok" explícito, para aquela ação |
 |---|---|
-| Editar código, testes e docs na branch da feature | `git push` para a `main`, force-push, merge, abrir PR |
-| Commit na branch da feature (no Git Folder do Databricks, commit e push saem juntos: na branch da feature, liberado) | `databricks bundle deploy` em qualquer target que não seja o de desenvolvimento |
-| Rodar testes no compute | Escrever, alterar ou apagar tabela fora do schema de desenvolvimento |
+| Editar código, testes e docs na branch da feature | `git push` da branch da feature: um "ok" por lote do Build, pedido no fim do lote; push para a `main`, force-push, merge, abrir PR |
+| Commit na branch da feature (com o Git CLI do Git Folder, o commit fica local; o push é outra ação) | `databricks bundle deploy`, `bundle run` e `bundle destroy` em **qualquer** target, inclusive o de desenvolvimento. A ferramenta de execução do Genie Code bloqueia o deploy sem a autorização explícita do usuário |
+| Rodar testes no compute (inclusive a sessão do Databricks Connect no serverless que os testes abrem) | Escrever, alterar ou apagar tabela fora do schema de desenvolvimento |
 | `databricks bundle validate` | `DROP`, `TRUNCATE` ou `DELETE` em tabela que esta feature não criou |
-| `databricks bundle deploy` no target de desenvolvimento (`mode: development`, que pausa schedules e triggers) e rodar o job ou pipeline ali | Ativar schedule ou trigger fora do desenvolvimento |
+| Consultas de leitura de conferência (event log, contagens) no ambiente de desenvolvimento | Ativar schedule ou trigger em qualquer target, inclusive deixar um agendamento rodando no desenvolvimento |
 | Ler tabelas e metadados que o usuário já pode ler | `GRANT`/`REVOKE` e qualquer mudança de permissão no Unity Catalog; criar ou alterar cluster, SQL warehouse, endpoint ou segredo |
 
 Na dúvida se uma ação sai do ambiente de desenvolvimento, trate como "exige ok".
+
+**O `mode: development` só pausa o agendamento que não fixa `pause_status`.** Ele liga
+`presets.trigger_pause_status: PAUSED`, mas um `pause_status: UNPAUSED` no recurso vence o preset
+e deixa o job rodando no desenvolvimento ([deployment modes](https://docs.databricks.com/aws/en/dev-tools/bundles/deployment-modes)).
+O recurso base nunca fixa `pause_status`; o `UNPAUSED` vai só no target de produção. Antes de
+pedir o "ok" do deploy no desenvolvimento, confira com `databricks bundle validate -t <dev> -o json`:
+todo agendamento precisa sair `PAUSED`. Diga isso ao usuário junto com o pedido.
 
 Trabalhe sempre na branch da feature, criada antes do primeiro arquivo. No Genie Code, a própria
 plataforma bloqueia o push para a `main`, mesmo com o ok do usuário.
@@ -109,7 +116,7 @@ plataforma bloqueia o push para a `main`, mesmo com o ok do usuário.
 
 Um gate é um script que decide, por código, se a etapa pode avançar. O código dos gates fica num
 **segundo Git Folder deste mesmo repo, fora de `.assistant`**, chamado `sdd-gates`. Versão mínima
-exigida por estas skills: **0.3.0**.
+exigida por estas skills: **0.4.0**.
 
 Duas coisas que o Genie Code bloqueia, e que você não deve tentar contornar:
 - executar scripts dentro de `.assistant/skills` (nem copiando o código de lá);
@@ -121,8 +128,9 @@ Duas coisas que o Genie Code bloqueia, e que você não deve tentar contornar:
    README do repo, Passo 2b). Grave o caminho no state.
 2. **Confira a versão:** `PYTHONPATH=<gates> python3 -m sdd_gates --version`. Abaixo da mínima,
    peça ao usuário um pull no Git Folder `sdd-gates`; não rode gate velho.
-3. **Rode o gate** a partir da raiz do repo do projeto:
-   `PYTHONPATH=<gates> python3 -m sdd_gates <gate> …`. Nada é instalado.
+3. **Rode o gate** a partir da raiz do repo do projeto. O shell do agente começa na pasta
+   pessoal do usuário, não no projeto, então o comando leva o `cd`:
+   `cd <raiz do projeto> && PYTHONPATH=<gates> python3 -m sdd_gates <gate> …`. Nada é instalado.
    Exit 0: passou. Exit 1: não passou, e a saída diz o que corrigir. Exit 2: erro de uso.
    Copie para o state a última linha da saída, como saiu (ex.:
    `sdd_gates define DEFINE_X.md: OK — 0 aviso(s)`). É a prova de que o gate rodou.
@@ -132,7 +140,13 @@ Duas coisas que o Genie Code bloqueia, e que você não deve tentar contornar:
 | Gate | Etapa | Comando |
 |---|---|---|
 | `define` | Define | `PYTHONPATH=<gates> python3 -m sdd_gates define docs/specs/DEFINE_{FEATURE}.md` (com `--aprovado` antes do PO ou do Build) |
-| `tasks` | PO e Design | `PYTHONPATH=<gates> python3 -m sdd_gates tasks docs/planning/TASKS_{FEATURE}.md` (lê o DEFINE e, se existir, o DESIGN; com `--aprovado` antes do Build) |
+| `define … --executar` | Antes da 1ª mudança do Build, no Médio | O mesmo do `--aprovado` + roda a linha `**Build**` das Provas uma vez: vermelho antes de mudar = parar |
+| `tasks` | PO e Design | `PYTHONPATH=<gates> python3 -m sdd_gates tasks docs/planning/TASKS_{FEATURE}.md` (lê o DEFINE e, se existir, o DESIGN; com `--aprovado` depois da aprovação do plano) |
+| `tasks … --executar` | Antes da 1ª task do Build, no Grande e no Complexo | O mesmo do `--aprovado` + DESIGN presente + roda a linha `**Build**` das Provas uma vez: vermelho antes de mudar = parar |
+
+**Provas:** o guia [`PROVAS.md`](PROVAS.md), nesta skill, diz como escrever a prova de cada
+critério (formato, tipo por critério, matriz de testes padrão, antipadrões). É lido pelo
+`@sdd-po`, pelo `@sdd-define` (Médio) e pelo `@sdd-build`.
 
 ---
 
@@ -142,7 +156,7 @@ Duas coisas que o Genie Code bloqueia, e que você não deve tentar contornar:
 |---|---|---|
 | Define | `@sdd-define` | `docs/specs/DEFINE_{FEATURE}.md` + `.sdd/features/{FEATURE}/state.md`; gate `sdd_gates define` |
 | Arquitetura | `@sdd-staff-engineer` | `docs/adr/ADR_{FEATURE}.md` (vinculante para Design e Build) |
-| Planejamento | `@sdd-po` | `docs/planning/TASKS_{FEATURE}.md` (histórias + tasks) + Jira, se houver `jira_key`; gate `sdd_gates tasks` |
+| Planejamento | `@sdd-po` | `docs/planning/TASKS_{FEATURE}.md` (matriz de testes, gates, histórias + tasks, provas) + Jira, se houver `jira_key`; gate `sdd_gates tasks` |
 | Design | `@sdd-design` | `docs/designs/DESIGN_{FEATURE}.md`; conferido pelo gate `sdd_gates tasks` |
 | Build | `@sdd-build` | código + `.sdd/features/{FEATURE}/BUILD_REPORT.md` |
 | Ship | `@sdd-ship` | `.sdd/archive/{FEATURE}/` + ticket fechado |

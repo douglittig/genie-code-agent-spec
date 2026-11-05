@@ -193,11 +193,173 @@ def placeholders(linhas):
     return [i + 1 for i, linha in enumerate(linhas) if PLACEHOLDER_RE.search(linha)]
 
 
+def campo_da_identificacao(linhas, campo):
+    """Valor da linha `campo` na tabela da Identificação; '' se não houver."""
+    ident = secao(linhas, "Identificação", nivel=2) or []
+    for _, dados in tabelas(ident):
+        for row in dados:
+            if row and normaliza(row[0]).strip("* ") == normaliza(campo) and len(row) > 1:
+                return row[1]
+    return ""
+
+
+def tamanho(linhas):
+    """Tamanho da feature pela Identificação: 'pequeno', 'medio', 'grande', 'complexo' ou None."""
+    valor = normaliza(campo_da_identificacao(linhas, "Tamanho"))
+    for t in ("pequeno", "medio", "grande", "complexo"):
+        if valor.startswith(t):
+            return t
+    return None
+
+
+# --- Provas -------------------------------------------------------------------------------------
+# Seção `## Provas` do TASKS (Grande e Complexo) ou do DEFINE (Médio). Formato adaptado do
+# `## Checks` do TLC Spec-Driven: uma prova por critério de aceite, com o comando que a decide.
+#
+#   **Build**: `databricks bundle validate -t dev`            comandos entre crases; ou "nenhum — motivo"
+#   **Run unit**: `python3 -m pytest tests/unit -v`           um grupo de testes, rodado uma vez
+#   **P3** — afirmação observável, com o valor (R2.1)
+#   Prova: run unit | tests/unit/test_x.py::test_y PASSED     a linha que o teste imprime ao passar
+#   Prova: `python3 tests/config/confere_agenda.py`           prova solta: o código de saída decide
+#   Prova: passeio — o que a consulta no dev mostra           passeio no dado, registrado no state
+#
+# Os gates que leem provas (define, tasks e, na Fase 4, provas) usam estas funções, para não
+# divergirem.
+ID_CRITERIO_RE = re.compile(r"\bR\d+\.\d+\b")
+BUILD_RE = re.compile(r"^\**\s*Build\s*\**\s*:\s*(.*)$", re.I)
+RUN_RE = re.compile(r"^\**\s*Run\s+([\w-]+)\s*\**\s*:\s*(.*)$", re.I)
+PROVA_ID_RE = re.compile(r"^\**\s*(P\d+)\s*\**\s*[—–:-]\s*(.*)$")
+PROVA_RE = re.compile(r"^\**\s*Prova\s*\**\s*:\s*(.*)$", re.I)
+PROVA_RUN_RE = re.compile(r"^run\s+([\w-]+)\s*\|\s*(.*)$", re.I)
+PASSEIO_RE = re.compile(r"^passeio\b\s*[—–:-]?\s*(.*)$", re.I)
+COMANDO_RE = re.compile(r"^`([^`]+)`$")
+CRASES_RE = re.compile(r"`([^`]+)`")
+# A linha esperada precisa do marcador de "passou": sem ele, a mesma linha aparece quando o teste falha.
+MARCADOR_PASSOU_RE = re.compile(r"\bPASSED\b|\bok\b|✓|\bpassou\b", re.I)
+
+
+def tipo_da_prova(texto):
+    """('run', nome, linha esperada) | ('solta', comando, None) | ('passeio', descrição, None) | (None, …)."""
+    t = texto.strip()
+    m = PROVA_RUN_RE.match(t)
+    if m:
+        return "run", m.group(1), m.group(2).strip()
+    m = COMANDO_RE.match(t)
+    if m:
+        return "solta", m.group(1).strip(), None
+    m = PASSEIO_RE.match(t)
+    if m:
+        return "passeio", m.group(1).strip(), None
+    return None, t, None
+
+
+def le_build(texto, rel, onde):
+    """Comandos da linha **Build** (lista vazia se 'nenhum — motivo'); None se a linha está errada."""
+    texto = texto.strip()
+    if normaliza(texto).startswith("nenhum"):
+        motivo = re.sub(r"^nenhum\w*\s*[—–:-]?\s*", "", texto, flags=re.I).strip()
+        if not motivo:
+            rel.erro(f"{onde}: '**Build**: nenhum' sem o motivo (ex.: nenhum — repo novo, sem bundle nem testes)")
+        return []
+    comandos = [c.strip() for c in CRASES_RE.findall(texto) if c.strip()]
+    if not comandos:
+        rel.erro(f"{onde}: '**Build**:' sem comando entre crases (ou 'nenhum — motivo')")
+        return None
+    return comandos
+
+
+def confere_provas(sec, criterios, rel, onde="Provas"):
+    """Valida a seção de provas e devolve {'build': [...] | None, 'runs': {...}, 'provas': [...]}.
+
+    `criterios` é a lista de IDs do DEFINE. Todo critério precisa de pelo menos uma prova, e
+    toda prova precisa citar critério que existe.
+    """
+    build, tem_build, runs, provas, atual = None, False, {}, [], None
+    for linha in sec:
+        s = linha.strip()
+        if not s:
+            continue
+        m = BUILD_RE.match(s)
+        if m:
+            if tem_build:
+                rel.erro(f"{onde}: mais de uma linha '**Build**:'")
+            tem_build, build = True, le_build(m.group(1), rel, onde)
+            continue
+        m = RUN_RE.match(s)
+        if m:
+            nome, comandos = m.group(1), CRASES_RE.findall(m.group(2))
+            if nome in runs:
+                rel.erro(f"{onde}: Run {nome} repetido")
+            if not comandos:
+                rel.erro(f"{onde}: Run {nome} sem o comando entre crases")
+            runs[nome] = comandos[0].strip() if comandos else ""
+            continue
+        m = PROVA_ID_RE.match(s)
+        if m:
+            atual = (m.group(1), m.group(2).strip(), [])
+            provas.append(atual)
+            continue
+        m = PROVA_RE.match(s)
+        if m:
+            if atual is None:
+                rel.erro(f"{onde}: linha 'Prova:' antes de qualquer P<n>")
+            else:
+                atual[2].append(m.group(1).strip())
+
+    if not tem_build:
+        rel.erro(f"{onde}: falta a linha '**Build**:' (comandos de build, lint e validação do repo, "
+                 "entre crases; ou 'nenhum — motivo')")
+    if not provas:
+        rel.erro(f"{onde}: nenhuma prova (**P1** — afirmação (R1.1), e na linha de baixo Prova: …)")
+
+    vistos, cobertos, usados = set(), set(), set()
+    validos = set(criterios)
+    for pid, afirmacao, lista in provas:
+        if pid in vistos:
+            rel.erro(f"prova {pid} repetida")
+        vistos.add(pid)
+        refs = ID_CRITERIO_RE.findall(afirmacao)
+        if not ID_CRITERIO_RE.sub("", afirmacao).strip(" ()[],;.—–-"):
+            rel.erro(f"prova {pid} sem a afirmação: o que fica verdade, com o valor")
+        if not refs:
+            rel.erro(f"prova {pid} não cita o critério que prova (ex.: (R2.1))")
+        for r in refs:
+            if r not in validos:
+                rel.erro(f"prova {pid} cita {r}, que não existe no DEFINE")
+        cobertos.update(refs)
+        if not lista:
+            rel.erro(f"prova {pid} sem 'Prova:'")
+        for texto in lista:
+            tipo, valor, esperado = tipo_da_prova(texto)
+            if tipo == "run":
+                usados.add(valor)
+                if valor not in runs:
+                    rel.erro(f"prova {pid}: 'run {valor}' sem a linha **Run {valor}**: com o comando")
+                if not esperado:
+                    rel.erro(f"prova {pid}: 'run {valor} |' sem a linha que o teste imprime ao passar")
+                elif not MARCADOR_PASSOU_RE.search(esperado):
+                    rel.erro(f"prova {pid}: a linha esperada '{esperado[:50]}' não tem o marcador de passou "
+                             "(PASSED, ok, ✓): sem ele, a mesma linha aparece quando o teste falha")
+            elif tipo == "passeio":
+                if not valor:
+                    rel.erro(f"prova {pid}: 'passeio' sem dizer o que a consulta no dev mostra")
+            elif tipo is None:
+                rel.erro(f"prova {pid}: '{valor[:50]}' não é 'run <nome> | <linha>', um comando entre crases "
+                         "nem 'passeio — …'")
+    for nome in runs:
+        if nome not in usados:
+            rel.aviso(f"{onde}: Run {nome} não é usado por nenhuma prova")
+    for c in criterios:
+        if c not in cobertos:
+            rel.erro(f"critério {c} do DEFINE sem prova em ## Provas")
+    return {"build": build, "runs": runs, "provas": provas}
+
+
 class Relatorio:
-    """Junta erros e avisos e decide o código de saída (0 ok, 1 falhou)."""
+    """Junta erros, avisos e notas e decide o código de saída (0 ok, 1 falhou)."""
 
     def __init__(self, nome):
-        self.nome, self.erros, self.avisos = nome, [], []
+        self.nome, self.erros, self.avisos, self.notas = nome, [], [], []
 
     def erro(self, msg):
         self.erros.append(msg)
@@ -205,7 +367,13 @@ class Relatorio:
     def aviso(self, msg):
         self.avisos.append(msg)
 
+    def nota(self, msg):
+        """O que o gate executou e passou (ex.: o build): mostrado, sem mudar o resultado."""
+        self.notas.append(msg)
+
     def imprime_e_sai(self, estrito=False):
+        for msg in self.notas:
+            print(f"  NOTA   {msg}")
         for msg in self.erros:
             print(f"  ERRO   {msg}")
         for msg in self.avisos:

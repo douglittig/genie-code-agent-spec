@@ -23,9 +23,9 @@ preencher:
 | Tamanho | O que entra no DEFINE |
 |---|---|
 | Pequeno | Não há DEFINE: um critério e o teste dele, no chat |
-| Médio | Requisitos, critérios, rubrica (pode ter várias linhas "não se aplica: motivo"), escopo e rastreabilidade |
-| Grande | Tudo, incluindo contrato de dados e contexto técnico |
-| Complexo | Tudo + **áreas cinzentas** (passo 4) |
+| Médio | Requisitos, critérios, rubrica (pode ter várias linhas "não se aplica: motivo"), escopo, rastreabilidade e **provas** (passo 6b) |
+| Grande | Tudo, incluindo contrato de dados e contexto técnico; sem a seção Provas (vai no TASKS) |
+| Complexo | Tudo + **áreas cinzentas** (passo 4); sem a seção Provas (vai no TASKS) |
 
 **A feature vive só nos arquivos:** `docs/specs/` e `.sdd/`. Não grave nada dela na memória do
 Genie Code: nem o ponto em que parou, nem as respostas, nem a aprovação. A memória passa para
@@ -160,10 +160,21 @@ Antes de apresentar, confira os cinco pontos e corrija no próprio arquivo:
 
 O gate esclarece o que foi pedido. Ele não inventa requisito novo.
 
+## Passo 6b — Provas (só no tamanho Médio)
+
+No Médio não há plano de tarefas: as provas ficam no DEFINE e são aprovadas com a spec. Leia o
+guia `PROVAS.md` da skill `sdd-workflow` (`sdd-workflow/PROVAS.md`, na pasta das skills) e
+preencha a seção Provas: **uma prova por critério**, com a linha `**Build**:` (os comandos de
+build, lint e validação que o repo já tem, ou `nenhum — motivo`) e os grupos `**Run <nome>**:`.
+O Build roda essa linha com `--executar` antes de mudar qualquer coisa.
+
+No Grande e no Complexo, apague a seção Provas do template: as provas vão no TASKS, pelo
+`@sdd-po`.
+
 ## Passo 7 — Validar, apresentar e parar
 
 ```bash
-PYTHONPATH=<gates> python3 -m sdd_gates define docs/specs/DEFINE_{FEATURE}.md
+cd <raiz do projeto> && PYTHONPATH=<gates> python3 -m sdd_gates define docs/specs/DEFINE_{FEATURE}.md
 ```
 
 Rode a partir da raiz do repo do projeto. Rode o gate em vez de ler o código dele: as mensagens
@@ -189,7 +200,7 @@ A versão é a última do Histórico de revisões. Aprovar não cria versão nov
 aprovação que ele não deu. Depois rode o gate com `--aprovado`:
 
 ```bash
-PYTHONPATH=<gates> python3 -m sdd_gates define docs/specs/DEFINE_{FEATURE}.md --aprovado
+cd <raiz do projeto> && PYTHONPATH=<gates> python3 -m sdd_gates define docs/specs/DEFINE_{FEATURE}.md --aprovado
 ```
 
 ## Passo 9 — State, Jira e fim de etapa
@@ -199,7 +210,8 @@ PYTHONPATH=<gates> python3 -m sdd_gates define docs/specs/DEFINE_{FEATURE}.md --
    aprovação e a linha de saída do gate `--aprovado`.
 3. Chame `@sdd-doc` (comentário no Jira + transição para Em andamento; ele faz preview antes).
 4. Proponha o próximo passo, conforme o tamanho: `@sdd-staff-engineer` (Complexo, ou decisão de
-   arquitetura), `@sdd-po` (Grande) ou `@sdd-build` (Médio).
+   arquitetura), `@sdd-po` (Grande) ou `@sdd-build` (Médio, que começa rodando
+   `sdd_gates define … --executar`).
 
 Se a spec mudar depois de aprovada: versão nova no Histórico de revisões, Status "Em revisão" e
 aprovação nova (`@sdd-iterate`). A aprovação antiga fica no arquivo como texto simples, sem o

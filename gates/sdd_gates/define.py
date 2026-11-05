@@ -20,9 +20,13 @@ Erros (exit 1):
   - critério sem linha na Rastreabilidade, ou linha de rastreabilidade de critério inexistente
   - origem de critério que não aponta para pedido, Qn.m, Confluence, ticket, rubrica ou área cinzenta
   - Qn.m citado que não está no Registro; frase entre aspas que não está no pedido ou na linha Qn.m
+  - tamanho Médio sem a seção Provas, ou com provas que não passam nas regras do gate tasks
+    (uma por critério, com a linha **Build** e o comando que decide cada uma)
   - com --aprovado: sem linha **Aprovado** com a versão e as palavras do usuário, aprovação de
     uma versão que não é a última do Histórico de revisões, pergunta em aberto, pergunta do
     Registro sem resposta, ou dimensão implícita sem destino
+  - com --executar (só no Médio, antes da 1ª mudança do Build): o mesmo do --aprovado, ou o
+    build vermelho antes de mudar qualquer coisa
 Avisos (exit 1 só com --estrito):
   - {placeholder} do template que sobrou
   - critério com termo vago sem número (rápido, adequado, eficiente…)
@@ -30,9 +34,10 @@ Avisos (exit 1 só com --estrito):
   - dimensão implícita que não diz para onde foi (antes da aprovação)
   - pergunta em aberto, ou pergunta do Registro sem resposta (antes da aprovação)
   - trecho do pedido original que nenhuma origem cita
+  - Identificação sem Tamanho; seção Provas num DEFINE Grande ou Complexo (lá elas vão no TASKS)
 
 Uso:
-  python3 -m sdd_gates define docs/specs/DEFINE_<FEATURE>.md [--aprovado] [--estrito]
+  python3 -m sdd_gates define docs/specs/DEFINE_<FEATURE>.md [--aprovado | --executar] [--estrito]
 
 Códigos de saída: 0 ok, 1 o DEFINE não passou, 2 erro de uso.
 """
@@ -42,7 +47,7 @@ import re
 import sys
 from pathlib import Path
 
-from . import md
+from . import execucao, md
 
 REGISTRO = "Registro do pedido e das respostas"
 
@@ -181,7 +186,7 @@ def confere_qids(texto, perguntas, onde, rel):
             rel.erro(f"{onde} cita {q.upper()}, que não está no '{REGISTRO}'")
 
 
-def valida(caminho, aprovado=False):
+def valida(caminho, aprovado=False, executar=False):
     rel = md.Relatorio(f"sdd_gates define {caminho.name}")
     linhas = md.prepara(caminho.read_text(encoding="utf-8"))
 
@@ -359,11 +364,38 @@ def valida(caminho, aprovado=False):
     for p in abertas:
         (rel.erro if aprovado else rel.aviso)(f"pergunta em aberto: {p[:80]}")
 
-    # 11. Aprovação (só com --aprovado)
+    # 11. Aprovação (com --aprovado ou --executar)
     if aprovado:
         md.confere_aprovacao(linhas, rel, "a spec")
 
-    # 12. Placeholders que sobraram
+    # 12. Provas: no Médio, uma por critério, aprovadas com a spec; no Grande e no Complexo, no TASKS
+    tam = md.tamanho(linhas)
+    sec_provas = md.secao(linhas, "Provas", nivel=2)
+    provas = None
+    if tam is None:
+        rel.aviso("Identificação sem 'Tamanho' (Médio, Grande ou Complexo): o gate não sabe se a spec "
+                  "leva provas")
+    elif tam == "medio":
+        if sec_provas is None:
+            rel.erro("no tamanho Médio, a spec leva a seção '## Provas': uma prova por critério, com o "
+                     "comando que a decide (guia: sdd-workflow/PROVAS.md)")
+        else:
+            provas = md.confere_provas(sec_provas, list(criterios), rel)
+    elif sec_provas is not None:
+        rel.aviso(f"seção '## Provas' num DEFINE {tam}: no Grande e no Complexo as provas ficam no "
+                  "TASKS (@sdd-po); apague a seção daqui")
+
+    # 13. Antes da primeira mudança do Build (só no Médio): o build está verde
+    if executar:
+        if tam != "medio":
+            rel.erro("--executar no DEFINE vale só para o tamanho Médio; no Grande e no Complexo, rode "
+                     "`sdd_gates tasks docs/planning/TASKS_<FEATURE>.md --executar`")
+        elif rel.erros:
+            rel.nota("build não rodou: corrija os erros acima primeiro")
+        elif provas is not None and provas["build"] is not None:
+            execucao.confere_build(provas["build"], rel)
+
+    # 14. Placeholders que sobraram
     for n in md.placeholders(linhas):
         rel.aviso(f"linha {n}: placeholder do template não preenchido")
 
@@ -375,13 +407,16 @@ def main(argv=None):
     p.add_argument("arquivo", help="caminho do DEFINE_<FEATURE>.md")
     p.add_argument("--aprovado", action="store_true",
                    help="gate antes do Build: exige aprovação, nenhuma pergunta aberta e toda dimensão com destino")
+    p.add_argument("--executar", action="store_true",
+                   help="só no Médio, antes da 1ª mudança do Build: o mesmo do --aprovado e o build verde")
     p.add_argument("--estrito", action="store_true", help="avisos também reprovam")
     a = p.parse_args(argv)
     caminho = Path(a.arquivo)
     if not caminho.is_file():
         print(f"arquivo não encontrado: {caminho}", file=sys.stderr)
         return 2
-    return valida(caminho, aprovado=a.aprovado).imprime_e_sai(estrito=a.estrito)
+    rel = valida(caminho, aprovado=a.aprovado or a.executar, executar=a.executar)
+    return rel.imprime_e_sai(estrito=a.estrito)
 
 
 if __name__ == "__main__":
