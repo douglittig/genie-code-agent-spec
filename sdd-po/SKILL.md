@@ -33,7 +33,7 @@ sessões sem revisão. Para retomar, a sessão seguinte lê o TASKS e o state.
 2. Rode o gate do Define com `--aprovado`, a partir da raiz do repo do projeto:
 
    ```bash
-   PYTHONPATH=<gates> python3 -m sdd_gates define docs/specs/DEFINE_{FEATURE}.md --aprovado
+   cd <raiz do projeto> && PYTHONPATH=<gates> python3 -m sdd_gates define docs/specs/DEFINE_{FEATURE}.md --aprovado
    ```
 
    Não passou: **pare**. O plano só nasce de uma spec aprovada na última versão. Diga ao usuário
@@ -64,6 +64,9 @@ Depois abra de 5 a 10 testes que já existem: eles dizem o estilo, o lugar e o t
 
   Sem integração no repo: `nenhum — motivo` no nível completo. Nunca invente comando: use o que
   o repo roda (manifesto, Makefile, CI). Comando que não sabe se existe vira pergunta.
+  O nível completo depende de deploy no target de desenvolvimento, e deploy pede o "ok" do
+  usuário (raio de ação): diga isso ao apresentar o plano. Cada comando termina em menos de 10
+  minutos; a ferramenta do agente não espera mais que isso.
 
 ## Passo 2 — Histórias
 
@@ -139,7 +142,7 @@ volta para aprovação.
 ## Passo 6 — Gate
 
 ```bash
-PYTHONPATH=<gates> python3 -m sdd_gates tasks docs/planning/TASKS_{FEATURE}.md
+cd <raiz do projeto> && PYTHONPATH=<gates> python3 -m sdd_gates tasks docs/planning/TASKS_{FEATURE}.md
 ```
 
 Rode a partir da raiz do repo do projeto. O gate lê também o DEFINE da feature e confere a

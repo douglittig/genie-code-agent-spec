@@ -37,7 +37,7 @@ revisão. Para retomar, a sessão seguinte lê o DESIGN e o state.
 2. Rode o gate do plano com `--aprovado`, a partir da raiz do repo do projeto:
 
    ```bash
-   PYTHONPATH=<gates> python3 -m sdd_gates tasks docs/planning/TASKS_{FEATURE}.md --aprovado
+   cd <raiz do projeto> && PYTHONPATH=<gates> python3 -m sdd_gates tasks docs/planning/TASKS_{FEATURE}.md --aprovado
    ```
 
    Ele confere também que o DEFINE está aprovado na versão que o plano cita. Não passou:
@@ -143,7 +143,7 @@ peça aprovação nova do plano (`@sdd-po`, Passo 8). Nunca ajuste o plano aprov
 Rode o gate, que agora lê o DESIGN junto:
 
 ```bash
-PYTHONPATH=<gates> python3 -m sdd_gates tasks docs/planning/TASKS_{FEATURE}.md --aprovado
+cd <raiz do projeto> && PYTHONPATH=<gates> python3 -m sdd_gates tasks docs/planning/TASKS_{FEATURE}.md --aprovado
 ```
 
 Exit diferente de 0 → corrija e rode de novo. Cada aviso: corrija, ou explique ao usuário por que

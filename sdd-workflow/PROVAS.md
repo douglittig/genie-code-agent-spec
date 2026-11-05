@@ -106,8 +106,45 @@ def test_r2_1_refunded_sai_da_silver(spark):
   existem a partir do PySpark 4.0, que é a base dos testes gerados (o clássico DBR 17).
 - Nada que só exista no PySpark 4.1 ou depois.
 
-<!-- PENDENTE (sondagem F, PR #32): a fixture `spark` do conftest.py, conforme o jeito que funcionou
-     num subprocesso no serverless e no clássico. Preencher antes do merge. -->
+### A sessão Spark dos testes
+
+Os testes rodam num processo novo (o shell do agente, ou o gate), nunca dentro do kernel do
+notebook: rodar o pytest duas vezes no mesmo kernel usa o código velho que ficou na memória.
+Num processo novo no Databricks, o Spark local não roda (o cluster bloqueia o `spark-submit`), e
+o processo herda a sessão Spark Connect do notebook (`SPARK_REMOTE`), que ele não consegue usar.
+O que funciona é o **Databricks Connect abrindo uma sessão no serverless**, depois de tirar essa
+herança:
+
+```python
+# tests/conftest.py
+import os
+
+import pytest
+
+# No Databricks, o processo herda a sessão Spark Connect do notebook, que um processo novo não usa.
+for _var in ("SPARK_REMOTE", "SPARK_CONNECT_MODE_ENABLED"):
+    os.environ.pop(_var, None)
+
+
+@pytest.fixture(scope="session")
+def spark():
+    if os.environ.get("DATABRICKS_RUNTIME_VERSION"):  # no Databricks: sessão nova no serverless
+        os.environ.setdefault("DATABRICKS_SERVERLESS_COMPUTE_ID", "auto")
+        from databricks.connect import DatabricksSession
+        return DatabricksSession.builder.getOrCreate()
+    from pyspark.sql import SparkSession  # fora do Databricks (máquina local, CI)
+    return SparkSession.builder.master("local[1]").getOrCreate()
+```
+
+- No shell do agente, a autenticação já está no ambiente (`DATABRICKS_HOST`, `DATABRICKS_TOKEN`).
+- Cada execução do pytest abre uma sessão no serverless: ~15 s e um pouco de compute serverless
+  (não é Genie Code). Junte os testes num `Run` para abrir uma sessão só.
+- O `DatabricksSession` para o próprio cluster clássico não funciona num processo novo
+  (`KeyError: 'SPARK_REMOTE'`); use o serverless.
+- `PYTHONDONTWRITEBYTECODE=1` e `-p no:cacheprovider`: o `/Workspace` não aceita a pasta
+  `__pycache__` (`OSError: [Errno 95]`), e o pytest para na coleta.
+- O pytest colore a saída mesmo sem terminal. O gate tira as cores antes de procurar a linha
+  esperada; ao copiar a linha de uma execução, copie sem os códigos de cor.
 
 ---
 
@@ -133,8 +170,19 @@ databricks bundle validate -t dev -o json | python3 tests/config/confere_pausa_n
 ## Integração no target de desenvolvimento
 
 Sequência da skill `@databricks-pipelines`: `databricks bundle validate`, `databricks bundle deploy
--t dev`, `databricks bundle run <pipeline> -t dev`. Deploy e run no target de desenvolvimento estão
-liberados pelo raio de ação, com o agendamento pausado lá.
+-t dev`, `databricks bundle run <pipeline> -t dev`. **Deploy, run e destroy pedem o "ok" do
+usuário**, mesmo no target de desenvolvimento: a ferramenta de execução do Genie Code bloqueia o
+deploy sem autorização explícita, e o raio de ação também exige. Peça junto com a conferência de
+que todo agendamento sai `PAUSED` no `validate -t dev -o json`.
+
+- **A prova não faz deploy.** Ela só lê o resultado de um update que já rodou: o deploy e o run
+  são passos com o "ok" do usuário, registrados no state, antes de rodar as provas.
+- **Leitura pelo Spark ou pela CLI.** No shell do agente, a CLI funciona e o SDK do Python não (no
+  clássico, `KeyError: 'SPARK_REMOTE'`). Consulte o event log com o Spark da sessão do Databricks
+  Connect (`spark.sql(...)`), ou com a CLI.
+- **Cada comando termina em menos de 10 minutos.** A ferramenta do agente não deixa um comando
+  esperar mais que isso (um `sleep 600` foi bloqueado). Prova que espera um update longo vira
+  dois passos: disparar e, depois, conferir.
 
 - **Expectation:** depois do update, consulte o event log do pipeline
   (`SELECT * FROM event_log(<pipelineId>)`). As métricas ficam nos eventos `flow_progress`, em

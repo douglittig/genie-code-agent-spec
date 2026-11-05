@@ -174,7 +174,7 @@ No Grande e no Complexo, apague a seção Provas do template: as provas vão no 
 ## Passo 7 — Validar, apresentar e parar
 
 ```bash
-PYTHONPATH=<gates> python3 -m sdd_gates define docs/specs/DEFINE_{FEATURE}.md
+cd <raiz do projeto> && PYTHONPATH=<gates> python3 -m sdd_gates define docs/specs/DEFINE_{FEATURE}.md
 ```
 
 Rode a partir da raiz do repo do projeto. Rode o gate em vez de ler o código dele: as mensagens
@@ -200,7 +200,7 @@ A versão é a última do Histórico de revisões. Aprovar não cria versão nov
 aprovação que ele não deu. Depois rode o gate com `--aprovado`:
 
 ```bash
-PYTHONPATH=<gates> python3 -m sdd_gates define docs/specs/DEFINE_{FEATURE}.md --aprovado
+cd <raiz do projeto> && PYTHONPATH=<gates> python3 -m sdd_gates define docs/specs/DEFINE_{FEATURE}.md --aprovado
 ```
 
 ## Passo 9 — State, Jira e fim de etapa

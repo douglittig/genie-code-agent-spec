@@ -91,11 +91,11 @@ Aprovar a spec e o plano libera **só o que é local ou do ambiente de desenvolv
 
 | Liberado pela aprovação | Exige um "ok" explícito, para aquela ação |
 |---|---|
-| Editar código, testes e docs na branch da feature | `git push` para a `main`, force-push, merge, abrir PR |
-| Commit na branch da feature (no Git Folder do Databricks, commit e push saem juntos: na branch da feature, liberado) | `databricks bundle deploy` em qualquer target que não seja o de desenvolvimento |
-| Rodar testes no compute | Escrever, alterar ou apagar tabela fora do schema de desenvolvimento |
+| Editar código, testes e docs na branch da feature | `git push`, inclusive da branch da feature; force-push, merge, abrir PR |
+| Commit na branch da feature (com o Git CLI do Git Folder, o commit fica local; o push é outra ação) | `databricks bundle deploy`, `bundle run` e `bundle destroy` em **qualquer** target, inclusive o de desenvolvimento. A ferramenta de execução do Genie Code bloqueia o deploy sem a autorização explícita do usuário |
+| Rodar testes no compute (inclusive a sessão do Databricks Connect no serverless que os testes abrem) | Escrever, alterar ou apagar tabela fora do schema de desenvolvimento |
 | `databricks bundle validate` | `DROP`, `TRUNCATE` ou `DELETE` em tabela que esta feature não criou |
-| `databricks bundle deploy` no target de desenvolvimento (`mode: development`) e rodar o job ou pipeline ali, **com o agendamento pausado lá** (abaixo) | Ativar schedule ou trigger em qualquer target, inclusive deixar um agendamento rodando no desenvolvimento |
+| Consultas de leitura de conferência (event log, contagens) no ambiente de desenvolvimento | Ativar schedule ou trigger em qualquer target, inclusive deixar um agendamento rodando no desenvolvimento |
 | Ler tabelas e metadados que o usuário já pode ler | `GRANT`/`REVOKE` e qualquer mudança de permissão no Unity Catalog; criar ou alterar cluster, SQL warehouse, endpoint ou segredo |
 
 Na dúvida se uma ação sai do ambiente de desenvolvimento, trate como "exige ok".
@@ -103,9 +103,9 @@ Na dúvida se uma ação sai do ambiente de desenvolvimento, trate como "exige o
 **O `mode: development` só pausa o agendamento que não fixa `pause_status`.** Ele liga
 `presets.trigger_pause_status: PAUSED`, mas um `pause_status: UNPAUSED` no recurso vence o preset
 e deixa o job rodando no desenvolvimento ([deployment modes](https://docs.databricks.com/aws/en/dev-tools/bundles/deployment-modes)).
-O recurso base nunca fixa `pause_status`; o `UNPAUSED` vai só no target de produção. Antes do
-deploy no desenvolvimento, confira com `databricks bundle validate -t <dev> -o json`: todo
-agendamento precisa sair `PAUSED`.
+O recurso base nunca fixa `pause_status`; o `UNPAUSED` vai só no target de produção. Antes de
+pedir o "ok" do deploy no desenvolvimento, confira com `databricks bundle validate -t <dev> -o json`:
+todo agendamento precisa sair `PAUSED`. Diga isso ao usuário junto com o pedido.
 
 Trabalhe sempre na branch da feature, criada antes do primeiro arquivo. No Genie Code, a própria
 plataforma bloqueia o push para a `main`, mesmo com o ok do usuário.
@@ -128,8 +128,9 @@ Duas coisas que o Genie Code bloqueia, e que você não deve tentar contornar:
    README do repo, Passo 2b). Grave o caminho no state.
 2. **Confira a versão:** `PYTHONPATH=<gates> python3 -m sdd_gates --version`. Abaixo da mínima,
    peça ao usuário um pull no Git Folder `sdd-gates`; não rode gate velho.
-3. **Rode o gate** a partir da raiz do repo do projeto:
-   `PYTHONPATH=<gates> python3 -m sdd_gates <gate> …`. Nada é instalado.
+3. **Rode o gate** a partir da raiz do repo do projeto. O shell do agente começa na pasta
+   pessoal do usuário, não no projeto, então o comando leva o `cd`:
+   `cd <raiz do projeto> && PYTHONPATH=<gates> python3 -m sdd_gates <gate> …`. Nada é instalado.
    Exit 0: passou. Exit 1: não passou, e a saída diz o que corrigir. Exit 2: erro de uso.
    Copie para o state a última linha da saída, como saiu (ex.:
    `sdd_gates define DEFINE_X.md: OK — 0 aviso(s)`). É a prova de que o gate rodou.
