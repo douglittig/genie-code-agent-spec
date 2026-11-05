@@ -368,6 +368,7 @@ print(json.dumps(resultado, indent=2, ensure_ascii=False, default=str))
 
 # COMMAND ----------
 
+# DBTITLE 1,Testes com o Genie Code
 # MAGIC %md
 # MAGIC ## Testes com o Genie Code (Agent mode)
 # MAGIC
@@ -376,18 +377,39 @@ print(json.dumps(resultado, indent=2, ensure_ascii=False, default=str))
 # MAGIC **E. Como o agente executa um comando (F1)**
 # MAGIC 1. Peça: *"Rode exatamente este comando e me mostre a saída, sem resumir: `python3 -c "import sys, os; print(sys.executable); print(os.getcwd())"`"*
 # MAGIC 2. Anote: como ele executou (célula nova num notebook, `%sh`, terminal, outro jeito), em que compute, e se pediu aprovação.
+# MAGIC 3. **Resultado (04/11, cluster clássico `cluster-treinamento-spark-fund`, DBR 17.3):**
+# MAGIC    - Como executou: pela ferramenta de execução de código do agente, em modo shell (`sh`). Não criou célula nem usou `%sh` no notebook.
+# MAGIC    - Compute: o cluster ligado ao notebook (`1012-142245-i6uz92nv`). Não pediu aprovação.
+# MAGIC    - Saída mostrada inteira: `/local_disk0/.ephemeral_nfs/envs/pythonEnv-ba41820c-…/bin/python3` e `/Workspace/Users/dltreinamentos.data@gmail.com`.
+# MAGIC    - Diretório: a pasta pessoal do usuário, não a do notebook (`sdd-gates/tools`). O gate precisa receber caminhos absolutos ou fazer `cd` antes.
+# MAGIC    - Ambiente Python: `pythonEnv-ba41820c…`, diferente do kernel do notebook (`pythonEnv-957634a3…`, célula 3). O agente roda num ambiente próprio no mesmo cluster.
+# MAGIC    - Tempo: \~5,8 min na primeira chamada, quase tudo esperando o cluster sair de PENDING. As chamadas seguintes levaram \~20 s.
 # MAGIC
 # MAGIC **F. O agente roda o pytest com Spark (F2)**
 # MAGIC 1. Peça: *"Rode `PYTHONDONTWRITEBYTECODE=1 python3 -m pytest /Workspace/Users/<você>/sondagem-build/f2/a_getorcreate -v -p no:cacheprovider` e me mostre as linhas da saída que têm PASSED ou FAILED."*
 # MAGIC 2. Esperado: uma linha `test_passa PASSED` e uma `test_falha FAILED`. Se no notebook a variante que funcionou não foi a (a), repita com a pasta dela.
+# MAGIC 3. **Resultado (04/11, cluster clássico):**
+# MAGIC    - Rodou o comando pelo shell, sem pedir aprovação, e mostrou só as linhas pedidas. Nenhuma linha teve PASSED ou FAILED: `test_passa ERROR` e `test_falha ERROR`, `2 errors in 11.76s`, código de saída 1.
+# MAGIC    - Causa (setup da fixture): `PySparkValueError: [INVALID_CONNECT_URL] … The URL must start with 'sc://'`. No subprocesso, `getOrCreate()` vai para o Spark Connect com a URL herdada `unix:///databricks/sparkconnect/grpc.sock;…`, que não começa com `sc://`.
+# MAGIC    - O código de saída 1 é o mesmo de uma falha real. Sozinho, o código não separa erro de falha; o gate precisa ler as linhas PASSED/FAILED.
+# MAGIC    - Repetição com outra pasta: não houve, porque nenhuma variante serviu no notebook nesse cluster (`f2["serve"] = []`: a, b e c com `separa = False`; a d parou na coleta com `OSError: [Errno 95]` ao criar `__pycache__` em `/Workspace`).
 # MAGIC
 # MAGIC **G. O agente roda a CLI (F3)**
 # MAGIC 1. Peça: *"Na pasta `/Workspace/Users/<você>/sondagem-build/bundle`, rode `databricks bundle validate -t dev -o json` e me diga o `pause_status` do schedule de cada job."*
 # MAGIC 2. Anote se ele aceitou rodar a CLI, se autenticou e o valor que relatou.
+# MAGIC 3. **Resultado (04/11, cluster clássico):**
+# MAGIC    - Aceitou rodar a CLI pelo shell, sem pedir aprovação, com `cd` para a pasta do bundle.
+# MAGIC    - CLI: `/usr/local/bin/databricks`. Na primeira chamada ela se instalou sozinha (`Installing the CLI...` → `v1.23.0` em `/home/spark-ba41820c-…/bin`). A mesma versão vista fora do workspace.
+# MAGIC    - Autenticação: funcionou sem passar credencial (`exit=0`, stderr vazio, `workspace.current_user` resolvido). Tempo: \~6 s.
+# MAGIC    - Configuração resolvida do `dev`: `mode: development`, `presets.trigger_pause_status: PAUSED`, nomes com prefixo `[dev dltreinamentos_data]`.
+# MAGIC    - `pause_status` relatado: `sondagem_job` → **UNPAUSED** (fixado no recurso); `sondagem_job_sem_pause` → **PAUSED** (veio do preset). Confirma o esperado da célula 6: o modo development não pausa o job que fixa `UNPAUSED`.
 # MAGIC
 # MAGIC **H. Quanto tempo ele espera um comando (F7)**
 # MAGIC 1. Peça: *"Rode `python3 -c "import time; time.sleep(120); print('fim 120')"` e me mostre a saída."*
 # MAGIC 2. Depois, o mesmo com `600` no lugar de `120` (10 minutos).
 # MAGIC 3. Anote se ele esperou, se desistiu, depois de quanto tempo, e o que relatou. Se disse "terminou" antes de mostrar `fim`, é o mesmo "relata antes de confirmar" do teste E.
+# MAGIC 4. **Resultado (04/11, cluster clássico):**
+# MAGIC    - 120 s: esperou até o fim e só relatou depois de ver a saída `fim 120` (`exit=0`). Rodou pelo shell, sem pedir aprovação, e por conta própria envolveu o comando com `date -u` antes e depois: 00:37:56 → 00:39:56 UTC, 120 s cravados. A ferramenta registrou 2,0 min.
+# MAGIC    - 600 s: pendente. O limite padrão da ferramenta de execução do agente é 10 min, então 600 s fica no limite.
 # MAGIC
 # MAGIC **Limpeza:** apague a pasta `/Workspace/Users/<você>/sondagem-build`. Se rodou com `TESTAR_DEPLOY = True`, confira que o job `[dev …] sondagem_job` não ficou no workspace.
