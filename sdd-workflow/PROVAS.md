@@ -137,8 +137,8 @@ def spark():
 ```
 
 - No shell do agente, a autenticação já está no ambiente (`DATABRICKS_HOST`, `DATABRICKS_TOKEN`).
-- Cada execução do pytest abre uma sessão no serverless: ~15 s e um pouco de compute serverless
-  (não é Genie Code). Junte os testes num `Run` para abrir uma sessão só.
+- Cada execução do pytest abre uma sessão no serverless: de 15 a 30 s e um pouco de compute
+  serverless (não é Genie Code). Junte os testes num `Run` para abrir uma sessão só.
 - O `DatabricksSession` para o próprio cluster clássico não funciona num processo novo
   (`KeyError: 'SPARK_REMOTE'`); use o serverless.
 - `PYTHONDONTWRITEBYTECODE=1` e `-p no:cacheprovider`: o `/Workspace` não aceita a pasta
