@@ -12,7 +12,12 @@
 # MAGIC | F2h | Pytest no kernel vê a mudança no arquivo, ou usa o módulo velho da memória? | Se usar o velho, rodar o gate dentro do kernel dá resultado falso |
 # MAGIC | F4b | SDK no subprocesso com `DATABRICKS_AUTH_TYPE=pat` | Para o update do pipeline e o event log no target de desenvolvimento |
 # MAGIC
-# MAGIC **Como rodar:** do Git Folder `sdd-gates`, como a rodada 1. O compute (serverless ou clássico) é detectado sozinho. Rode tudo uma vez em cada compute e cole os dois JSONs na conversa. O F2f abre uma sessão do Databricks Connect, que usa compute (no serverless, poucos segundos de serverless).
+# MAGIC Os testes E–H da rodada 1 mostraram que **o agente roda os comandos num shell próprio**: outro ambiente Python, no mesmo compute, começando na pasta pessoal do usuário. A CLI funciona ali (instalou sozinha e autenticou), e o Spark falha do mesmo jeito (`INVALID_CONNECT_URL`). Então o teste que vale é o do agente, no fim do notebook (I–L). As células do notebook preparam as pastas, o script `sem_connect.py` e o bundle sem agendamento, e servem de comparação.
+# MAGIC
+# MAGIC **Como rodar:**
+# MAGIC 1. Pull no Git Folder `sdd-gates` e abra este notebook de lá. O compute é detectado sozinho.
+# MAGIC 2. Rode tudo (*Run all*), uma vez em cada compute, e cole os dois JSONs na conversa. O F2f abre uma sessão do Databricks Connect, que usa compute (no serverless, poucos segundos).
+# MAGIC 3. Faça os testes I–L com o agente no clássico (mais barato) e anote o resultado neste notebook, como na rodada 1.
 
 # COMMAND ----------
 
@@ -127,6 +132,47 @@ escreve(f"{PASTA}/f_connect/conftest.py", '''
 for nome in ("e_local", "f_connect"):
     escreve(f"{PASTA}/{nome}/test_sondagem.py", TESTE)
 
+# Script que o agente usa nos testes I–L: roda o comando sem as variáveis do Spark Connect da sessão.
+escreve(f"{PASTA}/sem_connect.py", '''
+    """Roda um comando sem as variáveis que apontam para o Spark Connect da sessão do notebook."""
+    import os
+    import sys
+
+    def eh_connect(nome, valor):
+        spark = "SPARK" in nome.upper() and ("grpc.sock" in valor or valor.startswith(("sc://", "unix://")))
+        return spark or nome in ("SPARK_REMOTE", "SPARK_CONNECT_MODE_ENABLED")
+
+    removidas = sorted(k for k, v in os.environ.items() if eh_connect(k, v))
+    env = {k: v for k, v in os.environ.items() if k not in removidas}
+    env["PYTHONDONTWRITEBYTECODE"] = "1"
+    print("sem_connect: removidas " + (", ".join(removidas) or "nenhuma"), file=sys.stderr, flush=True)
+    os.execvpe(sys.argv[1], sys.argv[1:], env)
+''')
+
+# Bundle sem agendamento, para o teste K (deploy e destroy no dev): nada fica rodando.
+escreve(f"{PASTA}/bundle_deploy/databricks.yml", '''
+    bundle:
+      name: sondagem_deploy
+
+    resources:
+      jobs:
+        sondagem_deploy_job:
+          name: sondagem_deploy_job
+          tasks:
+            - task_key: principal
+              notebook_task:
+                notebook_path: ./nb_sondagem.py
+
+    targets:
+      dev:
+        default: true
+        mode: development
+''')
+escreve(f"{PASTA}/bundle_deploy/nb_sondagem.py", '''
+    # Databricks notebook source
+    print("sondagem")
+''')
+
 f2 = {"e_local_sem_connect": pytest_sub(f"{PASTA}/e_local", ENV_LIMPO)}
 if CRED:
     f2["f_connect_serverless"] = pytest_sub(f"{PASTA}/f_connect",
@@ -227,4 +273,30 @@ print(json.dumps(resultado, indent=2, ensure_ascii=False, default=str))
 
 # COMMAND ----------
 
-# MAGIC %md **Limpeza:** apague a pasta `/Workspace/Users/<você>/sondagem-build` quando terminar as duas rodadas.
+# MAGIC %md
+# MAGIC ## Testes com o Genie Code (Agent mode), rodada 2
+# MAGIC
+# MAGIC Sessão nova, no clássico. Troque `<você>` pelo seu usuário. `R2` é a pasta `/Workspace/Users/<você>/sondagem-build/rodada-2`, criada pelas células acima. São poucos turnos pagos.
+# MAGIC
+# MAGIC **I. O que o shell do agente tem**
+# MAGIC 1. Peça: *"Rode `env | cut -d= -f1 | grep -i -E 'spark|databricks' | sort` e mostre a saída inteira."* (só os nomes, sem valores)
+# MAGIC 2. Peça: *"Rode `python3 -c \"import os; print(sorted(k for k, v in os.environ.items() if 'grpc.sock' in v))\"` e mostre a saída."*
+# MAGIC 3. Anote os nomes. A célula 3 deste notebook mostra os do kernel, para comparar.
+# MAGIC
+# MAGIC **J. pytest com Spark, sem as variáveis do Spark Connect**
+# MAGIC 1. Spark local: *"Rode `cd R2/e_local && python3 ../sem_connect.py python3 -m pytest . -v -p no:cacheprovider` e mostre a linha `sem_connect: removidas …` e as linhas com PASSED, FAILED ou ERROR."*
+# MAGIC 2. Databricks Connect no serverless: o mesmo, na pasta `R2/f_connect`, com `DATABRICKS_SERVERLESS_COMPUTE_ID=auto` antes do `python3`.
+# MAGIC 3. Databricks Connect neste cluster: o mesmo, na pasta `R2/f_connect`, com `DATABRICKS_CLUSTER_ID=<id do cluster>` antes do `python3` (o id está no JSON, em `cluster_id`).
+# MAGIC 4. Esperado em cada um: `test_passa PASSED` e `test_falha FAILED`. Anote também o erro, se houver, e o tempo.
+# MAGIC
+# MAGIC **K. Deploy no dev (opcional)**
+# MAGIC 1. Peça: *"Na pasta `R2/bundle_deploy`, rode `databricks bundle deploy -t dev`, depois `databricks bundle summary -t dev`, e por fim `databricks bundle destroy -t dev --auto-approve`. Mostre o fim de cada saída."*
+# MAGIC 2. O bundle tem só um job sem agendamento: nada fica rodando. Anote se ele aceitou cada comando e se pediu aprovação.
+# MAGIC
+# MAGIC **L. SDK sem as variáveis**
+# MAGIC 1. Peça: *"Rode `python3 R2/sem_connect.py python3 -c \"from databricks.sdk import WorkspaceClient; print(WorkspaceClient().current_user.me().user_name is not None)\"` e mostre a saída."*
+# MAGIC 2. Esperado: `True`. É o caminho para o update do pipeline e o event log nas provas de integração.
+# MAGIC
+# MAGIC **H (pendente da rodada 1):** o `sleep 600`, se ainda não rodou.
+# MAGIC
+# MAGIC **Limpeza:** apague a pasta `/Workspace/Users/<você>/sondagem-build` quando terminar as duas rodadas. Se rodou o K, confira que o job `[dev …] sondagem_deploy_job` não ficou no workspace.
