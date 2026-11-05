@@ -21,7 +21,10 @@
 
 # COMMAND ----------
 
-import contextlib, io, json, os, subprocess, sys, tempfile, textwrap, time
+import contextlib, io, json, os, re, subprocess, sys, tempfile, textwrap, time
+
+# Cores do terminal: o pytest colore a saída mesmo sem terminal, e o código de cor separa "test_passa" de "PASSED".
+ANSI = re.compile(r"\x1b\[[0-9;?]*[ -/]*[@-~]")
 
 COMPUTE = "serverless" if os.environ.get("DATABRICKS_RUNTIME_VERSION", "").startswith("client.") else "classico"
 resultado = {"compute": COMPUTE, "runtime": os.environ.get("DATABRICKS_RUNTIME_VERSION")}
@@ -39,10 +42,15 @@ try:
 except Exception:
     CLUSTER_ID = None
 
-# Variáveis que apontam o subprocesso para a sessão Spark Connect do notebook. Só os nomes vão para o JSON.
+# Variáveis que prendem o subprocesso à sessão do notebook: a URL do Spark Connect e o gateway da JVM
+# do driver (sem tirar o gateway, o local[1] tenta usar a JVM do notebook e dá Py4JError). Só os nomes vão
+# para o JSON.
+PRESAS_A_SESSAO = ("SPARK_REMOTE", "SPARK_CONNECT_MODE_ENABLED", "PYSPARK_GATEWAY_PORT", "PYSPARK_GATEWAY_SECRET")
+
+
 def eh_connect(nome, valor):
     return ("SPARK" in nome.upper() and ("grpc.sock" in valor or valor.startswith(("sc://", "unix://")))) or \
-        nome in ("SPARK_REMOTE", "SPARK_CONNECT_MODE_ENABLED")
+        nome in PRESAS_A_SESSAO
 
 VARS_CONNECT = sorted(k for k, v in os.environ.items() if eh_connect(k, v))
 ENV_LIMPO = {k: v for k, v in os.environ.items() if k not in VARS_CONNECT}
@@ -59,7 +67,7 @@ def roda(cmd, cwd=None, env=None, timeout=600, linhas=8):
     t0 = time.time()
     try:
         p = subprocess.run(cmd, cwd=cwd, env=env, capture_output=True, text=True, timeout=timeout)
-        todas = limpa(p.stdout + p.stderr).strip().splitlines()
+        todas = ANSI.sub("", limpa(p.stdout + p.stderr)).strip().splitlines()
         return {"exit": p.returncode, "segundos": round(time.time() - t0, 1), "saida": todas[-linhas:], "_todas": todas}
     except Exception as e:
         return {"exit": None, "segundos": round(time.time() - t0, 1), "erro": limpa(f"{type(e).__name__}: {e}"), "_todas": []}
@@ -140,7 +148,8 @@ escreve(f"{PASTA}/sem_connect.py", '''
 
     def eh_connect(nome, valor):
         spark = "SPARK" in nome.upper() and ("grpc.sock" in valor or valor.startswith(("sc://", "unix://")))
-        return spark or nome in ("SPARK_REMOTE", "SPARK_CONNECT_MODE_ENABLED")
+        presa = nome in ("SPARK_REMOTE", "SPARK_CONNECT_MODE_ENABLED", "PYSPARK_GATEWAY_PORT", "PYSPARK_GATEWAY_SECRET")
+        return spark or presa
 
     removidas = sorted(k for k, v in os.environ.items() if eh_connect(k, v))
     env = {k: v for k, v in os.environ.items() if k not in removidas}
@@ -204,7 +213,7 @@ def pytest_kernel(pasta, *args):
     buf = io.StringIO()
     with contextlib.redirect_stdout(buf), contextlib.redirect_stderr(buf):
         codigo = pytest.main([pasta, "-v", "-p", "no:cacheprovider", *args], plugins=[PluginSpark()])
-    linhas = buf.getvalue().strip().splitlines()
+    linhas = ANSI.sub("", buf.getvalue()).strip().splitlines()
     return {"exit": int(codigo), "fim": linhas[-12:]}
 
 
