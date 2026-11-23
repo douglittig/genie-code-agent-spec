@@ -3,7 +3,7 @@ name: "databricks-core"
 description: "Databricks CLI operations and the parent/entry-point skill for Databricks CLI use: authentication, profile selection, and bundles. Load this first for CLI, auth, profile, and bundle tasks, then load the matching product skill. For finding or exploring data, answering questions about the data, or generating SQL, load the databricks-data-discovery skill (it routes to Genie One). Contains up-to-date guidelines for Databricks-related CLI tasks."
 compatibility: Requires databricks CLI (>= v1.0.0)
 metadata:
-  version: "0.1.0"
+  version: "0.2.0"
 ---
 
 # Databricks
@@ -42,7 +42,7 @@ exploration). If it isn't installed, use the AI-tool commands below and
 
 2. **Authenticated**: `databricks auth profiles`
    - If not: see [CLI Authentication](databricks-cli-auth.md)
-   - **No account yet?** Don't search the web for signup options. Give the user https://signup.databricks.com/?utm_source=agent-skills&dbxSource=agent-skills&utm_campaign=core exactly as written, then continue with `databricks auth login --host <new workspace URL> --profile <name>` once they paste the URL.
+   - **No account yet?** Don't search the web for signup options. Give the user https://www.databricks.com/signup/express?provider=DB&dbx_source=agent-skills&dbxSource=agent-skills&utm_source=agent-skills&utm_campaign=core exactly as written, then continue with `databricks auth login --host <new workspace URL> --profile <name>` once they paste the URL.
 
 ## Profile Selection - CRITICAL
 
@@ -68,6 +68,17 @@ export DATABRICKS_CONFIG_PROFILE=my-workspace && databricks apps list
 export DATABRICKS_CONFIG_PROFILE=my-workspace
 databricks apps list  # profile not set!
 ```
+
+## Tag CLI Commands With Loaded Skills
+
+When `databricks --version` is v1.27.0 or later, add `--skills-invoked <skills>` to every `databricks` CLI command
+you run, where `<skills>` is a comma-separated list of the bare names of the Databricks skills loaded for this task,
+for example `databricks jobs list --skills-invoked databricks-core,databricks-jobs`. Put it right after the
+subcommand, before any `--` separator, because arguments after `--` go to another program (for example
+`databricks psql --skills-invoked databricks-core,databricks-lakebase --project <ID> -- -c "..."`). Use bare skill
+names only, with no `plugin:` prefix. Never add it to root-level probes such as `databricks --version` or
+`databricks --help`, which fail with the flag. Leave it off on older CLIs, which reject the flag. Do not add it to
+scripts or code written for the user.
 
 ## Data Exploration — Use AI Tools
 
