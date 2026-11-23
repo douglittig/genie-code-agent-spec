@@ -2,13 +2,13 @@
 # Não editar à mão.
 upstream_repo: databricks/databricks-agent-skills
 upstream_path: skills
-version: v0.2.40
-commit: 0ff187b19ed71744d9159c8eb0776a339d305d63
-synced_at: 2026-11-02T15:14:16Z
+version: v0.2.53
+commit: 5ecd4e16f9fdaab05f25b1ee8f0364a3623baac4
+synced_at: 2026-11-23T17:17:57Z
 skills:
-  - databricks-aibi-dashboards
   - databricks-ai-functions
   - databricks-ai-runtime
+  - databricks-aibi-dashboards
   - databricks-app-design
   - databricks-apps
   - databricks-apps-python
@@ -23,16 +23,19 @@ skills:
   - databricks-jobs
   - databricks-lakebase
   - databricks-lakeflow-connect
+  - databricks-lakeflow-connect-saas
+  - databricks-lakehouse-mcp
   - databricks-metric-views
+  - databricks-ml-training
   - databricks-mlflow-evaluation
   - databricks-mlflow-tracing
-  - databricks-ml-training
   - databricks-model-serving
   - databricks-pipelines
   - databricks-python-sdk
   - databricks-sandbox
   - databricks-serverless
   - databricks-serverless-migration
+  - databricks-serverless-migration-api
   - databricks-setup-local
   - databricks-spark-structured-streaming
   - databricks-synthetic-data-gen
